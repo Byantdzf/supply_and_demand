@@ -2,14 +2,21 @@
   <!--<Loading :init.sync="init"></Loading>-->
   <form bindsubmit="formSubmit" report-submit>
     <button formType="submit" class="btn" data-type="click">
-      <view class="iconActive">
+      <view class="iconActive ff   ">
         <image wx:if="{{tabIndex == 0}}" src="http://images.ufutx.com/201905/31/6dbf441f112370befd2abb373edb0486.png" mode="widthFix" style="width: 100%;" class="bc_opcit"></image>
         <image wx:else src="http://images.ufutx.com/201905/31/f36d431299cd56651ba8ab432727c14c.png" mode="widthFix" style="width: 100%;" class="bc_opcit"></image>
       </view>
       <navBarTop :tabs.sync="tabs" @tapClick="tapClick"></navBarTop>
-      <view class="page__bd">
-        <view>
-          <image src="http://images.ufutx.com/201905/31/b6d697e0db3a6a1fe1afe76db815ce36.png"  mode="widthFix" style="width: 100%;"></image>
+      <view class="page__bd ff font_28">
+        <view wx:for="{{meet}}" wx:key="{{index}}">
+          <view class="bc_box">
+            <view class="flo_l text_title">专属</view>
+            <view class="flo_l">
+              <text>￥3999</text>
+              <text>（包含专属托管：10次）</text>
+            </view>
+            <view class="flo_r text_foot">购买</view>
+          </view>
         </view>
       </view>
     </button>
@@ -164,10 +171,10 @@
   @import "../../styles/weui/base/fn.wxss";
   @import "../../styles/custom/fn.less";
   page{
-    background: white;
+    background: #F7F7F7;
     .page__bd{
       border-top: 20rpx solid @lightgray;
-      padding: 28rpx 0;
+      padding: 22rpx 0;
     }
     .bc_opcit {
       animation: opacity 1.2s;
@@ -192,6 +199,21 @@
       }
       100%{
         opacity: 1;
+      }
+    }
+    .bc_box{
+      width: 100%;
+      height: 152rpx;
+      background-image: url("http://images.ufutx.com/201905/31/b6d697e0db3a6a1fe1afe76db815ce36.png");
+      background-size: cover;
+      background-repeat: no-repeat;
+      position: relative;
+      line-height: 152rpx;
+      .text_title{
+        margin-left: 42rpx;
+      }
+      .text_foot{
+        margin-right: 78rpx;
       }
     }
   }

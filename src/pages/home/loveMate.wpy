@@ -8,15 +8,29 @@
       </view>
       <navBarTop :tabs.sync="tabs" @tapClick="tapClick"></navBarTop>
       <view class="page__bd ff font_28">
-        <view wx:for="{{meet}}" wx:key="{{index}}">
+        <view wx:for="{{list}}" wx:key="{{index}}">
           <view class="bc_box">
             <view class="flo_l text_title">专属</view>
-            <view class="flo_l">
-              <text>￥3999</text>
-              <text>（包含专属托管：10次）</text>
+            <view class="flo_l" style="width: 50%;line-height: 116rpx;position: relative">
+              <text class="text_price bold">￥{{item.price}}</text>
+              <text class="font_26 text-info">（{{item.name}})</text>
             </view>
-            <view class="flo_r text_foot">购买</view>
+            <view class="flo_r text_foot bold" @tap="btnBuy({{item.id}})">购买</view>
           </view>
+        </view>
+      </view>
+      <view class="bc_call">
+        <image src="http://images.ufutx.com/201905/31/c41774b536f913f927eb54592ba71905.png" mode="widthFix" class="image" @tap="makePhoneCall"></image>
+        <view class="call_iphone font_26">热线：4000401707-2</view>
+      </view>
+      <view class=" font_26 state info">
+        <view class="title bold text-left">专业红娘托管规则</view>
+        <view style="margin: 0rpx 22rpx;">
+          <view>1、完全委托红娘按提出的择偶条件筛选对象，安排线下见面。</view>
+          <text>2、红娘推荐不超过４位被约方，约见方从中选取至少一位意向对象。</text>
+          <text>3、红娘主动与意向对象联系，详细核对资料，并了解用户真实愿望，做好备注，开始为用户提供相关服务；约见成功后扣除１次约见次数。</text>
+          <text>4、约见是双方自愿行为，平台不对约见沟通结果和安全负责，请注意自我保护！</text>
+          <text>5、红娘联系双方，确定见面时间，见面地点，红娘在平台做好备注信息。</text>
         </view>
       </view>
     </button>
@@ -48,6 +62,7 @@
       loading: false,
       noMore: false,
       meet: [],
+      list: [],
       tabIndex: 0,
       trade_no: '',
       Hosting: [],
@@ -82,6 +97,7 @@
         success: ({code, data}) => {
           _this.meet = data.active_appointments
           _this.Hosting = data.passive_appointments
+          _this.list = _this.meet
           _this.$apply()
           console.log(_this.meet)
           console.log(_this.Hosting)
@@ -95,6 +111,107 @@
       })
     }
     methods = {
+      btnBuy(id) {
+        let that = this
+        that.$post({
+          url: `${service.appointments}/${id}`
+        }, {
+          success: ({code, data}) => {
+            that.trade_no = data.trade_no
+            that.$apply()
+            let wxconfig = data.wx_pay.config
+            if (wxconfig.payment_debug) {
+              return that.$post({url: `${service.orderpay}/${that.trade_no}`}, {
+                success: ({code, data}) => {
+                  wx.showModal({
+                    title: '购买成功',
+                    content: '去约见你心仪的对象吧！',
+                    cancelText: '取消',
+                    confirmText: '确定',
+//                    cancelColor: '#e21918',
+                    success(res) {
+                      if (res.confirm) {
+                        wx.navigateTo({url: '/pages/home/search'})
+                      } else if (res.cancel) {
+                        console.log('用户点击取消')
+                      }
+                    }
+                  })
+                },
+                fail: ({code, data}) => {
+                },
+                complete: () => {
+                }
+              })
+            }
+            wxPay(wxconfig).then(() => {
+              that.$post({url: `${service.pay}/packet/${that.trade_no}`}, {
+                success: ({code, data}) => {
+                  wx.showModal({
+                    title: '购买成功',
+                    content: '去约见你心仪的对象吧！',
+                    cancelText: '取消',
+                    confirmText: '确定',
+//                    cancelColor: '#e21918',
+                    success(res) {
+                      if (res.confirm) {
+                        wx.navigateTo({url: '/pages/home/search'})
+                      } else if (res.cancel) {
+                        console.log('用户点击取消')
+                      }
+                    }
+                  })
+                }
+              })
+              that.$Toast_success('支付成功')
+            }).catch((error) => {
+              console.log(error)
+            })
+//             wx.requestPayment({
+//               timeStamp: wxconfig.timestamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
+//               nonceStr: wxconfig.nonceStr, // 支付签名随机串，不长于 32 位
+//               package: wxconfig.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
+//               signType: wxconfig.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
+//               paySign: wxconfig.paySign, // 支付签名
+//               success: function (res) {
+//                 that.$post({url: `${service.pay}/packet/${that.trade_no}`}, {
+//                   success: ({code, data}) => {
+//                     wx.showModal({
+//                       title: '购买成功',
+//                       content: '去约见你心仪的对象吧！',
+//                       cancelText: '取消',
+//                       confirmText: '确定',
+// //                    cancelColor: '#e21918',
+//                       success(res) {
+//                         if (res.confirm) {
+//                           wx.navigateTo({url: '/pages/home/search'})
+//                         } else if (res.cancel) {
+//                           console.log('用户点击取消')
+//                         }
+//                       }
+//                     })
+//                   },
+//                   fail: ({code, data}) => {
+//                   },
+//                   complete: () => {
+//                   }
+//                 })
+//               },
+//               fail: function (res) {
+//               }
+//             })
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+          }
+        })
+      },
+      makePhoneCall() {
+        wx.makePhoneCall({
+          phoneNumber: '4000401707-2' // 仅为示例，并非真实的电话号码
+        })
+      },
       selectMoney(index) {
         for (let item of this.table){
           item.active = false
@@ -160,6 +277,11 @@
         // this.$showLoading('加载中...')
         // this.page = 1
         this.tabIndex = value
+        this.list = this.meet
+        if (value == 1) {
+          this.list = this.Hosting
+          this.$apply()
+        }
         this.$apply()
       }
     }
@@ -211,9 +333,69 @@
       line-height: 152rpx;
       .text_title{
         margin-left: 42rpx;
+        margin-right: 64rpx;
+      }
+      .text_price{
+        color: @orange;
+        width: 100%;
+      }
+      .text-info{
+        position: absolute;
+        left: 0;
+        top: 42rpx;
+        color: @gray;
       }
       .text_foot{
-        margin-right: 78rpx;
+        margin-right: 60rpx;
+        color: @orange;
+      }
+    }
+    .state{
+      background: #f7f7f7;
+      padding: 12rpx 16rpx;
+      border: 1rpx solid #d3d3d3;
+      border-radius: 10rpx;
+      color: @gray;
+      .title{
+      color: @darkgray;
+      }
+    }
+    .info{
+      margin: 22rpx;
+      margin-top: 46rpx;
+      padding: 22rpx 0;
+      margin-bottom: 32rpx;
+      color: @gray;
+      .title{
+        border-bottom: 1rpx solid #d3d3d3;
+        margin: 0 0 0 22rpx;
+        padding-bottom: 12rpx;
+      }
+    }
+    .bc_call{
+      position: fixed;
+      top: 50%;
+      right: 6%;
+      height: 100rpx;
+      position: relative;
+      .image{
+        width: 100rpx;
+        position: absolute;
+        right: 0;
+        top: 0;
+        z-index: 9999;
+      }
+      .call_iphone{
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        background: #FBCDB9;
+        font-weight: 600;
+        color: #F96262;
+        padding: 8rpx 28rpx;
+        padding-right: 110rpx;
+        border-radius: 26rpx;
+        z-index: 1;
       }
     }
   }

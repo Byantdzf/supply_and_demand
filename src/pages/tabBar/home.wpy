@@ -6,7 +6,9 @@
     <view @tap="goto('/pages/map/mapList')">
       <tabSearch disabled="true"></tabSearch>
     </view>
-    <swiperV :list.sync="announcements" height="242"></swiperV>
+    <block wx:if="{{announcements.length>1}}">
+      <swiperV :list.sync="announcements" height="242"></swiperV>
+    </block>
     <view class="_bc-tab text-left ff ">
       <view class="_bc-tab-item text-center flo_l item{{index}}" wx:for="{{tab}}" wx:key="{{index}}" @tap="gotoV({{item.path+'?title='+item.title+'&type='+item.type}}, {{item.type}})">
         <image src="{{item.icon}}" class=" {{index===0?'heart':''}}" mode="widthFix" wx:if="{{item.icon}}"></image>

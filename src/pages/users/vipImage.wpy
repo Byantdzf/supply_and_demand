@@ -1,0 +1,391 @@
+<template>
+  <view class="container">
+    <view class="page-user">
+      <userTitle :user.sync="user"></userTitle>
+      <view class="orderdata">
+        <view class="clearfloat"></view>
+        <view class="Paths" style="margin:30rpx;" @tap="chooseimage">+</view>
+        <view style="padding: 22rpx ;border: 4rpx solid #f0f0f0;border-radius: 6rpx;margin: 10rpx">
+          <view wx:for="{{photosList}}" wx:key="*this" class="flo_l" @tap="previewImage({{item}},{{photosList}})" style="position: relative">
+            <image src="{{item}}" mode="widthFix" class="imge" />
+            <view class="white text-center font_26 deteleimage" @tap.stop="deteleimage({{index}})">
+              <image src="http://images.ufutx.com/201903/05/ed4182c14413647ddc5e8cd9ac311d0a.png" mode="aspectFit"></image>
+            </view>
+          </view>
+          <view class="clearfloat"></view>
+          <view class="font_26 color-333 bold" style="border-top: 4rpx dashed #f3f3f3;padding: 22rpx 12rpx;position: relative;">
+            <view class="example">
+              <view class="flo_l bold" style="margin-top: 8rpx;">查看示例：</view>
+              <image src="http://images.ufutx.com/201903/05/e6a4f3de5c1eaa60daad4e434a75667c.png" mode="aspectFit"  @tap="showModal"></image>
+              <view class="clearfloat"></view>
+            </view>
+            <view>1、身份证正面</view>
+            <view>2、身份证反面</view>
+            <view>3、手持身份证照片</view>
+            <view>4、其它身份证件</view>
+            <view> <span class="orange">提示语：</span>外籍成员，可用护照代替，证件只用于平台核实身份，不作它用，不对外显示，请放心上传！</view>
+          </view>
+        </view>
+      </view>
+      <view class="next btn_red" @tap="ensure">提交</view>
+    </view>
+    <modal>
+      <view slot="wrapper" class="wrapper">
+        <view class="header">
+          <image src="http://images.ufutx.com/201903/05/cbc22feb2fcbd4b43173f763c6a46107.png" mode="aspectFit" class="image"></image>
+          <span class="font_28 bold">福恋</span>
+        </view>
+        <view class="main">
+          <span class="font_32 bold">请上传你的身份证照片</span>
+          <view class="font_32 bold">示意图：</view>
+          <view class="text-center">
+            <swiper  display-multiple-items='1' circular previous-margin='50px' next-margin='50px' bindchange='change' current='{{current}}'>
+              <block wx:for="{{list}}" wx:key="{{index}}">
+                <swiper-item class="text-center">
+                  <view class="box {{index == current?'animationData': 'animationData2'}}" >
+                    <image src="{{item}}" mode="aspectFit" class="image"></image>
+                  </view>
+                </swiper-item>
+              </block>
+            </swiper>
+          </view>
+        </view>
+        <view class="footer">
+          <button class="text-center flo_l bold font_32" @tap="hideModal">取消</button>
+          <button class="upload text-center flo_r bold white font_32" @tap="chooseimage">上传</button>
+          <view class="clearfloat"></view>
+        </view>
+      </view>
+    </modal>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import userTitle from '../../components/userTitle'
+  import modal from '../../components/modal'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import uploadImages from '../../components/uploadImages'
+
+  export default class vipImage extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '上传照片',
+      navigationBarBackgroundColor: '#EEEFF1'
+    }
+    data = {
+      user: {
+      },
+      current: 0,
+      list: [
+        'http://images.ufutx.com/201903/05/76b5a062053acd18a79570a987fe2031.png',
+        'http://images.ufutx.com/201903/05/0797ae89fdd68af7f47032d3de2924db.png'
+      ],
+      files: [],
+      type_v: '',
+      uploadTitle: '',
+      tempFilePaths: '',
+      photosList: []
+    }
+    components = {userTitle, modal, uploadImages}
+    onLoad(e) {
+      this.type_v = e.type
+      this.$invoke('modal', 'showModal')
+      this.initPageData()
+    }
+    onPullDownRefresh() {
+      this.page = 1
+      this.initPageData()
+    }
+
+    onShow() {
+      this.$parent.getTracker(this.$root.$name, '上传' + this.uploadTitle)
+    }
+// 初始化页面数据
+    initPageData() {
+      this.$get({url: service.user}, {
+        success: ({code, data}) => {
+          this.user = data
+          this.photosList = data.identification_photos
+          this.$apply()
+        }
+      })
+    }
+
+    submit(type) {
+      let that = this,
+        data = {
+          identification_photos: that.photosList
+        }
+      that.$put({url: service.profile, data}, {
+        success: ({code, res}) => {
+          if (type) this.$showToast('提交成功,等待管理员审核')
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
+    methods = {
+      showModal() {
+        this.$invoke('modal', 'showModal')
+      },
+      change(e) {
+        this.current = e.detail.current
+        this.$apply()
+      },
+      hideModal() {
+        this.$invoke('modal', 'hideModal')
+      },
+      deteleimage(index) {
+        let that = this
+        wx.showModal({
+          title: '提示',
+          content: '是否确认删除该照片？',
+          success: function (res) {
+            if (res.confirm) {
+              console.log('用户点击确定')
+              that.photosList.splice(index, 1)
+              that.$apply()
+              that.submit()
+            } else if (res.cancel) {
+              console.log('用户点击取消')
+            }
+          }
+        })
+      },
+      chooseimage() {
+        this.$invoke('modal', 'hideModal')
+        this.$invoke('uploadImages', 'chooseimage')
+      },
+      previewImage(image, photolist) {
+        this.$previewImages(image, photolist)
+      },
+      ensure() {
+        this.submit('ensure')
+      }
+    }
+    events = {
+      'UpLoadImage': (value) => {
+        this.photosList.push(value)
+        this.$apply()
+      }
+    }
+  }
+</script>
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  @import "../../styles/custom/reset.less";
+  page{
+    background: #ffffff;
+  }
+  .weui-cells {
+    position: inherit;
+    box-shadow: 1rpx 1rpx 12rpx #dedede;
+    color: #666666;
+    /*margin-top: 12rpx;*/
+  }
+  .user_back{
+    background-image: url("http://local-pictures.img-cn-shenzhen.aliyuncs.com/201806/11/wx53cf66d72649eb5a.o6zAJs2lf_SH4K2plnWTlsSfhR70.9TmBzGGHW7w9470132e3efb72f0a1c8c06768b4cbd80.png");
+    background-size: cover;
+    position: relative;
+  }
+  .active {
+    border: 1 rpx solid red;
+  }
+  .display_inlin {
+    display: inline-block;
+  }
+  .violet{color: #B22DC3}
+
+  .font_12 {
+    font-size: 22rpx;
+  }
+  .orderdata{
+    width: 100%;
+    padding:32rpx 0 ;
+  }
+  .list{
+    margin-left: 32rpx;
+    margin-right: 32rpx;
+    height: 32rpx;
+    line-height: 30rpx;
+    /*border-bottom: 1px solid #ece5e5;*/
+    font-size: 30rpx;
+    padding: 22rpx;
+    /*padding-right: 22rpx;*/
+    /*padding-left: 22rpx;*/
+    box-shadow: 1rpx 1rpx 10rpx #d3d3d3;
+    margin-bottom: 22rpx;
+    border-radius: 6rpx;
+    background: white;
+  }
+  .list:active{
+    background: #e3e3e3;
+  }
+  .Inp{
+    text-align: right; width: 72%;height: 72rpx;
+    float: right;
+    padding-right: 22rpx;
+  }
+  .text{
+    float: right;
+    margin-right: 82rpx;
+    font-family: Arial, "Helvetica Neue", Helvetica, sans-serif;
+  }
+  .next{
+    margin: auto;
+  }
+  .Paths{
+    width: 150rpx;
+    height: 150rpx;
+    border: 4rpx dashed #d3d3d3;
+    text-align: center;
+    line-height: 150rpx;
+    font-size: 60rpx;
+    color: #d3d3d3;
+    margin-top: 100rpx;
+    border-radius: 12rpx;
+  }
+  .imge{
+    width: 200rpx;
+    height: 200rpx;
+    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+    margin-right: 20rpx;
+  }
+  .title{
+    max-width: 180rpx;
+    text-align: center;
+    font-size: 36rpx;
+    /*border: 1rpx solid #dbd8d8;*/
+    border-left: none;
+    border-bottom-right-radius: 32rpx;
+    border-top-right-radius: 32rpx;
+    padding: 12rpx;
+    position: relative;
+    left: -180rpx ; top: 10rpx;
+    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+    background: white;
+    animation:myfirst 2s;
+    animation-direction:alternate;
+    animation-fill-mode:forwards;
+    box-shadow: 1rpx 1rpx 12rpx #e4e4e4;
+  }
+  @keyframes myfirst
+  {
+    from {left:-180rpx;}
+    to {left:0rpx;}
+  }
+  .Pats:active{transform: scale(1.1)}
+  .deteleimage{
+    width: 42rpx;height: 42rpx;
+    background: rgba(0,0,0,0.5);
+    line-height: 42rpx;
+    box-shadow: 1rpx 1rpx 12rpx #ffffff;
+    position: absolute;
+    right: 16rpx;bottom: 16rpx;
+    padding: 8rpx;
+    border-radius: 8rpx;
+    image {
+      width: 100%;
+      height: 100%;
+    }
+  }
+  .deteleimage:active{
+    animation:myMove 500ms 1;
+  }
+  .wrapper{
+    padding: 32rpx;
+    padding-bottom: 72rpx;
+    .header {
+      .image{
+        width: 46rpx;
+        height: 46rpx;
+        vertical-align: middle;
+        margin-right: 18rpx;
+      }
+    }
+    .main{
+      margin-top: 22rpx;
+    }
+    .footer{
+      button{
+        width: 42%;
+        height: 72rpx;
+        background: #ededed;
+        line-height: 72rpx;
+      }
+      .upload{
+        background: #4bc066;
+      }
+    }
+    swiper{
+      height: 22vh;
+      padding-bottom: 22px;
+    }
+    /*.content{*/
+    /*color: #333;*/
+    /*padding: 0rpx 22rpx;*/
+    /*}*/
+    swiper-item{
+      text-align: center;
+    }
+    swiper-item image{
+      width: 100%;
+      height: 360rpx;
+    }
+    .animationData{
+      animation:myMove2 800ms linear;
+      animation-fill-mode: forwards;
+    }
+    .box{
+      width: 80%;
+      /*height: 500rpx;*/
+      display: inline-block;
+      margin-top: 40px;
+      box-sizing: border-box;
+      position:relative;
+      overflow: hidden;
+      top:33%;
+      transform:translateY(-35%);
+      padding-bottom: 6rpx;
+      image{
+        box-shadow: 0 0 14px #f2f2f2;
+      }
+    }
+    @keyframes  myMove2{
+      from{
+        height: 600rpx;
+      }
+      to{
+        height: 700rpx;
+      }
+    }
+    .animationData2{
+      animation:myMove1 800ms linear;
+      animation-fill-mode: forwards;
+
+    }
+    @keyframes  myMove1{
+      from{
+        height: 700rpx;
+      }
+      to{
+        height: 600rpx;
+      }
+    }
+  }
+  .example{
+    position: absolute;
+    right: 100rpx;
+    top: 16rpx;
+    image{
+      width: 160rpx;
+      height: 160rpx;
+    }
+  }
+</style>

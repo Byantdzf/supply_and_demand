@@ -1,0 +1,550 @@
+<template>
+  <NavBar rgba="" bag="" title="完善资料" title_c="#ffffff"></NavBar>
+  <view class="container">
+    <view class="userinfo">
+      <image src="http://images.ufutx.com/201901/09/01bf4ba5e32b474be6c93d9b7455ce71.png" mode="widthFix" style="filter: blur({{8-index}}rpx);" class="image"></image>
+    </view>
+    <block wx:if="{{index==0}}">
+      <view class="_bc_space">
+        <view class="title">请选择你的性别：</view>
+        <view wx:for="{{sexList}}" wx:key="index" class="_bc_sex text-center flo_l {{sexIndex==index?'active':''}}" @tap="typing('sexIndex',{{item}},{{index}})">
+          <image src="{{item.icon}}" mode="widthFix" ></image>
+          <view>{{item.title}}</view>
+        </view>
+        <view class="clearfloat"></view>
+      </view>
+    </block>
+    <block wx:if="{{index == 1}}">
+      <view class="_bc_space">
+        <view class="title">请选择你的生日：
+          <span class="flo_r">{{year}}年{{month}}月{{day}}日</span>
+        </view>
+        <view class="text-center">
+          <picker-view
+            indicator-style="height: 50px;"
+            style="width: 100%; height: 400rpx;"
+            value="{{value}}"
+            @change="bindChange"
+          >
+            <picker-view-column>
+              <view wx:for="{{years}}" wx:key="{{index}}" style="line-height: 50px">{{item}}年</view>
+            </picker-view-column>
+            <picker-view-column>
+              <view wx:for="{{months}}" wx:key="{{index}}" style="line-height: 50px">{{item}}月</view>
+            </picker-view-column>
+            <picker-view-column>
+              <view wx:for="{{days}}" wx:key="{{index}}" style="line-height: 50px">{{item}}日</view>
+            </picker-view-column>
+          </picker-view>
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{index == 2}}">
+      <view class="_bc_space">
+        <view class="title">请选择你的单身状态：
+          <span class="flo_r"></span>
+        </view>
+        <view class="text-center">
+          <view wx:for="{{state}}" wx:key="{{index}}" class="_bc_list {{stateIndex==index?'active':''}}" @tap="typing('stateIndex',{{item}},{{index}})">{{item}}</view>
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{index == 3}}">
+      <view class="_bc_space">
+        <view class="title">请选择你的学历：
+          <span class="flo_r"></span>
+        </view>
+        <view class="text-center">
+          <view wx:for="{{degree}}" wx:key="{{index}}" class="_bc_list {{degreeIndex==index?'active':''}}" @tap="typing('degreeIndex',{{item}},{{index}})">{{item}}</view>
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{index == 4}}">
+      <view class="_bc_space">
+        <view class="title">请选择你的宗教信仰：
+          <span class="flo_r"></span>
+        </view>
+        <view class="text-center">
+          <view wx:for="{{belief}}" wx:key="{{index}}" class="_bc_list {{beliefIndex==index?'active':''}}" @tap="typing('beliefIndex',{{item}},{{index}})">{{item}}</view>
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{index == 5}}">
+      <view class="_bc_space">
+        <view class="title">请填写你的基本信息：</view>
+        <view class="text-center">
+          <view wx:for="{{infoList}}" wx:key="{{idx}}" wx:for-index="idx" class="_bc_text font_32" @tap="typing('infoIndex',{{item}},{{idx}})">
+            <span class="flo_l">{{item.title}} <span class="red">*</span></span>
+            <block wx:if="{{item.type == 'address'}}">
+              <!--<picker  mode='region' value="{{item.region}}"  bindchange="cityChange({{index}})" >-->
+              <!--<view class="picker">-->
+              <!--</view>-->
+              <!--</picker>-->
+              <block wx:if="{{idx == 2}}">
+                <selectCity :itemIndex.sync="CITY_INDEX" >
+                  <input placeholder="{{'输入您的'+ item.title}}" slot="Input" class="text color-666 Inp {{infoIndex == idx?'active':''}}" disabled value="{{item.region[1]=='区'?'':item.region[0]+'-'+item.region[1]}}"/>
+                </selectCity>
+              </block>
+              <block wx:if="{{idx == 3}}">
+                <selectCity1 :itemIndex.sync="CITY_INDEX" >
+                  <input placeholder="{{'输入您的'+ item.title}}" slot="Input" class="text color-666 Inp {{infoIndex == idx?'active':''}}" disabled value="{{item.region[1]=='区'?'':item.region[0]+'-'+item.region[1]}}"/>
+                </selectCity1>
+              </block>
+            </block>
+            <block wx:else>
+              <input type="{{item.type}}" placeholder="{{'输入您的'+ item.title}}" class="Inp {{infoIndex == idx?'active':''}} color-666" value="{{item.value}}"  @input="typing('infoIndex',{{item}},{{idx}})"/>
+            </block>
+          </view>
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{index == 6}}">
+      <view class="_bc_space">
+        <view class="title">请填写你的公司信息：</view>
+        <view class="text-center" wx:for="{{workList}}" wx:key="{{index}}">
+          <view  class="_bc_text font_32" @tap="typing('workIndex',{{item}},{{index}})">
+            <span class="flo_l">{{item.title}} <span class="red">*</span></span>
+            <block wx:if="{{item.type == 'address'}}">
+              <picker mode="multiSelector" @change="bindMultiPickerChange2" @columnchange="bindMultiPickerColumnChange2" value="{{multiIndex2}}" range="{{objectMultiArray}}">
+                <input type="text" class="text color-666 Inp {{workIndex == index?'active':''}}"  placeholder="{{'输入您的'+ item.title}}" disabled  value="{{item.industry.length > 0?objectMultiArray[0][multiIndex2[0]]+'-'+objectMultiArray[1][multiIndex2[1]]:''}}"/>
+              </picker>
+            </block>
+            <block wx:else>
+              <input type="{{item.type}}" placeholder="{{'输入您的'+ item.title}}" class="Inp {{workIndex == index?'active':''}} color-666"  @input="typing('workIndex',{{item}},{{index}})" @blur="typing('workIndex',{{item}},{{index}})" value="{{item.value}}" focus="{{StatureFocus}}"/>
+            </block>
+          </view>
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{index == 7}}">
+      <view class="_bc_space">
+        <view class="title">请填写你的交友信息：</view>
+        <view class="text-center" wx:for="{{palList}}" wx:key="{{index}}">
+            <view style="margin-top: 22rpx;">
+              <textarea class="textarea font_28 {{palIndex == index?'active':''}} color-666 text-left"  placeholder="{{item.title}}" @input="typing('palIndex',{{item}},{{index}})" @blur="typing('palIndex',{{item}},{{index}})"  adjust-position="true"   value="{{item.value}}" />
+            </view>
+        </view>
+      </view>
+    </block>
+    <block wx:if="{{index >= 8}}">
+      <view class="_bc_space">
+        <view class="title">请上传你的生活照：<span class="font_22 orange">（*长按删除）</span></view>
+        <view class="upload text-center white flo_l" @tap="chooseimage">+</view>
+        <view class="flo_l uploadImage" wx:for="{{list}}" wx:key="*this">
+          <image src="{{item}}" mode="aspectFit" style="width: 160rpx;height: 160rpx;" @tap="previewImage({{item}},{{list}})" @longpress="deleteImage({{index}})"></image>
+        </view>
+        <view class="clearfloat"></view>
+      </view>
+    </block>
+    <view class="flo_r" wx:if="{{index > 0}}">
+      <image src="http://images.ufutx.com/201901/10/6d0a6b1dcb84f3c85fc88d3c552e606b.png" mode="aspectFit" class="back" @tap="back"></image>
+    </view>
+    <button  size="default"  class="next white" loading="{{loading}}"  hover-class="btn_active" @tap="next">下一步</button>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import upload_images from '../../mixins/upload_images'
+  import NavBar from '../../components/NavBar'
+  import selectCity from '../../components/selectCity'
+  import selectCity1 from '../../components/selectCity'
+
+  const date = new Date()
+  const years = []
+  const months = []
+  const days = []
+  for (let i = 1960; i <= date.getFullYear(); i++) {
+    years.push(i)
+  }
+  for (let i = 1; i <= 12; i++) {
+    months.push(i)
+  }
+  for (let i = 1; i <= 31; i++) {
+    days.push(i)
+  }
+
+  export default class Unmarried extends wepy.page {
+    mixins = [base, http, user, ShareMessage, upload_images]
+    config = {
+      navigationBarTitleText: '单身资料填写',
+      enablePullDownRefresh: false
+    }
+    components = {
+      NavBar, selectCity1, selectCity
+    }
+    data = {
+      index: 0,
+      show: false,
+      sexList: [
+        {
+          title: '男',
+          icon: 'http://images.ufutx.com/201901/09/b036e34a21f843deefdc23b08abe92ff.png',
+          type: '1'
+        }, {
+          title: '女',
+          icon: 'https://images.ufutx.com/201901/09/17adeea7d5e73c7a293e0dd458399e33.png',
+          type: '2'
+        }
+      ],
+      state: ['从未结婚', '离异', '丧偶'],
+      stateIndex: 0,
+      degree: ['大专', '本科', '硕士', '博士', '其他'],
+      degreeIndex: 0,
+      belief: ['基督教', '佛教', '伊斯兰教', '其他'],
+      beliefIndex: 3,
+      infoList: [
+        {title: '身高', type: 'number', value: ''},
+        {title: '体重', type: 'number', value: ''},
+//            {title:'国籍', type: 'text', value:''},
+        {title: '常居地', type: 'address', value: '', region: ['市', '区']},
+        {title: '成长地', type: 'address', value: '', region: ['市', '区']},
+        {title: '毕业学校', type: 'text', value: ''}
+      ],
+      infoIndex: 0,
+      CITY_INDEX: 0,
+      workList: [
+        {title: '工作单位', type: 'text', value: ''},
+        {title: '公司行业', type: 'address', value: [], industry: []},
+        {title: '职位', type: 'text', value: ''}
+      ],
+      palList: [
+        {title: '个人介绍（家庭情况，兴趣爱好，自我评价）', type: 'textarea', value: ''},
+        {title: '理想对象（写下你对另一半的期望）', type: 'textarea', value: ''}
+      ],
+      palIndex: 0,
+      objectMultiArray: [],
+      industry: '',
+      industry_sub: '',
+      multiIndex2: [0, 0],
+      Business: [],
+      formId: [],
+      jsonID: [],
+      jsonID_sub: [],
+      workIndex: 0,
+      loading: false,
+      sexIndex: 0,
+      years,
+      year: 1990,
+      months,
+      month: 1,
+      days,
+      day: 1,
+      value: [30, 0, 0]
+    }
+
+    onLoad() {
+      this.getindustry()
+    }
+
+    onShow() {
+      console.log(this.route)
+      this.objectMultiArray = []
+      this.$parent.getTracker(this.$root.$name, '个人信息（单身）')
+    }
+
+    getindustry() {  // get行业
+      this.objectMultiArray = []
+      let that = this
+      this.loading = true
+      this.$get({url: `${service.host}/industries`}, {
+        success: ({code, data}) => {
+          let result = data
+          for (let itemV of result) {
+            let arr = []
+            that.jsonID.push(itemV.name)
+            itemV.sub_industry.map((item) => {
+              arr.push(item.name)
+              that.jsonID_sub.push(item)
+            })
+            that.Business.push(
+              {title: itemV.name, items: arr}
+            )
+          }
+          let arr = result[0].sub_industry.map((item) => {
+            return item.name
+          })
+          let IndustryArr = []
+          result.forEach(function (item, index, arr) {
+            IndustryArr.push(arr[index].name)
+          })
+          that.objectMultiArray.push(IndustryArr)
+          that.objectMultiArray.push(arr)
+          that.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          this.loading = false
+          this.init = true
+        }
+      })
+    }
+
+    methods = {
+      deleteImage(index) { // 删除
+        let that = this
+        wx.showModal({
+          title: '提示',
+          content: '删除该照片？',
+          success(res) {
+            if (res.confirm) {
+              that.list.splice(index, 1)
+              that.$apply()
+            } else if (res.cancel) {
+              console.log('用户点击取消')
+            }
+          }
+        })
+      },
+      previewImage(imge, list) { // 预览
+        wepy.previewImage({
+          current: imge, // 当前显示图片的http链接
+          urls: list // 需要预览的图片http链接列表
+        })
+      },
+      back() { // 返回上一步
+        this.index--
+        this.$apply()
+      },
+      bindMultiPickerChange2(e) { // 行业
+        this.multiIndex2 = e.detail.value
+        console.log(this.multiIndex2)
+        this.$apply()
+      },
+      bindMultiPickerColumnChange2(e) { // 行业
+        let that = this
+        that.$apply()
+        that.multiIndex2[e.detail.column] = e.detail.value
+        switch (e.detail.column) {
+          case 0:
+            for (let i = 0; i < that.Business.length; i++) {
+              if (that.multiIndex2[0] === i) {
+                that.objectMultiArray[1] = that.Business[i].items
+              }
+            }
+            that.multiIndex2[1] = 0
+            break
+        }
+        this.workList[1].industry[0] = that.objectMultiArray[0][that.multiIndex2[0]]
+        this.workList[1].industry[1] = that.objectMultiArray[1][that.multiIndex2[1]]
+        console.log(that.objectMultiArray[0][that.multiIndex2[0]])
+        console.log(that.objectMultiArray[1][that.multiIndex2[1]])
+        that.$apply()
+      },
+      bindChange(e) { // 出生日期
+        const val = e.detail.value
+        this.year = this.years[val[0]]
+        this.month = this.months[val[1]]
+        this.day = this.days[val[2]]
+        this.$apply()
+      },
+      next() {  // 下一步
+        let data = {
+          sex: this.sexList[this.sexIndex].type,
+          birthday: `${this.year}-${this.month}-${this.day}`,
+          state: this.state[this.stateIndex],
+          degree: this.degree[this.degreeIndex],
+          belief: this.belief[this.beliefIndex],
+          stature: this.infoList[0].value,
+          weight: this.infoList[1].value,
+//              country: this.infoList[2].value,
+          province: this.infoList[2].value[0],
+          city: this.infoList[2].value[1],
+          dist: this.infoList[2].value[2],
+          resident_province: this.infoList[3].value[0],
+          resident_city: this.infoList[3].value[1],
+          resident_dist: this.infoList[3].value[2],
+          graduate_school: this.infoList[4].value,
+          company: this.workList[0].value,
+          industry: this.workList[1].industry[0],
+          industry_sub: this.workList[1].industry[1],
+          post: this.workList[2].value,
+          introduction: this.palList[0].value,
+          ideal_mate: this.palList[1].value,
+          photos: this.list
+        }
+        this.loading = true
+        this.$put({url: service.courtship + '/v2', data}, {
+          success: ({code, data}) => {
+            this.loading = false
+            this.index++
+            console.log('参数保存成功！')
+            console.log(this.index)
+            if (this.index > 8) {
+              this.$showLoading('加载中')
+              setTimeout(() => {
+                wx.hideLoading()
+                if (data.can_get_temp_member == 1) {
+                  wx.redirectTo({url: '/pages/users/tempMember'})
+                } else {
+                  this.$gotoTab('/pages/tabBar/home')
+                }
+              }, 800)
+            }
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+          }
+        })
+      },
+      cityChange(index, e) {  // 地址选择
+        console.log(index)
+        this.infoList[index].region = this.infoList[index].value = e.detail.value
+        this.$apply()
+      },
+      typing(name, item, index, e) { // 赋值
+        console.log(index)
+//            debugger
+        this[name] = index
+        this.show = true
+        if (name == 'infoIndex') {
+          if (index != 2 && index != 3 && e.detail.value == undefined) {
+            return
+          }
+          this.CITY_INDEX = index
+          this.infoList[index].value = e.detail.value
+          this.$apply()
+          console.log(this.infoList)
+        }
+        if (e.detail.value == undefined) {
+          return
+        }
+        if (name == 'workIndex') {
+          this.workList[index].value = e.detail.value
+          this.$apply()
+          console.log(this.workList)
+        }
+        if (name == 'palIndex') {
+          this.palList[index].value = e.detail.value
+          this.$apply()
+          console.log(this.palList)
+        }
+        console.log(e.detail.value)
+        console.log(item)
+        this.$apply()
+      }
+    }
+    events = {
+      'selectCity': (value, index) => {
+        console.log(value)
+        console.log(index)
+        this.infoList[index].region = this.infoList[index].value = value
+        this.$apply()
+      }
+    }
+  }
+</script>
+<style lang="less">
+  page{
+    background: #ffffff;
+    .container{
+      width: 100%;
+      padding-bottom: 6%;
+      /*position: fixed;*/
+      /*top: 0;*/
+      .userinfo{
+        .image{
+          width: 100%;
+        }
+      }
+      ._bc_space{
+        padding: 32rpx;
+        .title{
+          border-bottom:  3rpx solid #f4f4f4;
+          padding-bottom: 12rpx;
+        }
+        .textarea{
+          width: 92%;
+          overflow: auto;
+          background: #f4f3f9;
+          border-radius: 8rpx;
+          margin-bottom: 22rpx;
+          padding: 22rpx;
+          margin: auto;
+        }
+        ._bc_list{
+          margin: auto;
+          border: 3rpx solid #dbdbdb;
+          width: 88%;
+          padding: 12rpx;
+          margin-top: 22rpx;
+          border-radius: 8rpx;
+        }
+        ._bc_text{
+          margin: 22rpx 12rpx;
+          height: 72rpx;
+          line-height: 72rpx;
+          padding: 0 22rpx;
+          border-radius: 6rpx;
+          background: #f4f3f9;
+          .Inp{
+            text-align: right;
+            width: 70%;
+            height: 68rpx;
+            float: right;
+            padding-right: 22rpx;
+            border-bottom: 1rpx solid #f9f9f9;
+          }
+        }
+        ._bc_sex{
+          width: 25%;
+          height: 25%;
+          border: 3rpx solid #dbdbdb;
+          border-radius: 8rpx;
+          padding: 22rpx;
+          margin-top: 32rpx;
+          margin-left: 12%;
+          image{
+            width: 80%;
+          }
+          view{
+            padding-top: 10rpx;
+            border-top: 1rpx dashed #dbdbdb;
+          }
+        }
+      }
+    }
+    .next{
+      background: #1AAC19;
+      margin: 0 62rpx;
+      margin-top: 16%;
+    }
+    .back{
+      width: 60rpx;
+      height: 60rpx;
+      margin-right: 32rpx;
+    }
+  }
+  .active {
+    border-color: #4bc32c !important;
+    /*box-shadow: 1rpx 1rpx 16rpx #4bc32c;*/
+    view{
+      border-top: 4rpx solid #4bc32c!important;
+      /*border-color: #4bc32c !important;*/
+    }
+  }
+  .upload{
+    width: 150rpx;
+    height: 150rpx;
+    background: #f4f3f9;
+    border-radius: 8rpx;
+    line-height: 150rpx;
+    color: #959595;
+    font-size: 62rpx;
+    margin-top: 22rpx;
+    margin-right: 12rpx;
+  }
+  .uploadImage{
+    width: 150rpx;
+    height: 150rpx;
+    margin-right: 12rpx;
+    margin-top: 22rpx;
+    border: 1rpx solid #f9f9f9;
+  }
+</style>

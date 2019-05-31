@@ -1,0 +1,534 @@
+<template>
+  <!--<NavBar rgba="#ffffff" bag="#ffffff" title="测试结果"></NavBar>-->
+  <Loading :init.sync="init"></Loading>
+  <view style="height: 100rpx;width: 100%"></view>
+  <view class='list_box' >
+    <view class='list'>
+      <view class='list_name_box' >
+        <text class='list_item_name orange'>爱情语言</text>
+        <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+      </view>
+      <view class='list_item_box'>
+        <view class='list_item' wx:for='{{love_languages}}' wx:key='this'  >
+          <view class='list_item_name_box' @tap="showModalV({{item.title}}, {{item.content}})" style="background: white">
+            <text class='list_item_name'>{{item.title}}</text>
+            <view class="weui-cell__ft weui-cell__ft_in-access">{{item.num}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <view class='list'>
+      <view class='list_name_box' >
+        <text class='list_item_name orange'>交往基因</text>
+        <view class="weui-cell__ft weui-cell__ft_in-access"></view>
+      </view>
+      <view class='list_item_box'>
+        <view class='list_item' wx:for='{{love_characters}}' wx:key='this' >
+          <view class='list_item_name_box' @tap="showModalV({{item.title}}, {{item.content}})" style="background: white">
+            <text class='list_item_name'>{{item.title}}</text>
+            <view class="weui-cell__ft weui-cell__ft_in-access">{{item.num}}</view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+  <view class="font_32 wx_Title orange" style="margin:0; padding: 22rpx 16rpx 16rpx 26rpx;">我的优势</view>
+  <view class="booklist  font_28">
+    <block wx:if="{{character == null}}">
+      <view style="margin: 0 ;" class="wx_Title font_32" >
+        <span class="black_6">你还未参加《我的优点》测试哦!</span>
+      </view>
+    </block>
+    <block wx:else style="background: white">
+      <view style="margin: 0 ;" class="wx_Title font_32" >
+        <span>TA—>属于： <span class=" orange">"{{character.type}}"</span></span>
+      </view>
+      <view style="margin: 0 ;" class="wx_Title font_32">
+        <span class="font_32">TA—>性格： </span>
+        <span class="orange font_32">"{{character.character}}"</span>
+      </view>
+      <view style="margin: 0 ;" class="wx_Title font_32">
+        <span class="font_32">TA—>适合职业： </span>
+        <view class=" orange" wx:for="{{character.profession}}" wx:key="*this">{{item}}</view>
+      </view>
+    </block>
+  </view>
+  <view class="next text-center">
+    <!--<open-data type="userAvatarUrl"  mode="aspectFit" class="party_image flo_l" style="width: 100rpx;height: 100rpx;box-shadow: 1rpx 1rpx 12rpx #dedede;margin:10rpx 36rpx;"></open-data>-->
+    <view style="margin-top: 22rpx">测试结果</view>
+    <view  class="btn_red font_26 flo_r" @tap="ensure" style="margin-right:12rpx;width: 200rpx;height: 120rpx;line-height: 116rpx;margin-top: -88rpx;">重新测试</view>
+  </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import NavBar from '../../components/NavBar'
+  import Loading from '../../components/loading'
+
+  export default class myTest extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '我的测试'
+    }
+    components = {NavBar, Loading}
+    data = {
+      loaded: false,
+      user: [],
+      init: false,
+      list: [
+        {
+          listName: '爱情语言',
+          item: [{
+            itemName: '需要肯定的语言', content: '13', time: '2017-05-06'
+          }, {
+            itemName: '关注精心时刻', content: '22', time: '2015-08-06'
+          }, {
+            itemName: '喜好接受礼物', content: '9', time: '2015-11-06'
+          }, {
+            itemName: '需求服务行动', content: '32', time: '2015-08-06'
+          }, {
+            itemName: '喜欢身体接触', content: '44', time: '2015-08-06'
+          }]
+        }, {
+          listName: '交往基因',
+          item: [{
+            itemName: '力量型', content: '12', time: '2015-05-15'
+          }, {
+            itemName: '活泼型', content: '5', time: '2015-05-24'
+          }, {
+            itemName: '完美型', content: '6', time: '2015-05-30'
+          }, {
+            itemName: '和平型', content: '21', time: '2015-05-30'
+          }]
+        }],
+      activeIndex: 0,
+      sliderOffset: 0,
+      sliderLeft: 0,
+      sliderWidth: 180,
+      screenWidth: 360,
+      page: 1,
+      noMore: false,
+      loading: false,
+      inputShowed: false,
+      inputVal: '',
+      text: '关注',
+      id: '',
+      profile_courtship: [],
+      paramet_v: false,
+      showAdvantages: true,
+      userType: '',
+      character: {},
+      love_languages: [],
+      love_characters: [],
+      login_time: 0
+    }
+
+    computed = {}
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    async onLoad(e) {
+      let _this = this
+      console.log(e.id)
+      _this.id = e.id
+      _this.userType = wx.getStorageSync('type')
+      _this.$apply()
+    }
+
+    onShow() {
+      this.getMessage()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onPullDownRefresh() {
+      this.getMessage()
+    }
+
+    onReachBottom() {
+      setTimeout(() => {
+//        if (this.activeIndex == '1') {
+        this.getLibraries()
+//        } else {
+//          this.initPageData()
+//        }
+//        this.$apply()
+      }, 200)
+    }
+
+    getMessage() {
+      let self = this
+      this.$get({url: service.user + '/' + self.id + '/test/result'}, {
+        success: ({code, data}) => {
+          self.init = true
+          let test = [{title: '该会员还没有测试哦！', id: '0', value: ''}]
+          self.love_languages = data.love_languages.length ? data.love_languages : test
+          self.love_characters = data.love_characters.length ? data.love_characters : test
+          self.character = data.character
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          this.loaded = false
+        }
+      })
+    }
+// 让所有的展开项，都变为收起
+    packUp(data, index) {
+      for (let i = 0, len = data.length; i < len; i++) {
+        // 其他最外层列表变为关闭状态
+        if (index != i) {
+          data[i].show = false
+          for (let j = 0; j < data[i].item.length; j++) {
+            // 其他所有内层也为关闭状态
+            data[i].item[j].show = false
+          }
+        }
+      }
+    }
+
+    methods = {
+      ensure() {
+        let url = '/pages/users/vipSetting'
+        wx.redirectTo({
+          url: url
+        })
+      },
+      showAdvantagesV() {
+//        let num = this.mylibs.my_rank_id
+//        if (num < 3) {
+//          return wx.showModal({
+//            title: '提示',
+//            content: '需要先成为VIP3会员！',
+//            confirmText: '去升级',
+//            success: function (res) {
+//              if (res.confirm) {
+//                wx.navigateTo({url: url})
+//                wx.navigateTo({url: '/pages/users/upgradingVIP'})
+//              } else if (res.cancel) {
+//                console.log('用户点击取消')
+//              }
+//            }
+//          })
+//        }
+        this.showAdvantages = false
+        this.$apply()
+      },
+      gotofriends(item) {
+        let url = ''
+        if (item.type == 'single') {
+          url = '/pages/home/information?id=' + item.user_id
+        } else {
+          url = '/pages/home/introducer?id=' + item.user_id
+        }
+        wx.navigateTo({url: url})
+      },
+      bindPickerChange(id, e) {
+        console.log(id)
+        console.log('picker发送选择改变，携带值为', e.detail.value)
+        let than = this
+        if (e.detail.value == 0) {
+          wx.showModal({
+            title: '提示',
+            content: '是否确认举报Ta',
+            success: function (res) {
+              if (res.confirm) {
+                than.$post({url: service.complaint + '/' + id}, {
+                  success: ({code, data}) => {
+                    wx.showToast({
+                      title: '举报成功',
+                      icon: 'success',
+                      duration: 2000
+                    })
+                  },
+                  fail: ({code, data}) => {
+                  },
+                  complete: () => {
+                    than.loaded = false
+                  }
+                })
+              } else if (res.cancel) {
+                console.log('用户点击取消')
+              }
+            }
+          })
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: '是否确认取消该好友',
+            success: function (res) {
+              if (res.confirm) {
+                than.$post({url: service.addFriend + '/' + id}, {
+                  success: ({code, data}) => {
+                    wx.showToast({
+                      title: '取消成功',
+                      icon: 'success',
+                      duration: 2000
+                    })
+                  },
+                  fail: ({code, data}) => {
+                  },
+                  complete: () => {
+                    than.loaded = false
+                  }
+                })
+              } else if (res.cancel) {
+                console.log('用户点击取消')
+              }
+            }
+          })
+        }
+      },
+      // 预览图片
+      previewImage(image, array) {
+        wx.previewImage({
+          current: image, // 当前显示图片的http链接
+          urls: array // 需要预览的图片http链接列表
+        })
+      },
+      showModalV(title, content) {
+        wx.showModal({
+          title: title,
+          content: content
+        })
+      },
+      listTap(index, e) {
+        console.log(index)
+        console.log('触发了最外层')
+//        let num = this.mylibs.my_rank_id
+//        console.log(num)
+//        if (num < 2 && index == 1) {
+//          wx.showModal({
+//            title: '提示',
+//            content: '需要先成为VIP2会员！',
+//            confirmText: '去升级',
+//            success: function (res) {
+//              if (res.confirm) {
+//                wx.navigateTo({url: url})
+//                wx.redirectTo({url: '/pages/users/upgradingVIP'})
+//              } else if (res.cancel) {
+//                console.log('用户点击取消')
+//              }
+//            }
+//          })
+//        } else {
+        let Index = e.currentTarget.dataset.parentindex,
+          list = this.data.list
+        list[Index].show = !list[Index].show || false
+        // 变换其打开、关闭的状态
+//        if (list[Index].show){// 如果点击后是展开状态，则让其他已经展开的列表变为收起状态
+//          this.packUp(list,Index);
+//        }
+        this.setData({
+          list
+        })
+//          debugger
+//        }
+      },
+      // 点击里面的子列表展开收起
+      listItemTap(e) {
+        let parentindex = e.currentTarget.dataset.parentindex, // 点击的内层所在的最外层列表下标
+          Index = e.currentTarget.dataset.index, // 点击的内层下标
+          list = this.data.list
+        console.log(list[parentindex].item, Index)
+        list[parentindex].item[Index].show = !list[parentindex].item[Index].show || false // 变换其打开、关闭的状态
+        if (list[parentindex].item[Index].show) { // 如果是操作的打开状态，那么就让同级的其他列表变为关闭状态，保持始终只有一个打开
+          for (let i = 0, len = list[parentindex].item.length; i < len; i++) {
+            if (i != Index) {
+              list[parentindex].item[i].show = false
+            }
+          }
+        }
+        this.setData({list})
+      },
+      showInput() {
+        this.inputShowed = true
+      },
+      hideInput() {
+        this.inputVal = ''
+        this.inputShowed = false
+      },
+      clearInput() {
+        this.inputVal = ''
+      },
+      inputTyping(e) {
+        this.inputVal = e.detail.value
+        console.log(this.inputVal)
+        this.page = 1
+        this.getLibraries(this.inputVal)
+      }
+    }
+  }
+
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: #EEEFF1;
+  }
+  .borrow{
+    .page__bd{
+      height: 100%;
+    }
+    .page__bd{
+      padding-bottom: 0;
+    }
+    .weui-tab__content{
+      padding-top: 0px;
+      text-align: center;
+    }
+    text-align: center;
+    background: #fff;
+    .library-title{
+      .h2();
+      text-align: left;
+      color: #666;
+      padding: 20rpx 40rpx 10rpx;
+    }
+    .library-wrapper{
+      padding: 20rpx 0;
+    }
+    .library-item{
+      position: relative;
+      &:before {
+        .setLeftLine(@weuiCellBorderColor);
+      }
+      &:first-child {
+        &:before {
+          display: none;
+        }
+      }
+    }
+    .item-title{
+      .h3();
+      line-height: 1;
+    }
+    .mini-btn{
+      //  margin: 1em auto;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
+  .inline-block {display: inline-block}
+
+  .imagebox{
+    width: 33%;
+  }
+  .borrowlist{
+    width: 86%;
+    box-shadow: 1rpx 1rpx 18rpx #d3d3d3;
+    margin-top: 18rpx;
+    border-radius: 6rpx;
+    margin-left: 4%;
+    padding: 22rpx;
+    /*position: relative*/
+  }
+  .menber{
+    background: white;
+    border-radius: 6rpx;
+    padding:4rpx 6rpx ;
+    width: 94rpx;
+    margin-left: 16rpx;
+  }
+  .weui-cell__ft {
+    /*margin-top: 10%;*/
+  }
+  .atten{
+    background: white;
+    width: 80rpx;
+    padding:2rpx 12rpx;
+    border-radius: 6rpx;
+    border: 1rpx solid #d3d3d3;
+    height: 48rpx;line-height: 48rpx;
+    margin-top: -40rpx;
+  }
+  .atten_w{
+    width: 140rpx;
+  }
+  .atten_btn{
+    width: 68rpx;
+    /*background: red;*/
+    padding:2rpx 12rpx;
+    /*height: 52rpx;*/
+    font-size: 80rpx;
+    margin-top: -100rpx;
+    margin-right: -12rpx;
+  }
+  .list_name_box {
+    background: #fff;
+    border-bottom: 1px solid #efefef;
+    display: flex;
+    height: 90rpx;
+
+    align-items: center;
+    padding: 0 25rpx;
+    font-size: 32rpx;
+  }
+
+  .list_item_name {
+    flex: 1;
+  }
+
+  .icon_down {
+    width: 35rpx;
+    height: 35rpx;
+    transition: transform 0.3s;
+  }
+
+  /* .list_item_box{ height: 0; transition:height 0.3s; overflow: hidden; } .list_item_box_show{ height: 500rpx; } */
+  .list_item_name_box {
+    background: #fff;
+    font-size: 30rpx;
+    height: 80rpx;
+    display: flex;
+    align-items: center;
+    border-bottom: 1rpx solid #d3d3d3;
+    padding: 0 25rpx 0 50rpx;
+  }
+
+  .other {
+    display: flex;
+    height: 80 rpx;
+    padding: 0 25rpx 0 50rpx;
+    align-items: center;
+    font-size: 30rpx;
+    color: #666;
+  }
+
+  .icon_down_rotate {
+    transform: rotate(180deg);
+  }
+  .wx_Title{
+    border-bottom: 1rpx solid #dedede;
+    margin: 12rpx 22rpx;
+    margin-bottom: 4rpx;
+    background: white;
+    padding: 8rpx 32rpx;
+  }
+  .booklist{
+    margin: 4rpx 24rpx 12rpx 24rpx;
+    width: 93%;
+    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+  }
+  .next{
+    position: fixed;
+    right: 0;
+    top:0;
+    height: 100rpx;
+    border-top: 1rpx solid #d9d9d9 ;
+    border-bottom: 1rpx solid #d9d9d9 ;
+    z-index: 10;
+    width: 100%;
+    background: white;
+    /*box-shadow: 5rpx 5rpx 12rpx #c2571f;*/
+  }
+</style>

@@ -1,0 +1,341 @@
+<template>
+  <view class="main-register" >
+      <view class="main-name">
+        <view class="color-666 font_28">姓名 <span class="red font_26">(*必填)</span></view>
+        <input @input="typing('name')" class="font_28 main-input" value="{{name}}" placeholder="请填写你的真实姓名"/>
+      </view>
+      <view class="main-mobile" >
+        <view class=" font_28 color-666">手机号 <span class="red font_26">(*必填)</span></view>
+        <input @input="typing('mobile')" type="number"  class="main-input font_28" value="{{mobile}}" placeholder="请填写你的手机号"/>
+      </view>
+    <!--<view style="margin-top: 146rpx;width: 100%">-->
+      <!--<view class="text-center flo_l">-->
+        <!--<view  class="btn_red_v font_28" style="width: 260rpx;" >-->
+          <!--<form bindsubmit="formSubmit" report-submit>-->
+            <!--<button formType="submit" class="btn text-center font_28 white"  open-type="getUserInfo" @getuserinfo="getuserinfo('marriage')" >我是介绍人</button>-->
+          <!--</form>-->
+        <!--</view>-->
+      <!--</view>-->
+      <!--<view  class="text-center flo_r">-->
+        <!--<view  class="btn_red_v font_28" style="width: 260rpx;" >-->
+          <!--<form bindsubmit="formSubmit" report-submit>-->
+            <!--<button class="btn text-center font_28 white"  formType="submit"  open-type="getUserInfo" @getuserinfo="getuserinfo('single')" >我是单身</button>-->
+          <!--</form>-->
+        <!--</view>-->
+      <!--</view>-->
+    <!--</view>-->
+      <view class=" reset-input">
+        <view class="main-code">
+          <view class=" font_28 color-666">验证码 <span class="red font_26">(*必填)</span></view>
+          <input @input="typing('code')" class="main-input font_28 code_input flo_l" value="{{code}}" placeholder="请输入验证码"/>
+          <button @tap="verify" class="mini-btn flo_r font_26 white" >{{btnText}}</button>
+          <view class="clearfloat"></view>
+        </view>
+      </view>
+      <view  class="buy-bar-box white text-center">
+        <button class="btn text-center font_32 white"  formType="submit"  open-type="getUserInfo" @getuserinfo="getuserinfo" >下一步</button>
+      </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+
+  export default class Register extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '报名表单',
+      enablePullDownRefresh: false,
+      navigationBarBackgroundColor: '#42B44F',
+      navigationBarTextStyle: 'white'
+
+    }
+    data = {
+      // 手机号/验证码
+      name: '',
+      mobile: '',
+      code: '',
+      wechat_code: '',
+      loading: false,
+      timer: null,
+      time: 0,
+      encryptedData: '',
+      iv: '',
+      avatarUrl: '',
+      marriage: '',
+      from_avatar: '',
+      nickName: '',
+      btnText: '',
+      userInfo: {},
+      id: 0
+    }
+
+    computed = {
+      realPrice() {
+        const item = this.list && this.list[this.listIndex]
+        const price = item && item.price
+        return price || 0
+      },
+      btnText() {
+        return +this.time > 0 ? `${this.time}s后重新获取` : '获取验证码'
+      }
+    }
+
+    onLoad(e) {
+      this.id = e.party_id
+      console.log()
+      this.$apply()
+//      if(e.from_openid) {
+//        wx.setStorageSync('from_openid', e.from_openid)
+//      }
+      // 初始化页面数据
+//      this.initPageData()
+//      this.getInfo()
+    }
+
+    onShow() {
+//      this.initPageData()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+
+    // 初始化页面数据
+    initPageData() {
+//      var token = wx.getStorageSync('token')
+//      if (!token) {
+      wepy.login({
+        success: (res) => {
+          console.log('wepy.login.success:', res)
+          // 根据业务接口处理:业务登陆:异步
+          let data = {code: res.code, from_openid: wx.getStorageSync('from_openid')}
+          this.$post({url: service.login, data}, {
+            success: ({code, data}) => {
+              this.from_avatar = data.from_avatar
+              this.marriage = data.marriage
+              this.$apply()
+              if (data.token) {
+                wx.setStorageSync('token', data.token)
+                wx.setStorageSync('openid', data.openid)
+                wx.switchTab({
+//                  url: '/pages/tabBar/home'
+                })
+              }
+            }
+          })
+        },
+        fail: (res) => {
+          console.log('wepy.login.fail:', res)
+        }
+      })
+    }
+
+    getPhoneNumber(e) {
+      wepy.login({
+        success: (res) => {
+          if (e.detail.iv) {
+            let data = {
+              code: res.code,
+              iv: e.detail.iv,
+              encryptedData: e.detail.encryptedData
+            }
+            this.$post({url: service.infor, data}, {
+              success: ({code, data}) => {
+                this.mobile = data.phoneNumber
+                this.$apply()
+                this.$setCode()
+              },
+              fail: ({code, data}) => {
+              },
+              complete: () => {
+                this.loading = false
+              }
+            })
+          }
+        },
+        fail: (res) => {
+          console.log('wepy.login.fail:', res)
+        }
+      })
+    }
+
+    doRegister() {
+      // 防抖
+      let that = this
+      if (this.loading) return
+      if (!this.getString(this.name)) {
+        return wx.showModal({
+          title: '提示',
+          content: '请返回填写姓名',
+          confirmText: '返回',
+          mask: true,
+          showCancel: false,
+          success: function(res) {
+            if (res.confirm) {
+              console.log('用户点击确定')
+            }
+          }
+        })
+      }
+      if (!this.mobile) {
+        return wx.showModal({
+          title: '提示',
+          content: '请输入正确的手机号码',
+          confirmText: '返回',
+          mask: true,
+          showCancel: false,
+          success: function(res) {
+            if (res.confirm) {
+              console.log('用户点击确定')
+            }
+          }
+        })
+      }
+      wepy.login({
+        success: (res) => {
+          const data = {
+            mobile: that.mobile,
+            wechat_code: res.code,
+            code: that.code,
+            name: this.getString(this.name),
+            userInfo: this.userInfo
+          }
+          console.log(data)
+          // 绑定手机号
+          that.loading = true
+          that.$post({url: `${service.host}/wechat/register/activity`, data}, {
+            success: ({code, data}) => {
+              wx.setStorageSync('token', data.token)
+              wx.showLoading({
+                title: '注册中...',
+                mask: true,
+                showCancel: false,
+                success: (res) => {
+                }
+              })
+              setTimeout(function () {
+                wx.hideLoading()
+                wx.showToast({
+                  title: '注册成功!',
+                  icon: 'success',
+                  duration: 1200,
+                  success: (res) => {
+                    let url = `/pages/party/trade?party_id=${that.id}`
+                    wx.redirectTo({url: url})
+                  }
+                })
+              }, 1000)
+            },
+            fail: ({code, data}) => {
+            },
+            complete: () => {
+              this.loading = false
+            }
+          })
+        },
+        fail: (res) => {
+          console.log('wepy.login.fail:', res)
+        }
+      })
+    }
+    methods = {
+      getuserinfo(e) {
+        console.log(e.detail)
+        if (e.detail.userInfo) {
+          this.userInfo = e.detail.userInfo
+          this.$apply()
+          this.doRegister()
+          // 用户按了允许授权按钮
+        } else {
+          // 用户按了拒绝按钮
+        }
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      typing(type, e) {
+        if (this.isDefined(this[type])) {
+          this[type] = e.detail.value
+        }
+      },
+      verify() {
+        // 防抖
+        if (this.loading || this.time > 0) return
+        if (!this.mobile) {
+          return this.$alert('温馨提示', '请输入正确的手机号码')
+        }
+        // 开防抖
+        this.loading = true
+        // 开倒计时
+        this.timing(60)
+
+        // 根据业务接口处理:发送验证码
+        this.$post({url: service.send_register, data: {mobile: this.mobile}}, {
+          success: (res) => {
+          },
+          fail: (res) => {
+            clearTimeout(this.timer)
+            this.timing(0)
+          },
+          complete: () => {
+            this.loading = false
+          }
+        })
+      }
+    }
+
+    timing(time) {
+      this.time = this.getNumber(time)
+      this.$apply()
+      this.timer = setTimeout(() => {
+        if (time > 0) {
+          this.timing(time - 1)
+        }
+      }, 1000)
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  page{
+    background: white;
+    .main-register{
+      padding: 48rpx;
+      .buy-bar-box{
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        line-height: 120rpx;
+        background: #42B44F;
+      }
+      .main-input{
+        background: #EEEDF3;
+        padding: 6rpx 22rpx;
+        border-radius: 8rpx;
+        margin-bottom: 22rpx;
+      }
+      .main-mobile,.main-name,.main-code{
+        view{
+          margin-bottom: 12rpx;
+        }
+        .code_input{
+          width: 40%;
+        }
+        .mini-btn{
+          width: 36%;
+          background: #42B44F;
+          margin-bottom: 22rpx;
+        }
+      }
+    }
+  }
+</style>

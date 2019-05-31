@@ -1,0 +1,336 @@
+<template>
+  <NavBar rgba="#ffffff" bag="#ffffff" :title.sync="title"></NavBar>
+  <Loading :init.sync="init"></Loading>
+  <view class="navbar borrow">
+    <view class="page__bd">
+      <view class="weui-tab">
+          <view class="weui-tab__content" >
+            <view class="weui-search-bar" >
+              <view class="weui-search-bar__form">
+                <view class="weui-search-bar__box">
+                  <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+                  <input type="text" class="weui-search-bar__input" placeholder="搜索" confirm-type="search" value="{{inputVal}}" focus="{{inputShowed}}" @confirm="inputTyping" />
+                  <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
+                    <icon type="clear" size="14"></icon>
+                  </view>
+                </view>
+                <label class="weui-search-bar__label" hidden="{{inputShowed}}" bindtap="showInput">
+                  <icon class="weui-icon-search" type="search" size="14"></icon>
+                  <view class="weui-search-bar__text">搜索</view>
+                </label>
+              </view>
+              <view class="weui-search-bar__cancel-btn" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
+            </view>
+            <view class="weui-cells__title"></view>
+            <view class="font_22 red flo_r" style="margin-right: 32rpx;">*长按移除黑名单</view>
+            <view class="page__bd" wx:for="{{list}}" wx:key="*this" >
+              <view class="flo_l borrowlist" @tap="gotoFriendPage({{item}})" @longpress="remove({{item.id}})">
+                <view class="flo_l weui-cell__hd" >
+                  <image src="{{item.linking_user.avatar}}" mode="aspectFill"   style="width: 120rpx;height: 120rpx;border-radius: 12rpx;" class="flo_l"></image>
+                </view>
+                <view class="flo_l" style="width: 78%;">
+                  <view  class="font_28 flo_l orange ellipsis_1 bold" style="margin-left: 20rpx;">
+                    {{item.linking_user.name}}
+                  </view>
+                  <view  class="font_28 flo_l ellipsis_1" style="margin-left: 6rpx;margin-top: 2rpx;">
+                    <image src="http://images.ufutx.com/201902/21/a309744e67082c4bd46db0df504c32c5.png" mode="aspectFit" wx:if="{{item.linking_user.sex == 1}}" style="width: 38rpx;height: 38rpx;" class="flo_l"></image>
+                    <image src="http://images.ufutx.com/201902/21/7b3892dcf60fabda05add35abfa9aec3.png" mode="aspectFit" wx:else   style="width: 38rpx;height: 38rpx;" class="flo_l"></image>
+                  </view>
+                </view>
+                <!--<view class="font_26 flo_l black_6 ellipsis_1" style="margin-left: 14rpx">{{item.linking_user.message}}</view>-->
+                <!--<view class="weui-cell__ft weui-cell__ft_in-access"></view>-->
+              </view>
+            </view>
+            <view class="clearfloat"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <pageScroll></pageScroll>
+    <block wx:if="{{loading}}">
+      <view class="weui-loadmore">
+        <view class="weui-loading"></view>
+        <view class="weui-loadmore__tips ff">正在加载</view>
+      </view>
+    </block>
+    <block wx:if="{{noMore}}">
+      <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot ff"></view>
+      </view>
+    </block>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import NavBar from '../../components/NavBar'
+  import Loading from '../../components/loading'
+  import pageScroll from '../../components/pageScroll'
+  export default class blacklist extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '黑名单'
+    }
+
+    components = {NavBar, Loading, pageScroll}
+    data = {
+      loaded: false,
+      init: false,
+      title: '',
+      mylibs: [],
+      list: [],
+      activeIndex: 0,
+      sliderOffset: 0,
+      sliderLeft: 0,
+      sliderWidth: 180,
+      screenWidth: 360,
+      page: 1,
+      noMore: false,
+      loading: false,
+      inputShowed: false,
+      inputVal: '',
+      type: ''
+    }
+
+    computed = {}
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    async onLoad(e) {
+      let that = this
+      that.type = e.type
+      that.list = []
+      that.page = 1
+      that.getLibraries()
+      that.$apply()
+    }
+
+    onShow() {
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onPullDownRefresh() {
+      this.page = 1
+      this.getLibraries()
+    }
+
+    onPageScroll(res) {
+      let top = res.scrollTop,
+        show = top > 380 ? true : false
+      this.$broadcast('showBackTopBtn', show)
+    }
+    onReachBottom() {
+      setTimeout(() => {
+        this.getLibraries()
+      }, 200)
+    }
+    getLibraries(keyword) {
+      let _this = this
+      _this.loading = true
+      let url = `${service.host}/blacklist`
+      _this.$get({
+        url: url,
+        data: {
+          page: this.page,
+          keyword: this.inputVal
+        }
+      }, {
+        success: ({code, data}) => {
+          _this.init = true
+          _this.noMore = false
+          _this.loading = false
+//           if (data.data.length == 0 && data.last_page == 1) {
+//             _this.loading = false
+//             _this.noMore = true
+//             _this.list = []
+//             return
+//           }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.noMore = true
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = data
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+            })
+          }
+          _this.noMore = true
+          _this.page += 1
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          this.loaded = false
+        }
+      })
+    }
+
+    methods = {
+      gotoFriendPage(item) {
+        let url = ''
+        if (item.linking_user.type == 'single') {
+          url = '/pages/home/information?id=' + item.linking_user.id
+        } else {
+          url = '/pages/home/introducer?id=' + item.linking_user.id
+        }
+        wx.navigateTo({url: url})
+      },
+      remove(id) {
+        let vm = this
+        wx.showModal({ // 使用模态框提示用户进行操作
+          title: '提示',
+          content: '是否移除黑名单？',
+          cancelText: '取消',
+          confirmText: '确定',
+          success: function (res) {
+            if (res.confirm) {
+              vm.$delete({url: `${service.host}/blacklist/${id}`}, {
+                success: ({code, data}) => {
+                  vm.$showToast('移除成功')
+                  vm.page = 1
+                  vm.$apply()
+                  vm.getLibraries()
+                }
+              })
+            } else if (res.cancel) {
+              console.log('用户点击取消')
+            }
+          }
+        })
+      },
+      showInput() {
+        this.inputShowed = true
+      },
+      hideInput() {
+        this.inputVal = ''
+        this.inputShowed = false
+      },
+      clearInput() {
+        this.inputVal = ''
+      },
+      inputTyping(e) {
+        this.inputVal = e.detail.value
+        console.log(this.inputVal)
+        this.page = 1
+        this.getLibraries(this.inputVal)
+      },
+      tabClick(e) {
+        this.sliderOffset = e.currentTarget.offsetLeft
+        this.activeIndex = e.currentTarget.id
+        this.getLibraries()
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      }
+    }
+  }
+
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: white;
+  }
+  .borrow{
+    .page__bd{
+      height: 100%;
+    }
+    .page__bd{
+      padding-bottom: 0;
+    }
+    .weui-tab__content{
+      padding-top: 0px;
+      text-align: center;
+    }
+    text-align: center;
+    background: #fff;
+    .library-title{
+      .h2();
+      text-align: left;
+      color: #666;
+      padding: 20rpx 40rpx 10rpx;
+    }
+    .library-wrapper{
+      padding: 20rpx 0;
+    }
+    .library-item{
+      position: relative;
+      &:before {
+        .setLeftLine(@weuiCellBorderColor);
+      }
+      &:first-child {
+        &:before {
+          display: none;
+        }
+      }
+    }
+    .item-title{
+      .h3();
+      line-height: 1;
+    }
+    .mini-btn{
+      //  margin: 1em auto;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
+  .list{
+    padding: 22rpx;
+    /*background: red;*/
+    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+  }
+  .inline-block {display: inline-block}
+  .flo_l {float: left}
+  .flo_r {float: right}
+  .font_26 {font-size: 26rpx}
+  .font_28 {font-size: 28rpx}
+  .bold{font-weight: bold}
+  .clearfloat {clear:both}
+  .white {background: white}
+  .ellipsis_2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .ellipsis_1 {
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+  }
+
+  .imagebox{
+    width: 33%;
+  }
+  .borrowlist{
+    width: 86%;
+    box-shadow: 1rpx 1rpx 18rpx #d3d3d3;
+    margin-top: 18rpx;
+    border-radius: 6rpx;
+    margin-left: 4%;
+    padding: 22rpx;
+    /*position: relative*/
+  }
+  .weui-cell__ft {
+    margin-top: 10%;
+  }
+</style>

@@ -1,0 +1,231 @@
+<template>
+  <Loading :init.sync="init"></Loading>
+  <NavBar title="访客记录" bag="#FFFFFF" rgba="#f4f4f4"></NavBar>
+  <view class="list">
+    <block wx:if="{{list.length > 0}}">
+      <Search class="search" BColor="#F4F4F4"></Search>
+      <view style="height: 100rpx;"></view>
+    </block>
+    <view class="kai-content text-left">
+      <block wx:if="{{list.length > 0}}">
+        <view wx:for="{{list}}" wx:key="index" class="ff vessel" @tap="gotofriends({{item}})">
+          <view class="vessel_image flo_l">
+            <image src="{{item.other_user.avatar}}" mode="aspectFit" class="avatar"></image>
+          </view>
+          <view class="vessel_text flo_l color666">
+            <view class="flo_l" style="width: 50%;">
+              <view  class="bold font_28 ellipsis_1 flo_l" style="max-width: 80%;margin-right: 12rpx">{{item.other_user.name}}</view>
+              <image src="http://images.ufutx.com/201902/21/a309744e67082c4bd46db0df504c32c5.png" wx:if="{{item.other_user.sex == 1}}" mode="aspectFit" style="width: 32rpx;height: 32rpx;margin-bottom: 4rpx;"></image>
+              <image src="http://images.ufutx.com/201902/21/7b3892dcf60fabda05add35abfa9aec3.png" wx:else mode="aspectFit" style="width: 32rpx;height: 32rpx;margin-bottom: 4rpx;"></image>
+            </view>
+            <view class="font_26 flo_r">{{item.created_at}}</view>
+            <!--<view class="font_26 ellipsis_1">{{item.other_user.post}}</view>-->
+            <!--<view class="font_26 ellipsis_1">{{item.card.company}}</view>-->
+          </view>
+          <view class="clearfloat"></view>
+        </view>
+      </block>
+      <block wx:else>
+        <view  class="text-center" >
+          <view class="font_28 black_6" style="margin-top: 22rpx">
+            暂无访客信息
+          </view>
+          <view class="clearfloat"></view>
+        </view>
+      </block>
+      <block wx:if="{{loading}}">
+        <view class="weui-loadmore">
+          <view class="weui-loading"></view>
+          <view class="weui-loadmore__tips ff" >正在加载</view>
+        </view>
+      </block>
+      <block wx:if="{{noMore}}">
+        <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+          <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot ff" ></view>
+        </view>
+      </block>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import {service} from '../../config.js'
+  import NavBar from '../../components/NavBar'
+  import Search from '../../components/SearchV2'
+  import Loading from '../../components/loading'
+
+  export default class visitor extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '访客记录',
+      enablePullDownRefresh: true
+    }
+    components = {NavBar, Search, Loading}
+    data = {
+      init: false,
+      list: [],
+      noMore: false,
+      page: 1,
+      loading: true,
+      inputVal: ''
+    }
+    computed = {}
+
+    onShow() {
+      // 初始化页面数据
+      this.initPageData()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    onLoad() {
+    }
+
+    onPullDownRefresh() {
+      this.page = 1
+      this.initPageData()
+    }
+
+    onReachBottom() {
+      this.initPageData()
+    }
+
+    // 初始化页面数据
+    initPageData() {
+      let _this = this,
+        data = {
+          keyword: _this.inputVal,
+          page: this.page
+        }
+      _this.loading = true
+      _this.$get({url: `${service.user}/preview/histroies`, data}, {
+        success: ({code, data}) => {
+//          if (data.data.length == 0 && data.last_page == 1) {
+//            _this.loading = false
+//            _this.noMore = true
+//            _this.list = []
+//            return
+//          }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.noMore = true
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = data
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+            })
+          }
+          console.log(_this.list)
+          _this.$apply()
+          _this.noMore = true
+          _this.page += 1
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          this.loading = false
+          this.init = true
+          _this.$apply()
+        }
+      })
+    }
+
+    methods = {
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      gotofriends(item) {
+        let url = ''
+        if (item.other_user.type == 'single') {
+          url = '/pages/home/information?id=' + item.other_user.id
+        } else {
+          url = '/pages/home/introducer?id=' + item.other_user.id
+        }
+        wx.navigateTo({url: url})
+      },
+      ensure() {
+        let data = {
+          questions: this.questions
+        }
+        this.$post({url: service.questions, data}, {
+          success: ({code, res}) => {
+            wx.showToast({
+              title: '设置成功',
+              icon: 'success',
+              duration: 1200
+            })
+            setTimeout(() => {
+              wx.navigateTo({url: '/pages/users/vipSetting'})
+            }, 1200)
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+            this.loading = false
+          }
+        })
+      }
+    }
+    events = {
+      'search': (value) => {
+        // 搜索返回值
+        this.page = 1
+        this.inputVal = value
+        this.$apply()
+        this.initPageData()
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  @import "../../styles/custom/reset.less";
+  page{
+    background: #ffffff;
+    .search{
+      position: fixed;
+      width: 100%;
+    }
+    .kai-content{
+      padding-top: 16rpx;
+    }
+    .vessel{
+      padding: 12rpx 22rpx 0 22rpx;
+      /*background: #f8f8f8;*/
+      border-bottom: 2px solid #f4f4f4;
+      .vessel_image{
+        display: inline-block;
+        .avatar{
+          width: 100rpx;
+          height: 100rpx;
+          border-radius: 50%;
+          border: 2px solid #eeeeee;
+          margin-bottom: 10rpx;
+          margin-right: 12rpx;
+        }
+      }
+      .vessel_text{
+        width: 80%;
+        display: inline-block;
+      }
+    }
+  }
+</style>

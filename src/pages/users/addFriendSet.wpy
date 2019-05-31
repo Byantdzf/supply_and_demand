@@ -1,0 +1,230 @@
+<template>
+  <NavBar rgba="#eeeff1" bag="#ffffff" title="加好友设置"></NavBar>
+  <Loading :init.sync="init"></Loading>
+  <view class="page-user">
+    <userTitle :user.sync="user"></userTitle>
+    <view class="weui-cells weui-cells_after-title">
+      <view class="font_32 loveTitle">异性加好友时，要求TA回答下列问题：</view>
+      <checkbox-group class="radio-group" bindchange="checkboxChange">
+        <view class="paylist">
+          <!--<view class="font_26 loveTitle">希望对方回答：</view>-->
+          <label class="checkbox" wx:for="{{list}}" wx:key="*this">
+            <view style="margin-top: 8rpx;">
+              <checkbox value="{{item.name}}" class="flo_l" checked="{{item.checked}}"/>
+              <view class="font_28 flo_l" style="margin-left: 12rpx;margin-top: 8rpx;">{{item.name}}</view>
+              <view class="clearfix"></view>
+            </view>
+          </label>
+          <!--<view class="section">-->
+            <!--<input placeholder="添加新问题" class="set_input font_26" @confirm="addQuestion"/>-->
+          <!--</view>-->
+          <view class="clearfix"></view>
+        </view>
+      </checkbox-group>
+      <view class="next btn_red" @tap="ensure">保存</view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import userTitle from '../../components/userTitle'
+  import NavBar from '../../components/NavBar'
+  import Loading from '../../components/loading'
+  import { service } from '../../config.js'
+
+  export default class addFriendSet extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '加好友设置',
+      enablePullDownRefresh: true,
+      navigationBarBackgroundColor: '#EEEFF1'
+    }
+    components = {userTitle, NavBar, Loading}
+    data = {
+      libraries: {},
+      user: {},
+      init: false,
+      is_vip: false,
+      nickName: '加载中...',
+      questions: [],
+      friend_question: [],
+      list: [
+        {name: '年龄是多少？', checked: false},
+        {name: '结婚计划？', checked: false},
+        {name: '是否吸烟喝酒？', checked: false},
+        {name: '是否有孩子？', checked: false},
+        {name: '信主时间?', checked: false}
+      ]
+
+    }
+
+    computed = {
+      nickName() {
+        return (user && user.wechat && user.wechat.nickname) ? user.wechat.nickname : '未授权用户'
+      }
+    }
+
+    onShow() {
+      // 初始化页面数据
+      this.initPageData()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    onLoad() {
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+
+    // 初始化页面数据
+    initPageData() {
+      let that = this
+      that.$get({url: service.user}, {
+        success: ({code, data}) => {
+          that.user = data
+          that.init = true
+          that.friend_question = data.friend_question
+          that.questions = data.friend_question
+          that.$apply()
+          if (!that.friend_question) {
+            return that.$showToast('数据显示错误')
+          }
+          that.list.forEach((item, index, arr) => {
+            for (let itemV of that.friend_question) {
+              if (item.name === itemV) {
+                item.checked = true
+              }
+            }
+          })
+          this.$apply()
+        }
+      })
+    }
+
+    methods = {
+      gotofriends(item) {
+        let url = ''
+        if (item.type == 'single') {
+          url = '/pages/home/information?id=' + item.id
+        } else {
+          url = '/pages/home/introducer?id=' + item.id
+        }
+        wx.navigateTo({url: url})
+      },
+      gotoUser(type) {
+        let url = ''
+        if (type == 'single') {
+          url = '/pages/users/unmarri'
+        } else {
+          url = '/pages/users/intro'
+        }
+        wx.navigateTo({url: url})
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      addQuestion(e) {
+        var value = {name: e.detail.value, checked: false}
+        console.log(value)
+        this.list.push(value)
+      },
+      checkboxChange(e) {
+//        console.log('checkbox发生change事件，携带value值为：', e.detail.value)
+        this.questions = e.detail.value
+        this.$apply()
+        console.log(this.questions)
+      },
+      ensure() {
+        let data = {
+          questions: this.questions
+        }
+        let vm = this
+        vm.$post({url: service.questions, data}, {
+          success: ({code, res}) => {
+            vm.$Toast_success('设置成功')
+            setTimeout(() => {
+              vm.$gotoTab('/pages/tabBar/user')
+            }, 1200)
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+            vm.loading = false
+          }
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  @import "../../styles/custom/reset.less";
+  page{
+    background: #f4f4f4;
+  }
+  .weui-cells {
+    position: inherit;
+    box-shadow: 1rpx 1rpx 12rpx #dedede;
+    color: #666666;
+  }
+  .user_back{
+    background-image: url("http://local-pictures.img-cn-shenzhen.aliyuncs.com/201806/11/wx53cf66d72649eb5a.o6zAJs2lf_SH4K2plnWTlsSfhR70.9TmBzGGHW7w9470132e3efb72f0a1c8c06768b4cbd80.png");
+    background-size: cover;
+    position: relative;
+  }
+  .message_red{
+    background: red;
+    width: 16rpx;
+    height: 16rpx;
+    position: absolute;
+    right: -12rpx;
+    border-radius: 50%;
+  }
+  .lead {
+    width: 16rpx;
+    height: 16rpx;
+    background: red;
+    margin-top: -24rpx;
+    border-radius: 50%;
+    position: absolute;
+    right: 16rpx;
+    top: 40rpx;
+  }
+  .next{
+    margin: auto;
+  }
+  .paylist{
+    width: 88%;
+    margin: 22rpx;
+    background: white;
+    padding: 22rpx;
+    border-radius: 12rpx;
+    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+  }
+  .loveTitle{
+    border-bottom: 1rpx solid #dedede;
+    margin: 22rpx;
+    margin-bottom: 4rpx;
+    background: white;
+    padding: 14rpx 32rpx;
+    margin-top: 0rpx;
+  }
+  .set_input{
+    width: 72%;
+    border-bottom: 1rpx solid #d3d3d3;
+    margin-top: 22rpx;
+    padding: 6rpx 12rpx;
+  }
+
+</style>

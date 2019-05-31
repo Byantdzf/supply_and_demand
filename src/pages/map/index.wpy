@@ -1,0 +1,563 @@
+<template>
+  <NavBar bag="#ffffff"></NavBar>
+  <!--<Loading :init.sync="init"></Loading>-->
+  <view class="map">
+    <view id="SearchMap">
+      <view class="weui-cells__title" style="padding-top: 12rpx;">
+        <view class="weui-search-bar__box text-left flo_l" style="width: 74%" @tap="goto('/pages/map/mapList')">
+          <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+          <input type="text" class="weui-search-bar__input" disabled placeholder="搜索TA的名字和地址" confirm-type="search" value="{{inputVal}}" focus="{{inputShowed}}" @confirm="inputTyping" />
+        </view>
+        <view class="flo_l _bc-list">
+          <image src="http://images.ufutx.com/201812/06/6fdcbf47683b4bb79f5e35cad98b61e9.png" mode="aspectFit" class="flo_l" @tap="goto('/pages/map/mapList')"></image>
+          <view class="flo_r _bc-message" @tap="goto('/pages/users/myMessage')">
+            <image src="http://images.ufutx.com/201812/06/85f92d47c50d8c84a26a4f08c4454b63.png" mode="aspectFit"></image>
+            <view class="dost white"  wx:if="{{message_count !== 0}}">{{message_count}}</view>
+          </view>
+        </view>
+        <view class="clearfloat"></view>
+      </view>
+      <Search :title.sync="title"></Search>
+    </view>
+    <map id="map" longitude="{{myLong}}" latitude="{{myLat}}" scale="{{scale}}" markers="{{markers}}" @markertap="markertap_click"
+         @regionchange="regionchange" show-location enable-3D wx:if="{{showMap}}" style="width: 100%; height: {{height}};" >
+      <cover-view class="loading-box" wx:if="{{!hideLoading}}"></cover-view>
+      <cover-view class="loading-image animate" wx:if="{{!hideLoading}}">
+        <cover-image src="http://images.ufutx.com/201901/14/259575c362189d548ef7b9946bbe899e.png" mode="widthFix" class="loading-icon" style="width: 100%;height: auto;"></cover-image>
+      </cover-view>
+      <cover-view class="ToLocation">
+        <cover-image src='http://images.ufutx.com/201812/06/dc53b1da1610de84456cf5b2dfa33049.png' @tap="moveToLocation" class=' flo_l'></cover-image>
+      </cover-view>
+      <cover-view class="btn CardBox" wx:if="{{showfriend}}" @tap="gotofriends({{friends}})">
+        <cover-view class="_bcBox">
+          <cover-image src='{{friends.circle_avatar}}' class='_bcAvater flo_l'></cover-image>
+          <cover-image src='http://images.ufutx.com/201902/21/a309744e67082c4bd46db0df504c32c5.png' wx:if="{{friends.sex  == '1'}}" class='_bcIcon flo_l'></cover-image>
+          <cover-image src='http://images.ufutx.com/201902/21/7b3892dcf60fabda05add35abfa9aec3.png' wx:else class='_bcIcon flo_l'></cover-image>
+          <cover-view class="font_32 orange bold flo_l ellipsis_1 _bcName">{{friends.name}}</cover-view>
+          <cover-view class="font_26 black_6 bold flo_l _bcDistance ellipsis_1" style="max-width: 220rpx;">距离{{friends.distance}}千米</cover-view>
+          <cover-view class="font_26 black_6 bold flo_r _bcRecommend">推荐值：
+            <cover-view  class="orange text-right bold font_28 _bcWeight">{{friends.match_weight}}</cover-view>
+          </cover-view>
+          <cover-view class="clearfloat"></cover-view>
+          <cover-view  class="flo_l _bcPic">
+            <cover-view class="font_24 black_6 bold flo_l _bcText">照片墙：</cover-view>
+            <block wx:if="{{friends.photos.length != 0}}">
+              <cover-view class="font_26 black_6 bold flo_l _bcImage"  wx:for="{{friends.photos}}" wx:key="*this">
+                <cover-image src='{{item}}' wx:if="{{index < 3}}" mode="aspectFit"   class='flo_l'></cover-image>
+              </cover-view>
+            </block>
+            <block wx:else>
+              <cover-view  class="btn black_6 font_24">
+                暂无照片
+              </cover-view>
+            </block>
+            <cover-view class="clearfloat"></cover-view>
+          </cover-view>
+        </cover-view>
+      </cover-view>
+    </map>
+    <modal class="modal" hidden="{{hide}}" title="提示" no-cancel no-confirm>
+      <view class="text-center font_32">福恋相遇地图功能需要获取您的位置,不授权将无法查看地图哦！</view>
+      <view style="position: absolute;left: 0;bottom: 0;background: #FAFAFC; z-index: 999999;width: 100%;" class="text-center">
+        <button class="btn bold text-center" style="width: 100%;height: 100rpx;color: #56c589;margin: auto;line-height: 100rpx;border-top: 2rpx solid #e3e3e3" open-type="openSetting" @opensetting="openSetting_address">
+          去授权
+        </button>
+      </view>
+    </modal>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import {service} from '../../config.js'
+  import Search from '../../components/search'
+  import NavBar from '../../components/NavBar'
+  import Loading from '../../components/loading'
+  const util = require('../../libs/util.js')
+
+  export default class MapIndex extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '相遇地图',
+      enablePullDownRefresh: false
+    }
+    components = {Search, Loading, NavBar}
+    data = {
+      markers: [],
+      polyline: [],
+      longitude: 0,
+      latitude: 0,
+      init: false,
+      myLong: '',
+      myLat: '',
+      nearFriends: [],
+      distance_library: {},
+      text: '',
+      height: '',
+      doudun: false,
+      showModalStatus: false,
+      showModal: false,
+      showImage: true,
+      hide: true,
+      showfriend: false,
+      friends: [],
+      animation: [],
+      animationData: {},
+      animation_F: [],
+      animateFriend: {},
+      showMap: true,
+      southwest: {},
+      new_notice_count: '',
+      northeast: {},
+      shareimage: '',
+      throttle: false,
+      updataAvatar: '',
+      animationImage: {},
+      markersNew: [],
+      weight: 0,
+      downloadIndex: 0,
+      needDownloadIndex: 0,
+      region: 'hide',
+      getMarkers: true,
+      time: 5,
+      markerIndex: '',
+      timer: '',
+      title: '',
+      message_count: 0,
+      lat: '',
+      lng: '',
+      scale: 13,
+      parameter: {
+        age: '不限',
+        type: '不限'
+      },
+      type: '不限',
+      hideLoading: false
+
+    }
+
+    onLoad(e) {
+//      if (e.title) {
+//        this.title = e.title
+//        this.type = e.type
+//        this.$apply()
+//      }
+      this.getSystem()
+      wx.showShareMenu({
+        withShareTicket: true
+      })
+    }
+
+    onShow() {
+      let that = this
+      let token = wx.getStorageSync('token')
+      if (!token && !wx.getStorageSync('skip')) {
+        return wepy.login({
+          success: (res) => {
+            this.$post({url: service.login, data: {code: res.code}}, {
+              success: ({code, data}) => {
+                if (data.token) {
+                  wx.setStorageSync('token', data.token)
+                  wx.setStorageSync('openid', data.openid)
+                  wx.setStorageSync('user_id', data.user.id)
+                  let userInfo = {
+                    nickName: data.user.name,
+                    avatarUrl: data.user.avatar
+                  }
+                  that.getCenterLocation()
+                  that.updataMap()
+                  wx.setStorageSync('userInfo', userInfo)
+                } else {
+                  wx.navigateTo({url: '/pages/users/register?from_openid=' + wx.getStorageSync('from_openid')})
+                }
+              }
+            })
+          },
+          fail: (res) => {
+            console.log('wepy.login.fail:', res)
+          }
+        })
+      }
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onReady() {
+      this.mapCtx = wx.createMapContext('map')
+      this.getCenterLocation()
+      this.updataMap()
+    }
+
+    getSystem(type) {
+      let that = this,
+        query = wx.createSelectorQuery()
+      wx.getSystemInfo({
+        success: (res) => {
+          query.select('#SearchMap').boundingClientRect()
+          query.exec((data) => {
+            that.height = res.windowHeight - data[0].height + 'px'
+            that.$apply()
+          })
+        }
+      })
+    }
+
+    updataMap() {
+      this.hideLoading = false
+      if (this.lng == '') {
+        this.myLong = wx.getStorageSync('myLong')
+        this.myLat = wx.getStorageSync('myLat')
+      } else {
+        this.myLong = this.lng
+        this.myLat = this.lat
+        this.$apply()
+      }
+      let that = this,
+        data = {}
+      if (!that.myLat) {
+        return
+      }
+      // 获取屏幕四周的点坐标
+      that.mapCtx.getRegion({
+        success: function (res) {
+          console.log(res.southwest)
+          that.southwest = res.southwest
+          that.northeast = res.northeast
+          that.$apply()
+          data = {
+            southwest: that.southwest,
+            northeast: that.northeast,
+            location_latitude: wx.getStorageSync('myLat'),
+            location_longitude: wx.getStorageSync('myLong'),
+            nopage: 1,
+            age: that.parameter.age,
+            type: that.type
+          }
+          console.log(data)
+          that.$get({
+            url: `${service.host}/map/users/v2`,
+            data: data
+          }, {
+            success: ({code, data}) => {
+              setTimeout(() => {
+                that.hideLoading = true
+                that.$apply()
+              }, 1200)
+              that.scale = 13
+              that.message_count = data.message_count
+              that.markers = data.users.map((item, index, arr) => {
+                return {
+                  iconPath: item.circle_avatar,
+                  id: index,
+                  latitude: item.location_latitude,
+                  longitude: item.location_longitude,
+                  width: 30,
+                  height: 30
+                }
+              })
+              that.nearFriends = data.users
+              that.$apply()
+              console.log(that.markers)
+            },
+            fail: ({code, data}) => {
+            },
+            complete: () => {
+            }
+          })
+        },
+        fail: ({code, data}) => {
+          console.log('屏幕四点位置获取失败！')
+        },
+        complete: () => {
+        }
+      })
+    }
+
+    // 授权获取经纬度
+    getCenterLocation() {
+      let that = this
+      wx.getLocation({
+        type: 'gcj02',
+        success: function (res) {
+          that.myLong = res.longitude
+          that.myLat = res.latitude
+          if (!wx.getStorageSync('myLong')) {
+            wx.setStorageSync('myLong', res.longitude)
+            wx.setStorageSync('myLat', res.latitude)
+            setTimeout(() => {
+              return that.updataMap()
+            }, 500)
+          }
+          wx.setStorageSync('myLong', res.longitude)
+          wx.setStorageSync('myLat', res.latitude)
+          that.$apply()
+        },
+        fail: function () {
+          that.showMap = false
+          that.hide = false
+          that.$apply()
+        }
+      })
+    }
+
+    methods = {
+      // 分享
+      onShareAppMessage(res) {
+        let that = this,
+          url = ''
+        url = that.getCurrentPageUrlWithArgs()
+        return {
+          title: '刚好遇见你！',
+          path: url,
+          imageUrl: that.shareimage,
+          success: function (res) {
+            wx.showToast({
+              title: '转发成功',
+              icon: 'success',
+              duration: 1500
+            })
+            var shareTickets = res.shareTickets
+            if (shareTickets.length == 0) {
+              return false
+            }
+          },
+          fail: function (res) {
+            // 转发失败
+          }
+        }
+      },
+      gotofriends(item) {
+        let url = ''
+        if (item.type == 'single') {
+          url = '/pages/home/information?id=' + item.id
+        } else {
+          url = '/pages/home/introducer?id=' + item.id
+        }
+        wx.navigateTo({url: url})
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      moveToLocation() {
+        this.region = 'hide'
+        this.$apply()
+        this.mapCtx.moveToLocation()
+        this.updataMap()
+        if (!this.myLat) {
+          this.hide = true
+          this.$apply()
+        }
+      },
+      regionchange(e) {
+        let that = this
+        if (e.type == 'end' && this.region == 'show') {
+          util.throttle(function () {
+            // 添加回调处理函数的函数体
+            that.updataMap()
+          }, 1500, true)
+        } else {
+          this.region = 'show'
+          this.$apply()
+        }
+      },
+      // 授权地理位置
+      openSetting_address(e) {
+        let that = this
+        this.$apply()
+        if (e.detail.authSetting['scope.userLocation']) {
+          // 如果打开了地理位置，就会为true
+          wepy.getLocation({
+            altitude: true,
+            type: 'gcj02',
+            success: function (res) {
+              that.hide = true
+              that.showMap = true
+              that.$Toast_success('授权成功!')
+              that.myLat = res.latitude
+              that.myLong = res.longitude
+              wx.setStorageSync('myLong', res.longitude)
+              wx.setStorageSync('myLat', res.latitude)
+              that.$apply()
+              that.updataMap()
+            },
+            fail: function () {
+            },
+            complete: function () {
+            }
+          })
+        }
+      },
+      // 点击marker
+      markertap_click(e) {
+        let that = this,
+          index = e.markerId
+        for (let idx in that.markers) {
+          if (index !== idx) {
+            that.markers[idx].height = that.markers[idx].width = 30
+          }
+        }
+        that.markers[index].height = that.markers[index].width = 48
+        that.markerIndex = index
+        that.friends = that.nearFriends[index]
+        that.showfriend = true
+        that.$apply()
+        clearInterval(that.timer)
+        that.timer = setInterval(() => {
+          that.showfriend = false
+          that.$apply()
+        }, 3000)
+      }
+    }
+    events = {
+      'search': (value) => {
+        this.parameter.age = value.age
+        this.parameter.type = value.type
+        this.type = value.type
+        this.region = 'hide'
+        this.scale = 13
+        this.$apply()
+        this.getLocation(value.province, value.city)
+        console.log(value)
+      }
+    }
+
+    getLocation(lat, lan) {
+      let data = {address: `${lat}${lan}`}, that = this
+      that.$get({url: `${service.host}/location`, data}, {
+        success: ({code, data}) => {
+          if (JSON.stringify(data) != '{}' && data.length != 0) {
+            let {lat, lng} = data
+            that.lat = lat
+            that.lng = lng
+            that.$apply()
+            that.updataMap()
+          } else {
+            that.$showToast('经纬度获取失败！')
+            setTimeout(() => {
+              that.hideLoading = true
+              that.$apply()
+            }, 1000)
+          }
+        }
+      })
+    }
+  }
+</script>
+<style lang="less">
+  @import "../../styles/page/map/index.less";
+  .loading-box{
+   width: 100%;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    /*background: rgba(103, 103, 103, 0.5);*/
+  }
+  .loading-image{
+    width: 300rpx;height: 300rpx;
+    margin: auto;
+    margin-top: 30vh;
+  }
+  .animate{
+    -webkit-animation:  move2 2s linear infinite;
+  }
+  .loading-icon {
+    width: 200rpx;
+  }
+  @-webkit-keyframes move2{
+    0%{-webkit-transform:rotate(0deg);}
+
+    50%{-webkit-transform:rotate(-180deg);}
+
+    100%{-webkit-transform:rotate(-360deg);}
+  }
+  .city-picker {
+    /*position: absolute;*/
+    /*top: 0;*/
+    /*left: 0;*/
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+  }
+
+  .city-picker-mask {
+    /*position: absolute;*/
+    /*top: 0;*/
+    /*left: 0;*/
+    background-color: #353535;
+    opacity: 0.3;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+  }
+
+  .city-picker-content {
+    /*position: absolute;*/
+    /*bottom: 64rpx;*/
+    /*left: 0;*/
+    width: 654rpx;
+    height: 474rpx;
+    margin-right: 48rpx;
+    margin-left: 48rpx;
+    border-radius: 8px;
+    background-color: #fff;
+    z-index: 33;
+    overflow: hidden;
+  }
+
+  .hover-class{
+    background-color: #e6e6e6;
+  }
+
+  .city-picker-content-top {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 112rpx;
+    justify-content: space-between;
+  }
+
+  .city-picker-content-line {
+    background-color: #d3dce6;
+    height: 1px;
+    width: 100%;
+  }
+
+  .city-picker-content-cancel {
+    line-height: 50rpx;
+    height: 50rpx;
+    font-size: 36rpx;
+    color: #353535;
+    padding: 30rpx 48rpx;
+  }
+
+  .city-picker-content-sure {
+    line-height: 50rpx;
+    height: 50rpx;
+    font-size: 36rpx;
+    color: #1AAC19;
+    padding: 30rpx 48rpx;
+  }
+
+  .city-picker-content-center {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    height: 400rpx;
+    overflow: hidden;
+    margin-top: 6rpx;
+    margin-bottom: 6rpx;
+    justify-content: space-between;
+  }
+
+  .city-picker-content-item {
+    width: 50%;
+    height: 300rpx;
+    text-align: center;
+  }
+</style>

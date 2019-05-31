@@ -1,0 +1,306 @@
+<template>
+  <NavBar rgba="#ffffff" bag="#ffffff" title="活动预约"></NavBar>
+  <Loading :init.sync="init"></Loading>
+  <view class="weui-panel weui-panel_access">
+    <view class="weui-navbar">
+      <view wx:for="{{tabs}}" wx:key="{{item.id}}" id="{{item.id}}" class="weui-navbar__item {{activeIndex == item.id ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
+        <view class="weui-navbar__title" >{{item.name}}</view>
+      </view>
+      <view class="weui-navbar__slider" style="width:{{sliderWidth}}px; left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+    </view>
+    <view style="width: 100%;height: 100rpx"></view>
+    <view class="weui-panel__bd">
+    </view>
+  </view>
+  <block wx:if="{{list.length > 0}}">
+    <view class="_bc_content ff" wx:for="{{list}}" wx:key="{{index}}">
+      <view class="_bc_list">
+        <view class="goods_image flo_l">
+          <image src="{{item.poster}}" mode="aspectFit"></image>
+        </view>
+        <view class="goods_message flo_l">
+          <view class="font_28 bold ellipsis_2">{{item.theme}}</view>
+          <view class="font_24">{{item.city}} {{item.dist}}</view>
+          <view class="font_24">{{item.start_time}} ~ {{item.end_time}}</view>
+        </view>
+        <view class="clearfloat"></view>
+      </view>
+      <view class="_bc_item ff">
+        <view class="_bc_btn_warn font_24 flo_r warn" wx:if="{{item.is_deadline == 1}}">已过期</view>
+        <view class="_bc_btn_success font_24 flo_r primary" wx:else>待参加</view>
+
+        <view class="clearfloat"></view>
+      </view>
+    </view>
+  </block>
+  <block wx:else>
+    <view  class="book text-center" >
+      <view class="font_28" style="margin-top: 22rpx">
+        暂无活动信息
+      </view>
+      <view class="clearfloat"></view>
+    </view>
+  </block>
+  <block wx:if="{{loading}}">
+    <view class="weui-loadmore">
+      <view class="weui-loading"></view>
+      <view class="weui-loadmore__tips">正在加载</view>
+    </view>
+  </block>
+  <block wx:if="{{noMore}}">
+    <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+      <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"></view>
+    </view>
+  </block>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import NavBar from '../../components/NavBar'
+  import Loading from '../../components/loading'
+  export default class myActivity extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '活动预约'
+    }
+    components = {NavBar, Loading}
+
+    data = {
+      loaded: false,
+      mylibs: [],
+      tabs: [
+        {name: '全部', id: 0, type: ''},
+        {name: '待参加', id: 1, type: 'joining'},
+        {name: '已过期', id: 2, type: 'joined'}
+      ],
+      type: '',
+      init: false,
+      list: [],
+      activeIndex: 0,
+      sliderOffset: 0,
+      sliderLeft: 0,
+      sliderWidth: 180,
+      screenWidth: 360,
+      page: 1,
+      noMore: false,
+      loading: false,
+      inputShowed: false,
+      inputVal: ''
+    }
+
+    computed = {}
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    async onLoad(e) {
+      let _this = this
+      _this.tabIndex()
+//      this.list.forEach((item,index,arr)=>{
+//        arr[index].URL = encodeURIComponent(arr[index].mod_textUrl)
+//      })
+    }
+
+    onShow() {
+      this.getPageData()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    tabIndex() {
+      let _this = this
+      wx.getSystemInfo({
+        success: function (rst) {
+          _this.screenWidth = rst.screenWidth
+        }
+      })
+      _this.sliderWidth = _this.screenWidth / this.tabs.length
+//      _this.sliderWidth = _this.screenWidth / 6
+      _this.sliderLeft = 0
+      _this.sliderOffset = _this.screenWidth / this.tabs.length * this.activeIndex
+//      _this.sliderOffset = _this.screenWidth / 6 * this.activeIndex
+    }
+
+    onPullDownRefresh() {
+      this.getPageData()
+    }
+
+    onReachBottom() {
+      setTimeout(() => {
+        if (this.activeIndex == '1') {
+//          this.getLibraries()
+        } else {
+//          this.initPageData()
+        }
+        this.$apply()
+      }, 200)
+    }
+    // 初始化页面数据
+    getPageData(keyword) {
+      let _this = this
+      _this.loading = true
+      _this.$get({
+        url: `${service.host}/user/joined/activities`,
+        data: {
+          page: _this.page,
+          type: _this.type
+        }
+      }, {
+        success: ({code, data}) => {
+          _this.init = true
+          _this.noMore = false
+          _this.loading = true
+          if (data.data.length == 0 && data.data.last_page == 1) {
+            _this.loading = false
+            _this.noMore = true
+            _this.list = []
+            return
+          }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = true
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.loading = false
+            _this.noMore = true
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = data
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+            })
+          }
+          _this.noMore = true
+          _this.loading = false
+          _this.page += 1
+          console.log(_this.list)
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          _this.loaded = false
+        }
+      })
+    }
+
+    methods = {
+      gotofriends(item) {
+        let url = ''
+        if (item.type == 'single') {
+          url = '/pages/home/information?id=' + item.id
+        } else {
+          url = '/pages/home/introducer?id=' + item.id
+        }
+        wx.navigateTo({url: url})
+      },
+      showInput() {
+        this.inputShowed = true
+      },
+      hideInput() {
+        this.inputVal = ''
+        this.inputShowed = false
+      },
+      clearInput() {
+        this.inputVal = ''
+      },
+      inputTyping(e) {
+        this.inputVal = e.detail.value
+        console.log(this.inputVal)
+        this.page = 1
+        this.getLibraries(this.inputVal)
+      },
+      tabClick(e) {
+        let that = this
+        that.loading = true
+        that.sliderOffset = e.currentTarget.offsetLeft
+        that.activeIndex = e.currentTarget.id
+        that.type = that.tabs[e.currentTarget.id].type
+        that.list = []
+        that.page = 1
+        that.$apply()
+        that.getPageData()
+      },
+
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      gotoapp(item) {
+        wx.navigateTo({url: '/pages/books/bookDetail?url=' + item})
+      }
+    }
+  }
+
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: #F7F7F7;
+  }
+  .weui-navbar__slider {
+    background-color: #47B351;
+  }
+  .weui-panel{
+    margin-bottom: 12rpx;
+  }
+  weui-loadmore__tips {
+    background: #F7F7F7;
+  }
+  .weui-navbar__item.weui-bar__item_on {
+    color: #47B351;
+  }
+  .weui-panel {
+    margin-top: 0px;
+  }
+  .book{
+    padding: 12rpx;
+    background: white;
+    border-bottom: 1rpx solid #dedede;
+  }
+  ._bc_content{
+    padding: 0 22rpx;
+    margin-bottom: 12rpx;
+    ._bc_list{
+      padding: 12rpx 0;
+      border-bottom: 1rpx solid #d3d3d3;
+      .goods_image{
+        width: 30%;
+        height: 164rpx;
+        image{
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .goods_message{
+        width: 65%;
+        padding: 16rpx;
+      }
+    }
+    ._bc_item{
+      padding: 12rpx 22rpx;
+      ._bc_btn_warn,._bc_btn_success{
+        padding: 2rpx 6rpx;
+        border: 1rpx solid #E64240;
+        border-radius: 4rpx;
+      }
+      ._bc_btn_success{
+        border: 1rpx solid #1AAC19;
+      }
+    }
+  }
+  .weui-loadmore__tips{
+    background: #f7f7f7;
+  }
+</style>

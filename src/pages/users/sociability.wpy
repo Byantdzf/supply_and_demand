@@ -1,0 +1,409 @@
+<template>
+  <view class="page-user">
+    <userTitle :user.sync="user"></userTitle>
+    <view class="weui-cells weui-cells_after-title">
+      <view class="font_32 loveTitle" wx:if="{{showTitle}}">请用第一感觉选择最适合你的选项</view>
+      <view class="font_32 loveTitle" wx:else>{{questions}}</view>
+      <radio-group class="radio-group" bindchange="radioChange">
+        <view class="paylist"  wx:for="{{list}}" wx:key="*this">
+          <label class="radio">
+            <radio value="{{item.value}}" class="flo_l" checked="{{item.checked}}"/>
+            <view class="font_28 flo_l" style="margin-left: 12rpx;margin-top: 8rpx;">{{item.title}}</view>
+            <view class="clearfix"></view>
+          </label>
+          <view class="clearfix"></view>
+        </view>
+      </radio-group>
+      <view class="font_32 flo_r black_6" style="margin: 4%;">
+        <span class="orange">{{index+1}}</span> / {{questionsList.length}}
+      </view>
+      <view class="clearfloat"></view>
+      <block wx:if="{{index}}">
+        <view style="padding: 0 16%;" class="text-center">
+          <view class="next btn_white inline-block" @tap="ensure" >上一题</view>
+          <view class="next btn_red inline-block" @tap="ensure_from" style="margin-top: -8rpx;" wx:if="{{!show}}">完成</view>
+          <view class="clearfloat"></view>
+        </view>
+      </block>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import userTitle from '../../components/userTitle'
+  import { service } from '../../config.js'
+
+  export default class sociability extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '了解交往基因',
+      navigationBarBackgroundColor: '#EEEFF1',
+      enablePullDownRefresh: false
+    }
+    data = {
+      libraries: {},
+      user: {},
+      is_vip: false,
+      nickName: '加载中...',
+      type: '',
+      show: true,
+      index: 0,
+      value: '',
+      showTitle: true,
+      answer: [],
+      questionsList: [],
+      questions: '',
+      list: []
+    }
+
+    computed = {
+      nickName() {
+        return (user && user.wechat && user.wechat.nickname) ? user.wechat.nickname : '未授权用户'
+      }
+    }
+
+    onShow() {
+      // 初始化页面数据
+      this.answer = []
+      this.questionsList = []
+      this.questions = ''
+      this.list = []
+      this.getQuestions()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    onLoad(e) {
+      console.log(e.title)
+      console.log(e.type)
+      this.type = e.type
+      if (e.title == '自己的优势') {
+        this.showTitle = false
+      }
+      this.$apply()
+      let title = '了解' + e.title
+      wx.setNavigationBarTitle({
+        title: title
+      })
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+
+    getQuestions() {
+      this.$showLoading('加载题目中')
+      let data = {type: this.type},
+        that = this
+      this.$get({url: service.user}, {
+        success: ({code, data}) => {
+          this.user = data
+          this.$apply()
+        }
+      })
+      this.$get({url: service.vip + '/questions', data}, {
+        success: ({code, data}) => {
+          that.questionsList = data
+          if (!data.length) {
+            return this.$showToast('数据显示错误')
+          }
+          that.list = data[that.index].option_arr
+          that.questions = data[that.index].questions
+          console.log(that.list)
+          that.list.forEach((item, index, arr) => {
+            arr[index].checked = false
+          })
+          that.$apply()
+          wx.hideLoading()
+        }
+      })
+    }
+
+    // 初始化页面数据
+    initPageData() {
+      this.$get({url: service.user}, {
+        success: ({code, data}) => {
+          this.user = data.user
+          if (data.user.is_news) {
+            wepy.showTabBarRedDot({
+              index: 4
+            })
+          } else {
+            wepy.hideTabBarRedDot({
+              index: 4
+            })
+          }
+        }
+      })
+    }
+
+    methods = {
+      gotofriends(item) {
+        let url = ''
+        if (item.type == 'single') {
+          url = '/pages/home/information?id=' + item.id
+        } else {
+          url = '/pages/home/introducer?id=' + item.id
+        }
+        wx.navigateTo({url: url})
+      },
+      gotoUser(type) {
+        let url = ''
+        if (type == 'single') {
+          url = '/pages/users/unmarri'
+        } else {
+          url = '/pages/users/intro'
+        }
+        wx.navigateTo({url: url})
+      },
+      radioChange(e) {
+        let that = this
+        that.value = e.detail.value
+        that.$apply()
+        console.log('radio发生change事件，携带value值为：', e.detail.value)
+        let quert = {
+          question_id: that.questionsList[that.index].id,
+          value: that.value
+        }
+        if (that.index == that.questionsList.length - 1) {
+          that.answer.splice(that.index, 1)
+          that.answer.push(quert)
+          console.log(that.answer)
+        } else {
+          that.answer.push(quert)
+          setTimeout(() => {
+            if (that.index < that.questionsList.length - 1) {
+              that.index++
+              that.list = that.questionsList[that.index].option_arr
+              that.questions = that.questionsList[that.index].questions
+              that.list.forEach((item, index, arr) => {
+                arr[index].checked = false
+              })
+              that.value = ''
+            }
+            if (that.index == that.questionsList.length - 1) {
+              that.show = false
+            }
+            that.$apply()
+          }, 200)
+        }
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      ensure_from() {
+        let that = this
+        if (that.value == '') {
+          return wx.showToast({
+            title: '请选择选项!',
+            icon: 'none',
+            duration: 1000
+          })
+        } else {
+//          let quert = {
+//            question_id: that.questionsList[that.index].id,
+//            value: that.value
+//          }
+//          that.answer.push(quert)
+//          that.$apply()
+          console.log(that.answer)
+          wx.showLoading({
+            title: '提交中...'
+          })
+          let data = {
+            answer: that.answer,
+            type: that.type
+          }
+          console.log(data)
+          that.$post({url: service.vip + '/test', data}, {
+            success: ({code, data}) => {
+              setTimeout(function () {
+                wx.hideLoading()
+                wx.showToast({
+                  title: '提交成功!',
+                  icon: 'success',
+                  duration: 1200
+                })
+                setTimeout(() => {
+                  wx.redirectTo({url: '/pages/users/myTest?id=' + that.user.id})
+                }, 1200)
+              }, 1000)
+            },
+            fail: ({code, data}) => {
+            },
+            complete: () => {
+              this.loading = false
+            }
+          })
+        }
+      },
+      ensure() {
+        let that = this
+//        if (that.value == '') {
+//          return wx.showToast({
+//            title: '请选择选项!',
+//            icon: 'none',
+//            duration: 1000
+//          })
+//        } else {
+//          let quert = {
+//            question_id: that.questionsList[that.index].id,
+//            value: that.value
+//          }
+//          that.answer.push(quert)
+//          that.$apply()
+//        }
+        if (that.index == that.questionsList.length - 1) {
+          that.answer.splice(that.index, 1)
+        }
+        if (that.index < that.questionsList.length + 1) {
+//          debugger
+          that.index--
+          that.list = that.questionsList[that.index].option_arr
+          that.questions = that.questionsList[that.index].questions
+          console.log(that.answer)
+          that.list.forEach((item, index, arr) => {
+            if (that.answer[that.index].value == arr[index].value) {
+              arr[index].checked = true
+            } else {
+              arr[index].checked = false
+            }
+          })
+          that.answer.splice(that.index, 1)
+        }
+
+        that.value = ''
+        that.$apply()
+        console.log(that.answer)
+        if (that.index < that.questionsList.length - 1) {
+          that.show = true
+          that.$apply()
+        }
+      }
+    }
+
+    components = {userTitle: userTitle}
+  }
+</script>
+
+<style lang="less" scoped>
+  @import "../../styles/custom/fn.less";
+  @import "../../styles/custom/reset.less";
+  page{
+    background: #f4f4f4;
+  }
+  .weui-cells {
+    position: inherit;
+    box-shadow: 1rpx 1rpx 12rpx #dedede;
+    color: #666666;
+    /*margin-top: 12rpx;*/
+  }
+  .user_back{
+    background-image: url("http://local-pictures.img-cn-shenzhen.aliyuncs.com/201806/11/wx53cf66d72649eb5a.o6zAJs2lf_SH4K2plnWTlsSfhR70.9TmBzGGHW7w9470132e3efb72f0a1c8c06768b4cbd80.png");
+    background-size: cover;
+    position: relative;
+  }
+  .page-user{
+    @userinfoHeight: 100rpx;
+    @userinfoSpace: 8rpx;
+
+    .userinfo{
+      padding: 20rpx 0;
+      padding-top: 68rpx;
+      position: relative;
+      left: 0;
+      bottom: -26rpx;
+    }
+    .page__bd_spacing{
+      padding: 22rpx;
+    }
+
+    .userinfo-avatar {
+      border:4rpx solid #ffffff;
+      float: left;
+      width: @userinfoHeight;
+      height: @userinfoHeight;
+      border-radius: 50%;
+    }
+    .weui-cell__bd{
+      margin-left: 12rpx;
+    }
+    // space + space
+    .userinfo-info {
+      float: left;
+      line-height: 1;
+      padding: @userinfoSpace 0;
+      margin-left: 3 * @userinfoSpace;
+      position: relative;
+    }
+
+    // text + space + text
+    .userinfo-nickname {
+      color: white;
+      //font-size: (@userinfoHeight - 4 * @userinfoSpace) * (16 / 30);
+      margin-bottom: 2 * @userinfoSpace;
+    }
+    .userinfo-status {
+      color: #999;
+      font-size: (@userinfoHeight - 4 * @userinfoSpace) * (14 / 30);
+
+    }
+    .menber{
+      background: white;
+      border-radius: 12rpx;
+      padding:4rpx 6rpx ;
+      width: 94rpx;
+      margin-left: 16rpx;
+    }
+    .message{
+      position: absolute;
+      right: 32rpx;
+      top: 32rpx;
+    }
+    .message_red{
+      background: red;
+      width: 16rpx;
+      height: 16rpx;
+      position: absolute;
+      right: -12rpx;
+      border-radius: 50%;
+    }
+    .lead {
+      width: 16rpx;
+      height: 16rpx;
+      background: red;
+      margin-top: -24rpx;
+      border-radius: 50%;
+      position: absolute;
+      right: 16rpx;
+      top: 40rpx;
+    }
+    .next{
+      margin: auto;
+    }
+    .paylist{
+      width: 88%;
+      margin: 22rpx;
+      background: white;
+      padding: 22rpx;
+      border-radius: 12rpx;
+      box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+    }
+    .loveTitle{
+      border-bottom: 1rpx solid #dedede;
+      margin: 22rpx;
+      margin-bottom: 4rpx;
+      background: white;
+      padding: 14rpx 32rpx;
+      margin-top: 0rpx;
+    }
+  }
+</style>

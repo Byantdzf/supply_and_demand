@@ -1,0 +1,83 @@
+<template>
+  <form bindsubmit="formSubmit" report-submit>
+    <button formType="submit" class="btn" data-type="click">
+      <view class="font_26 box">
+        <view class="bold">深圳市友福同享信息科技有限公司福恋服务协议条款：</view>
+        <view>一、遵守中华人民共和国法律法令和其他相关法规，不可发布破坏宪法和法律、法规的信息。</view>
+        <view>二、不得在网上宣扬封建迷信、淫秽、色情、暴力、赌博等不正当行为。</view>
+        <view>三、福恋交友平台（以下简称：本平台）基于“使命·开放·互助·幸福”价值观而开发的婚恋家庭平台。</view>
+        <view>四、本平台也联合具有相同价观的企业，团队和个人在平台提供各类服务，各人使用时，务必谨慎，特别是在约会时，应选择人多的公众场合，不要去电影院、KTV、郊外等光线较暗或能独处的地方。</view>
+        <view>五、交友时务必查验对方的实名认证，并请谨记，我们都完全，交友务必谨慎！应尽量一起参加聚会或活动，互相多多了解。</view>
+        <view>六、申请使用平台会员必须年满18周岁以上，向我们提供本人真实、正确、最新及完整的资料，随时更新登记资料,确保其有效性，使用本平台需要实名认证，认证会员须遵守阿里巴巴
+          <span @tap="goto('/pages/users/protocolV2')">《云盾身份认证服务合同》</span>
+          。</view>
+        <view>七、若会员提供任何错误、不实或不完整的资料,或我们有理由怀疑资料为错误、不实或不完整及违反会员注册条款的,或我们有理由怀疑其会员资料、言行等令其他网友反感的,我们有权修改或删除会员的注册昵称、资料、交友圈等,或暂停或终止该会员的帐号。</view>
+        <view>八、对于用户上传的照片、资料、证件等,我们已采用相关措施进行审核,但不保证其内容的正确性、合法性或可靠性,相关责任由上传上述内容的会员负责。</view>
+        <view>九、会员以自己的独立判断从事与交友相关的行为,并独立承担可能产生的不利后果和责任,本平台不承担任何法律责任。</view>
+        <view>十、在交往中，请不要涉及借贷、投资或金钱交易，若涉及则纯属个人行为，其损失本平台不承担任何法律责任。</view>
+        <view>十一、本平台对所有会员自发组织的活动、自发成立的组织不负责任。</view>
+        <view>十二、你在本平台所有的信息、资料，都将被保存。</view>
+        <view>十三、本注册条款的最终解释权和修改权归本平台所有。</view>
+      </view>
+    </button>
+  </form>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+
+  export default class protocol extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '福恋协议书',
+      enablePullDownRefresh: true
+    }
+    data = {
+      user: {}
+    }
+
+    computed = {}
+
+    onShow() {
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    onLoad() {
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+    methods = {
+      goto(url) {
+        wx.navigateTo({url: url})
+      }
+    }
+    components = {}
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  @import "../../styles/custom/reset.less";
+  page{
+    background: white;
+    .box{
+      padding: 32rpx;
+      view{
+        margin-bottom: 12rpx;
+        span{
+          color: #0a9ec7;
+        }
+      }
+    }
+  }
+</style>

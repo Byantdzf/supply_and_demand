@@ -1,0 +1,253 @@
+<template>
+  <Loading :init.sync="init"></Loading>
+  <Tab_NavBar rgba="#ffffff" title="最新消息"></Tab_NavBar>
+  <view class="page-user">
+    <view wx:for="{{list}}" wx:key="index" class="list ff" @tap="goto({{index}}, {{item}})">
+      <view class="flo_l relative_bot">
+        <image src="{{item.icon}}" class="_icon" mode="aspectFill" wx:if="{{item.icon}}"></image>
+        <view class="dost white" wx:if="{{item.message.new_count && item.message.new_count != 0}}">{{item.message.new_count}}</view>
+      </view>
+      <view  class="_item-text flo_l">
+        <span class="font_28">{{item.title}}</span>
+        <span class="font_22" style="margin-left: 8rpx;color: #FF688A;" wx:if="{{item.message.type == 'marriage'}}">介绍人</span>
+      </view>
+      <span class="font_22 flo_r _time">{{item.message.created_at}}</span>
+      <view  class="_item-user ellipsis_1 flo_r font_26">
+        <span wx:if="{{item.message.content}}">{{item.message.content}}</span>
+        <span wx:else>暂无新消息</span>
+      </view>
+      <view class="clearfloat"></view>
+    </view>
+    <block wx:if="{{loading}}">
+      <view class="weui-loadmore">
+        <view class="weui-loading"></view>
+        <view class="weui-loadmore__tips"  style="background: white">正在加载</view>
+      </view>
+    </block>
+    <block wx:if="{{noMore}}">
+      <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot" style="background: white"></view>
+      </view>
+    </block>
+    <official-account style="position:absolute;bottom:0;width:100%;height:168rpx;"></official-account>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import Loading from '../../components/loading'
+  import Tab_NavBar from '../../components/Tab_NavBar'
+  import {service} from '../../config.js'
+
+  export default class news extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '我的消息',
+      enablePullDownRefresh: true
+    }
+    components = {
+      Loading, Tab_NavBar
+    }
+    data = {
+      init: false,
+      page: 1,
+      loading: false,
+      noMore: false,
+      list: [],
+      typeList: [
+        {
+          icon: 'http://images.ufutx.com/201905/24/2a8b1b56565df18e7ad8e3e4d7554629.png',
+          title: '福恋小助手',
+          message: {},
+          path: `/pages/home/chitchat?id=1&name=福恋小助手&type=chat`
+        },
+        {
+          icon: 'http://images.ufutx.com/201905/24/ee6e88b5d0ce3911300a04f028284bf1.png',
+          title: '系统通知',
+          message: {},
+          path: '/pages/users/myNews'
+        }
+      ]
+    }
+    onShow() {
+      this.page = 1
+      this.initPageData()
+      this.getNewCount()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onLoad(e) {
+    }
+
+    onPullDownRefresh() {
+      this.page = 1
+      this.initPageData()
+    }
+
+    onReachBottom() {
+      this.initPageData()
+    }
+    getNewCount() {
+      this.$get({url: `${service.host}/new/message/count`}, {
+        success: ({code, data}) => {
+          let {new_count} = data
+          if (new_count > 0) {
+            wx.setTabBarBadge({
+              index: 2,
+              text: `${new_count}`
+            })
+          } else {
+            wx.removeTabBarBadge({
+              index: 2
+            })
+          }
+        }
+      })
+    }
+
+    // 初始化页面数据
+    initPageData() {
+      this.$get({url: `${service.host}/message/linkmen/v2`, data: {page: this.page}}, {
+        success: ({code, data}) => {
+          this.init = true
+          console.log(data)
+          let {chat, linkmen, notice} = data
+          if (!linkmen.data.length) {
+            return this.$showToast('我到底了啦...')
+          }
+          this.typeList.forEach((item, index) => {
+            switch (index) {
+              case 0:
+                item.message = chat
+                break
+              case 1:
+                item.message = notice
+                break
+            }
+          })
+          if (linkmen.data.length == 0 && linkmen.last_page == 1) {
+            this.noMore = true
+            this.loading = false
+            return
+          }
+          if (data.current_page > data.last_page) {
+            this.noMore = true
+            this.loading = false
+            return
+          }
+          data = linkmen.data
+          if (this.isArray(data) && data.length === 0) {
+            this.noMore = true
+            this.loading = false
+            return
+          }
+          if (this.list.length === 0 || this.page === 1) {
+            this.list = []
+            this.list = [...this.typeList]
+            for (let item of data) {
+              this.list.push({
+                icon: item.other_user.wechat.avatar2,
+                title: item.other_user.name,
+                message: {
+                  content: item.last_message.content,
+                  created_at: item.last_message.created_at,
+                  id: item.other_user.id,
+                  type: item.other_user.type,
+                  new_count: item.new_count
+                },
+                path: `/pages/home/chitchat?id=${item.other_user.id}&name=${item.other_user.name}&type=${item.other_user.type}`
+              })
+            }
+            this.loading = false
+            this.$apply()
+          } else {
+            let items = []
+            for (let item of data) {
+              items.push({
+                icon: item.other_user.wechat.avatar2,
+                title: item.other_user.name,
+                message: {
+                  content: item.last_message.content,
+                  created_at: item.last_message.created_at,
+                  id: item.other_user.id,
+                  type: item.other_user.type,
+                  new_count: item.new_count
+                },
+                path: `/pages/home/chitchat?id=${item.other_user.id}&name=${item.other_user.name}&type=${item.other_user.type}`
+              })
+            }
+            this.list = [...this.list,...items]
+            console.log(this.list)
+            this.$apply()
+          }
+          this.noMore = true
+          this.page += 1
+          this.$apply()
+          console.log(this.list)
+        }
+      })
+    }
+
+    methods = {
+      goto(index, item) {
+        console.log(item.path)
+        wx.navigateTo({url: item.path})
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  @import "../../styles/custom/reset.less";
+page{
+  background: #fcfcfc;
+  .page-user {
+    position: relative;
+    height: 100vh;
+  }
+  .list{
+    padding: 22rpx 0 0 37rpx;
+    ._icon{
+      width: 100rpx;
+      height: 100rpx;
+      margin-top: 6rpx;
+      border-radius: 50%;
+    }
+    ._time{
+      color: #cacaca;
+      margin-top: 16rpx;
+      margin-right: 28rpx;
+    }
+    .dost{
+      height: 32rpx;
+      min-width: 32rpx;
+      text-align: center;
+      font-size: 20rpx;
+      position: absolute;
+      right: 0rpx;
+      top: 8rpx;
+      font-weight: 600;
+      border-radius: 50%;
+      background: red;
+    }
+    ._item-text{
+      margin-left: 30rpx;
+      font-weight: 700;
+    }
+    ._item-user{
+      padding-right: 4%;
+      color: #838383;
+      margin-top: 6rpx;
+      width: 78%;
+      font-weight: 500;
+      border-bottom: 1rpx solid #e2e2e2;
+      padding-bottom: 26rpx;
+    }
+  }
+}
+</style>

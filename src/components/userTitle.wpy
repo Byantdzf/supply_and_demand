@@ -1,0 +1,838 @@
+<template>
+  <view class="weui-panel">
+    <message :time.sync="deadline"></message>
+    <view class="weui-cells_after-title">
+      <view class="weui-cell user_back">
+        <!--<navigator url="/pages/user/registerV2" >-->
+        <view class="userinfo clearfix">
+          <span  @tap.stop="userMessage" @longpress="longPress">
+            <image class="userinfo-avatar ff" src="{{Image}}" mode="aspectFill" />
+            <!--<image src="https://images.ufutx.com/201812/04/c0a087feb36282e96930e5c612c9d987.png" mode="aspectFit" class="vip-image" ></image>-->
+          </span>
+          <view class="userinfo-info">
+            <view class="userinfo-nickname font_32 bold">
+              {{ user.name }} <span class="font_26 blod">({{StateText}})</span>
+              <view style="margin-top: 28rpx;margin-left: -12rpx;">
+                <block wx:if="{{user.type == 'marriage'}}">
+                  <view class="orange font_26 text-center flo_l menber" style="padding: 8rpx 16rpx;">
+                    <!--<image src="http://images.ufutx.com/201902/21/20416feb7d39e92b8fd56b27468f21f3.png" mode="aspectFill" style="width: 32rpx;height: 32rpx;"-->
+                           <!--class="flo_l"></image>-->
+                    <view style="font-size: 20rpx;" class="flo_r">介绍人</view>
+                  </view>
+                </block>
+                <block wx:else>
+                  <block wx:if="{{user.rank_id == 0}}">
+                    <block wx:if="{{user.is_temp_member == 0}}">
+                    <span @tap="goto('/pages/users/upgradeVIP')">
+                      <!--<span class="flo_r font_26" style="margin: 8rpx 12rpx">升级</span>-->
+                      <view class="orange font_26 text-center flo_l menber" style="width: 116rpx" >
+                        <image src="http://images.ufutx.com/201902/21/20416feb7d39e92b8fd56b27468f21f3.png" mode="aspectFill" style="width: 32rpx;height: 32rpx;"
+                               class="flo_l"></image>
+                        <view style="font-size: 20rpx;margin-top: 8rpx" class="flo_r">普通VIP</view>
+                      </view>
+                    </span>
+                    </block>
+                    <block wx:else>
+                    <span @tap="goto('/pages/users/upgradeVIP')">
+                      <!--<span class="flo_r font_26" style="margin: 8rpx 12rpx">升级</span>-->
+                      <view class="orange font_26 text-center flo_l menber" style="min-width: 76rpx">
+                        <image src="http://images.ufutx.com/201902/21/fea657836c8c203e75c0bb1316a4a827.png" mode="aspectFill" style="width: 32rpx;height: 32rpx;"
+                               class="flo_l"></image>
+                        <view style="font-size: 20rpx;margin-top: 8rpx;margin-left: 4rpx;" class="flo_l">临时VIP</view>
+                      </view>
+                    </span>
+                    </block>
+                  </block>
+                  <block wx:else>
+                    <span @tap="goto('/pages/users/upgradeVIP')">
+                      <!--<span class="flo_r font_26" style="margin: 8rpx 12rpx">升级</span>-->
+                      <view class="orange font_26 text-center flo_l menber" style="width: inherit; min-width: 76rpx">
+                        <image src="http://images.ufutx.com/201902/21/fea657836c8c203e75c0bb1316a4a827.png" mode="aspectFill" style="width: 32rpx;height: 32rpx;"
+                               class="flo_l"></image>
+                        <view style="font-size: 20rpx;margin-top: 8rpx;margin-left: 4rpx;" class="flo_l">{{user.rank_name}}VIP</view>
+                      </view>
+                    </span>
+                  </block>
+                </block>
+              </view>
+            </view>
+          </view>
+
+          <!--<view class="flo_r font_26 white" @tap="gotoUser({{user.type}})">-->
+            <!--<image src="../images/icon/edit_red.png" mode="aspectFill" class="flo_r"-->
+                   <!--style="width: 48rpx;height: 48rpx;margin:0 -6rpx 0 12rpx; "></image>-->
+          <!--</view>-->
+          <!--<view class="message" @tap="goto('/pages/users/myNews')" >-->
+            <!--<image src="http://images.ufutx.com/201901/04/8fa5e8921c0dca549a1302af42c743c2.png" mode="aspectFill" class="flo_r {{user.new_notice_count ? 'doudun' : ''}}"-->
+                   <!--style="width: 56rpx;height: 56rpx;margin:0 -6rpx 0 12rpx; "></image>-->
+            <!--<view class="message_red {{user.new_notice_count ? 'doudun' : ''}}" wx:if="{{user.new_notice_count}}"></view>-->
+          <!--</view>-->
+          <view class="message" style="right: 12rpx;" @tap.stop="showModal({{user}})">
+            <image src="http://images.ufutx.com/201901/04/f6404bd7a4103ee0eb4b59b636c1861f.png" mode="aspectFill" class="flo_r"
+                   style="width: 56rpx;height: 56rpx;margin:0 -6rpx 0 12rpx; "></image>
+          </view>
+        </view>
+        <!--</navigator>-->
+      </view>
+    </view>
+  </view>
+  <modal :border.sync="border">
+    <view slot="wrapper" class="wrapper">
+      <view @tap="chooseimage" class="uploadAvatar text-center">
+        <image class="ff avater" src="{{Image}}" mode="aspectFill" />
+        <image src="https://images.ufutx.com/201812/04/c0a087feb36282e96930e5c612c9d987.png" mode="aspectFit" class="vip-image" ></image>
+      </view>
+      <image src="http://images.ufutx.com/201903/13/479fd90a75475e3f95598843944e7141.png" mode="aspectFit" @tap="quitMusic" class="music {{!stopMusic?'avatar-animation':''}}"></image>
+      <view style="height: 30vh;"></view>
+      <block wx:if="{{user.type == 'single'}}">
+        <view class="_bc_title white" >
+          <span class="flo_l font_28">生活照:</span>
+          <block wx:for="{{user.lifePhotos}}" wx:key="{{index}}">
+            <view class="_bc-photo flo_l">
+              <image src="{{item.photo}}" mode="aspectFill" class=" ff" @tap="previewImage({{item.photo}},{{user.lifePhotos}})"></image>
+            </view>
+          </block>
+          <view class="_bc-photo flo_l">
+            <image src="http://images.ufutx.com/201903/14/6350d843bbe4c3da05aa44a63a2d23b0.jpeg" mode="aspectFit" class=" ff" ></image>
+            <view class="more white font_28 text-center" @tap="goto('/pages/users/uploadPic')">更多...</view>
+          </view>
+          <view class="clearfloat"></view>
+        </view>
+      </block>
+      <view class="_bc_title white" style="padding-bottom: 32rpx;">
+        <view class="font_28" style="margin-bottom: 12rpx;" @tap="gotoUser({{user.type}})">
+          <span class="flo_l">基本信息:</span>
+          <span class="flo_r">
+            完善资料
+            <image src="http://images.ufutx.com/201903/11/a019b634a26641c65bde61fc5a939bfe.png" mode="aspectFit" class="icon-right"></image>
+          </span>
+          <view class="clearfloat"></view>
+        </view>
+        <view class="inline-block _bc-message font_26 color-666" wx:if="{{user.profile.sex}}">性别：{{user.profile.sex == 1?'男': '女'}}</view>
+        <view class="inline-block _bc-message font_26 color-666" wx:if="{{user.profile.age}}">{{user.profile.age}}</view>
+        <view class="inline-block _bc-message font_26 color-666" wx:if="{{user.profile.stature}}">身高：{{user.profile.stature + 'cm'}}</view>
+        <view class="inline-block _bc-message font_26 color-666" wx:if="{{user.profile.weight}}">体重：{{user.profile.weight + 'kg'}}</view>
+        <view class="inline-block _bc-message font_26 color-666" wx:if="{{user.profile.birthday}}">{{user.profile.birthday}}</view>
+        <view class="inline-block _bc-message font_26 color-666" wx:if="{{user.profile.degree}}">学历：{{user.profile.degree}}</view>
+        <view class="inline-block _bc-message font_26 color-666" wx:if="{{user.profile.city}}">常居地：{{user.profile.city}}</view>
+        <view class="inline-block _bc-message font_26 color-666" @tap="goto('/pages/users/unmarriV2')">...</view>
+      </view>
+      <image src="http://images.ufutx.com/201903/14/2f4acf83e4d8a8134902279b9d517ca9.png" mode="aspectFit" class="hidemodal" @tap="hide"></image>
+    </view>
+  </modal>
+  <modalUp>
+    <view slot="wrapper" class="wrapper-up white">
+      <view class="header">
+        <image src="http://images.ufutx.com/201903/05/cbc22feb2fcbd4b43173f763c6a46107.png" mode="aspectFit" class="image"></image>
+        <span class="font_28 bold">福恋： <span class="font_24">头像审核标准</span></span>
+      </view>
+      <view class="imagebox">
+        <image src="http://images.ufutx.com/201903/13/6b705dc8ce0087eae7301080e5e2fc90.png" mode="aspectFit"></image>
+      </view>
+      <!--<view class="text-center">-->
+        <!--<button size="mini"  type="default" @tap="chooseimage">-->
+          <!--<image mode="aspectFit" src="http://images.ufutx.com/201902/22/f564ba546511736c95a4e9dd4bb793da.png" style="width: 18px;height: 18px;vertical-align: middle;margin-bottom: 6rpx;"></image>-->
+          <!--上传-->
+        <!--</button>-->
+      <!--</view>-->
+    </view>
+  </modalUp>
+  <view class="commodity_screen" bindtap="hideModal" wx:if="{{showModalStatus}}"></view>
+  <!--弹出框  -->
+  <view animation="{{animationData}}" class="commodity_attr_box" wx:if="{{showModalStatus}}">
+    <view class="_bc-title " hover-class="weui-cell_active"  @tap="gotofriends({{user}})">
+      <span class="font_28">个人信息</span>
+      <image class="image flo_r" mode="aspectFit" src="http://images.ufutx.com/201901/11/4276017b1691e5b0ad57ed6da88f681b.png"></image>
+    </view>
+    <view class="_bc-title " hover-class="weui-cell_active"  @tap="gotoUser({{user.type}})">
+      <span class="font_28">编辑资料</span>
+      <image class="image flo_r" mode="aspectFit" src="http://images.ufutx.com/201901/11/4276017b1691e5b0ad57ed6da88f681b.png"></image>
+    </view>
+    <view class="_bc-title "   @tap="ChangeState" wx:if="{{user.type !== 'marriage'}}">
+      <span class="font_28">单身状态</span>
+      <image class="image flo_r " style="{{showChangeState?'transform: rotate(90deg)': ''}}" mode="aspectFit" src="http://images.ufutx.com/201901/11/4276017b1691e5b0ad57ed6da88f681b.png"></image>
+      <view class="font_26 State text-right" wx:if="{{showChangeState}}">
+        <span wx:for="{{StateList}}" class="{{item.active?'active':''}}" wx:key="{{index}}"  @tap.stop="StateActive({{index}})">{{item.title}}</span>
+      </view>
+    </view>
+    <view style="background: #f8f8f8;height: 22rpx;"></view>
+    <view class="_bc-title">
+      <span class="font_28">隐身访问</span>
+      <switch checked="{{user.hidden}}" bindchange="hiddenChange" color="#ff7645" class="flo_r" style="margin-right: -22rpx;margin-top: -6rpx;"/>
+    </view>
+    <view class="_bc-title " hover-class="weui-cell_active"  @tap="goto('/pages/users/blacklist')">
+      <span class="font_28">黑名单</span>
+      <image class="image flo_r" mode="aspectFit" src="http://images.ufutx.com/201901/11/4276017b1691e5b0ad57ed6da88f681b.png"></image>
+    </view>
+    <view style="background: #f8f8f8;height: 22rpx;"></view>
+    <view class="_bc-title " hover-class="weui-cell_active"  @tap="gotoH5('https://mp.weixin.qq.com/s/-V_iAHAb-IjKY1gYgnsmHA')">
+      <span class="font_28">如何使用？</span>
+      <image class="image flo_r" mode="aspectFit" src="http://images.ufutx.com/201901/11/4276017b1691e5b0ad57ed6da88f681b.png"></image>
+    </view>
+    <block wx:if="{{user.hidden_profile == 'ALLSEX'}}">
+      <view class="_bc-title">
+        <span class="font_28">打开资料</span>
+        <switch checked="{{user.hidden_profile !== 'ALLSEX'}}" bindchange="openData" color="#ff7645" class="flo_r" style="margin-right: -22rpx;margin-top: -6rpx;"/>
+      </view>
+    </block>
+    <block wx:else>
+      <view class="_bc-title " hover-class="weui-cell_active"  @tap="goto('/pages/users/logout')">
+        <span class="font_28">关闭资料？</span>
+        <image class="image flo_r" mode="aspectFit" src="http://images.ufutx.com/201901/11/4276017b1691e5b0ad57ed6da88f681b.png"></image>
+      </view>
+    </block>
+    <!--<view class="text-center">-->
+      <!--<view class="font_26 text-center orange logout"  @tap="logout">-->
+        <!--注销账号-->
+      <!--</view>-->
+    <!--</view>-->
+    <view class="clearfloat"></view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import message from './message'
+  import base from '../mixins/base'
+  import {service} from '../config.js'
+  import http from '../mixins/http'
+  import uploadImage from '../components/uploadImage'
+  import modal from '../components/modal'
+  import modalUp from '../components/modal-up'
+  export default class userTitle extends wepy.component {
+    mixins = [base, http]
+    props = {
+      user: {
+        type: Object,
+        default: {}
+      }
+    }
+    components = {
+      message, modal, uploadImage, modalUp
+    }
+    data = {
+      user: {
+        name: '获取中...'
+      },
+      deadline: '',
+      showModalStatus: false,
+      showChangeState: false,
+      animationData: {},
+      pic: [],
+      Image: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
+      files: '',
+      ShowUpload: false,
+      border: 0,
+      BookImage: '',
+      showUpLoad: false,
+      stopMusic: false,
+      innerAudioContext: null,
+      StateList: [
+        {title: '单身', active: true, type: 'single'},
+        {title: '恋爱', active: false, type: 'loveing'},
+        {title: '已婚', active: false, type: 'marriage'}
+      ],
+      StateText: ''
+    }
+    watch = {
+      user() {
+        console.log(this.user.type)
+        for (let item of this.StateList) {
+          if (item.type == this.user.type) {
+            item.active = true
+            this.StateText = item.title
+          } else {
+            item.active = false
+          }
+        }
+        this.Image = this.user.avatar
+        if (this.user.deadline != null) {
+          this.deadline = this.user.deadline
+        } else {
+          this.deadline = ''
+        }
+        this.$apply()
+      },
+      pic() {
+        console.log(this.pic)
+      }
+    }
+
+    onLoad() {
+      // this.$invoke('modal', 'showModal')
+      console.log(this.user)
+    }
+
+    // onHide() {
+    //   this.$invoke('modal', 'hideModal')
+    //   this.$invoke('modalUp', 'hideModal')
+    //   this.stopMusic = !this.stopMusic
+    //   this.$apply()
+    //   this.onPauseMusic()
+    // }
+
+    onPlayMusic() {
+      this.innerAudioContext = wx.createInnerAudioContext()
+      this.innerAudioContext.autoplay = true
+      this.innerAudioContext.src = 'http://fs.w.kugou.com/201903131827/e1a8ec0760cadfae374d8134e34586e6/G005/M0A/0D/11/pYYBAFUAR6OIO27aAA_94zuQwNEAABIIALm1Z8AD_37501.mp3'
+      this.innerAudioContext.loop = true
+      this.innerAudioContext.onPlay(() => {
+        console.log('开始播放')
+      })
+      this.innerAudioContext.onError((res) => {
+        console.log(res.errMsg)
+        console.log(res.errCode)
+      })
+    }
+    onPauseMusic() {
+      this.$invoke('modal', 'hideModal')
+      this.$invoke('modalUp', 'hideModal')
+      this.showUpLoad = !this.showUpLoad
+      this.stopMusic = !this.stopMusic
+      this.$apply()
+      if (this.innerAudioContext) {
+        this.innerAudioContext.pause(() => {
+          console.log('停止播放')
+        })
+        this.innerAudioContext.onError((res) => {
+          console.log(res.errMsg)
+          console.log(res.errCode)
+        })
+      }
+    }
+
+    upDataAvatar() {
+      let data = {
+        photo: this.Image
+      }
+      this.$put({url: `${service.user}/photo`, data}, {
+        success: ({code, data}) => {
+          this.$Toast_success('更换成功')
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          wx.hideLoading()
+        }
+      })
+    }
+
+    methods = {
+      previewImage(item, list) {
+        this.$previewImage(item, list)
+      },
+      hide() {
+        this.stopMusic = !this.stopMusic
+        this.$apply()
+        this.onPauseMusic()
+      },
+      chooseimage() {
+        this.onPauseMusic()
+        this.$invoke('uploadImage', 'chooseimage')
+      },
+      quitMusic() { // 停止音乐
+        this.stopMusic = !this.stopMusic
+        this.$apply()
+        if (!this.stopMusic) {
+          this.onPlayMusic()
+        } else {
+          this.onPauseMusic()
+        }
+      },
+      userMessage() { // 打开浮层 播放音乐
+        this.$invoke('modalUp', 'showModal')
+        this.$invoke('modal', 'showModal')
+        this.onPlayMusic()
+      },
+      openData() { // 打开资料
+        let vm = this
+        vm.$put({
+          url: `${service.host}/change/hidden/profile`,
+          data: {type: 'NONE'}
+        }, {
+          success: ({code, res}) => {
+            vm.$showToast('已打开')
+            vm.$get({url: service.user}, {
+              success: ({code, data}) => {
+                vm.user = data
+                vm.$apply()
+              }
+            })
+          }
+        })
+      },
+      gotoH5(item) {
+        console.log(encodeURIComponent(item))
+        wx.navigateTo({url: '/pages/books/bookDetail?url=' + encodeURIComponent(item)})
+      },
+      ChangeState() {
+        if (this.showChangeState) {
+          this.showChangeState = false
+        } else {
+          this.showChangeState = true
+        }
+        this.$apply()
+        console.log(this.showChangeState)
+      },
+      hiddenChange() { // 隐身处理
+        this.$put({url: `${service.host}/users/hidden`}, {
+          success: ({code, data}) => {
+            this.$showToast('设置成功')
+          }
+        })
+      },
+      StateActive(index) {
+        let data = {
+          type: this.StateList[index].type
+        }
+        this.$put({url: `${service.host}/change/users/type`, data}, {
+          success: ({code, data}) => {
+            this.$get({url: service.user}, {
+              success: ({code, data}) => {
+                this.user = data
+                this.$apply()
+                wx.setStorageSync('type', data.type)
+              }
+            })
+            for (let idx in this.StateList) {
+              if (idx == index) {
+                this.StateList[idx].active = true
+              } else {
+                this.StateList[idx].active = false
+              }
+              this.$apply()
+            }
+            console.log('更改成功')
+          }
+        })
+      },
+      // 注销账号
+      logout() {
+        let that = this
+        wx.showModal({ // 使用模态框提示用户进行操作
+          title: '警告',
+          content: '本操作将会注销您的账户，可能会导致您错过精心为您配对的另一半，是否继续？',
+          cancelText: '确定',
+          confirmText: '取消',
+          success: function (res) {
+            if (res.confirm) {
+              console.log('用户点击取消')
+            } else if (res.cancel) {
+              that.$delete({url: `${service.host}/admin/users/${that.user.id}`}, {
+                success: ({code, data}) => {
+                  wx.clearStorageSync()
+                  wx.showModal({ // 使用模态框提示用户进行操作
+                    title: 'Sorry!',
+                    content: '很抱歉！我们的产品没有留住你，希望我们能够再次见面！！！',
+                    showCancel: false,
+                    confirmText: '确定',
+                    success: function (res) {
+                      if (res.confirm) {
+                        that.$goto('/pages/tabBar/welcome')
+                      }
+                    }
+                  })
+                }
+              })
+            }
+          }
+        })
+      },
+      // 显示对话框
+      showModal() {
+        // 显示遮罩层
+        var animation = wx.createAnimation({
+          duration: 200,
+          timingFunction: 'linear',
+          delay: 0
+        })
+        this.animation = animation
+        animation.translateY(300).step()
+        this.animationData = animation.export()
+        this.showModalStatus = true
+        this.$apply()
+        setTimeout(function () {
+          animation.translateY(0).step()
+          this.animationData = animation.export()
+          this.$apply()
+        }.bind(this), 200)
+      },
+      // 隐藏对话框
+      hideModal() {
+        // 隐藏遮罩层
+        var animation = wx.createAnimation({
+          duration: 200,
+          timingFunction: 'linear',
+          delay: 0
+        })
+        this.animation = animation
+        animation.translateY(300).step()
+        this.animationData = animation.export()
+        setTimeout(function () {
+          animation.translateY(0).step()
+          this.animationData = animation.export()
+          this.showModalStatus = false
+          this.$apply()
+        }.bind(this), 200)
+      },
+      longPress() {
+        wx.showModal({ // 使用模态框提示用户进行操作
+          title: '警告',
+          content: '你将清空福恋小程序本地所有缓存！',
+          success: function (res) {
+            if (res.confirm) { // 判断用户是否点击了确定
+              wx.clearStorageSync()
+            }
+          }
+        })
+      },
+      gotofriends(item) {
+//        this.showModalStatus = false
+//        this.$apply()
+        let url = ''
+        if (item.type == 'single') {
+          url = '/pages/home/information?id=' + item.id
+        } else {
+          url = '/pages/home/introducer?id=' + item.id
+        }
+        wx.navigateTo({url: url})
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      gotoUser(type) {
+        this.onPauseMusic()
+        let url = ''
+        if (type == 'single') {
+          url = '/pages/users/unmarriV2'
+        } else {
+          url = '/pages/users/intro'
+        }
+        wx.navigateTo({url: url})
+      }
+    }
+    events = {
+      'UpLoadImage': (value) => {
+        let vm = this
+        vm.Image = value
+        vm.$apply()
+        vm.upDataAvatar()
+      }
+    }
+  }
+</script>
+
+<style type="less" scoped>
+@import "../styles/custom/fn.less";
+.user_back{
+  background-image: url("http://images.ufutx.com/201901/04/eb2209f12a0499af336476aa462c67a6.png");
+  background-size: contain;
+  height: 188rpx;
+  position: relative;
+}
+.userinfo-avatar {
+  float: left;
+  width: 130rpx;
+  height: 130rpx;
+  border-radius: 50%;
+  /*margin-left: 12rpx;*/
+  box-shadow: 0 0 20rpx #bdbdbd;
+  border: 4rpx solid #ffffff;
+}
+.userinfo-nickname {
+  margin-top: 12rpx;
+}
+.userinfo{
+  padding: 20rpx 0;
+  padding-top: 32rpx;
+  position: relative;
+  left: 0;
+  bottom: 20rpx;
+  width: 100%;
+}
+.menber{
+  background: white;
+  border-radius: 16rpx;
+  padding: 4rpx 16rpx ;
+  /*width: 94rpx;*/
+  margin-left: 16rpx;
+  position: relative;
+  &:before{
+    width:0;
+    height:0;
+    border: 12rpx solid transparent;
+    border-bottom-color: white;
+    position:absolute;
+    content:'';
+    left: 12rpx;
+    top: -22rpx;
+  }
+}
+/*.menber:after{*/
+  /*content: "";*/
+  /*border-top: 7px solid transparent;*/
+  /*border-bottom: 7px solid transparent;*/
+  /*border-right: 7px solid #fff;//箭头背景颜色，覆盖前面的#eee颜色，使其颜色与整体颜色一致/*/
+/*position: absolute;*/
+  /*top: 27px;*/
+  /*left: -7px;//这里的top:27px，left:-7px是为了遮盖住.c-main:before生成的箭头，使箭头边框呈现颜色*/
+/*}*/
+.doudun{
+  animation: tada 1800ms ease infinite;
+}
+.vip-image{
+  width: 42rpx;
+  height: 42rpx;
+  position: absolute;
+  left: 92rpx;bottom: 30rpx;
+  animation: zy 2.5s .15s linear infinite;
+}
+
+@keyframes tada {
+  0% {
+    transform: scale(1);
+  }
+  10%, 20% {
+    transform: scale(0.9) rotate(-12deg)
+  }
+  30%, 50%, 70%, 90% {
+    transform: scale(1.1) rotate(12deg)
+  }
+  40%, 60%, 80% {
+    transform: scale(1.1) rotate(-12deg)
+  }
+  100% {
+    transform: scale(1) rotate(0)
+  }
+}
+@keyframes zy{
+  10%{transform: rotate(15deg);}
+  20%{transform: rotate(-10deg);}
+  30%{transform: rotate(5deg);}
+  40%{transform: rotate(-5deg);}
+  50%,100%{transform: rotate(0deg);}
+}
+.active{
+  background: #1AAC19 !important;
+  color: white;
+}
+.State{
+  padding-right: 8%;
+  span {
+    padding: 6rpx 12rpx;
+    background: #f3f4f9;
+    margin-top: 12rpx;
+    margin-right: 22rpx;
+    border-radius: 4rpx;
+  }
+}
+/*使屏幕变暗  */
+.commodity_screen {
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background: #000;
+  opacity: 0.2;
+  overflow: hidden;
+  z-index: 1000;
+  color: #fff;
+  filter: blur(38px);
+}
+/*对话框 */
+.commodity_attr_box {
+  /*height: 300rpx;*/
+  padding-bottom: 4%;
+  width: 100%;
+  overflow: hidden;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  z-index: 2000;
+  background: #fff;
+  padding-top: 20rpx;
+  border-top-right-radius: 22rpx;
+  border-top-left-radius: 22rpx;
+}
+.share-image{
+  width: 76rpx;
+  height: 76rpx;
+}
+.message{
+  position: absolute;
+  right: 112rpx;
+  top: 4rpx;
+}
+.message_red{
+  background: red;
+  width: 16rpx;
+  height: 16rpx;
+  position: absolute;
+  right: -8rpx;
+  border-radius: 50%;
+}
+.userinfo-info {
+  float: left;
+  line-height: 1;
+  padding: 8rpx 0;
+  margin-left: 3 * 8rpx;
+  position: relative;
+}
+  ._bc-title{
+    border-bottom: 3rpx solid #f3f3f3;
+    margin: 0 32rpx;
+    padding: 22rpx 22rpx;
+    .image{
+      width: 32rpx;
+      height: 32rpx;
+      /*display: flex;// flex布局*/
+      /*justify-content: center;// 使子项目水平居中*/
+      /*align-items: center;// 使子项目垂直居中*/
+      margin-top: 12rpx;
+    }
+  }
+  .logout{
+    padding: 16rpx 42rpx;
+    background: #e6e5ea;
+    margin: auto;
+    display: inline-block;
+    margin-top: 32rpx;
+    border-radius: 8rpx;
+  }
+  .wrapper{
+    padding: 22rpx;
+    height: 72vh;
+    background: #313137;
+    background-image: url("http://images.ufutx.com/201903/11/a4851507b93dfa6d85038d7cbd513566.png");
+    background-size: cover;
+    background-repeat: no-repeat;
+    position: relative;
+    z-index: 99;
+    .uploadAvatar{
+      width: 132rpx;
+      height: 132rpx;
+      border-radius: 50%;
+      position: absolute;
+      left: 302rpx;
+      top: 106rpx;
+      padding: 4rpx;
+      border: 4rpx solid #f9f9f9;
+      .avater{
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        box-shadow: 1rpx 1rpx 12rpx #ffffff;
+      }
+      .vip-image{
+        box-shadow: 1rpx 1rpx 12rpx #f9f9f9;
+        bottom: 12rpx;
+      }
+    }
+    ._bc_title{
+      border-bottom: 2rpx solid #f9f9f9;
+      border-radius: 12rpx;
+      padding: 16rpx 22rpx;
+      padding-bottom: 2rpx;
+      margin-bottom: 36rpx;
+      ._bc-photo{
+        width: 120rpx;
+        height: 120rpx;
+        margin-left: 16rpx;
+        margin-top: 8rpx;
+        margin-bottom: 22rpx;
+        position: relative;
+        image{
+          width: 100%;
+          height: 100%;
+        }
+        .more{
+          width: 100%;
+          height: 100%;
+          background: rgba(165, 165, 165, 0.8);
+          /*filter: blur(8rpx);*/
+          position: absolute;
+          top: 0;
+          left: 0;
+          vertical-align: middle;
+          line-height: 4.5;
+        }
+      }
+      .icon-right{
+        width: 32rpx;
+        height: 32rpx;
+        vertical-align: middle;
+        margin-bottom: 4rpx;
+      }
+      ._bc-message{
+        background: #ffffff;
+        border: 4rpx solid #f4f4f4;
+        padding: 0 12rpx;
+        border-radius: 6rpx;
+        margin-right: 12rpx;
+        vertical-align: middle;
+        margin-top: 16rpx;
+      }
+    }
+    .music{
+      position: absolute;
+      top: 32rpx;
+      right: 42rpx;
+      width: 60rpx;
+      height: 60rpx;
+      box-shadow: 1rpx 1rpx 12rpx #ffffff;
+      border-radius: 50%;
+    }
+  }
+  .avatar-animation{
+    /*-webkit-transition-property: -webkit-transform;*/
+    /*-webkit-transition-duration: 1s;*/
+    animation: rotate 8s linear infinite;
+    @-webkit-keyframes rotate{
+      from{-webkit-transform: rotate(0deg)}
+      to{-webkit-transform: rotate(360deg)}
+    }
+  }
+  .wrapper-up{
+    padding: 22rpx;
+    padding-top: 32rpx;
+    height: 22vh;
+    background: #313137;
+    /*background-image: url("http://images.ufutx.com/201903/11/a4851507b93dfa6d85038d7cbd513566.png");*/
+    /*background-size: cover;*/
+    /*background-repeat: no-repeat;*/
+    position: relative;
+    z-index: 1;
+    .header {
+      .image{
+        width: 46rpx;
+        height: 46rpx;
+        vertical-align: middle;
+        margin-right: 18rpx;
+      }
+    }
+    .imagebox{
+      width: 100%;
+      height: 160rpx;
+      margin-top: 22rpx;
+      margin-bottom: 36rpx;
+      image{
+        width: 100%;
+        height: 100%;
+      }
+    }
+  }
+  .hidemodal{
+    position: fixed;
+    bottom: 100rpx;
+    right: 42rpx;
+    width: 48rpx;
+    height: 48rpx;
+    padding: 16rpx;
+    box-shadow: 1rpx 1rpx 12rpx #ffffff;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.1);
+    /*filter: blur(4rpx);*/
+  }
+
+</style>

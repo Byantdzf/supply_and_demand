@@ -1,0 +1,519 @@
+<template>
+  <view >
+    <image src="http://images.ufutx.com/201902/21/023be3e034664527c1bc3306febe4c44.png" mode="aspectFill" style="width: 100%;height:100vh;position: fixed;top: 0;left: 0;"></image>
+  </view>
+  <view class="main-register" >
+    <view class="main-address">
+      <block wx:if="{{marriage}}">
+        <view class=" reset-cell-block">
+          <view class="text-center">
+            <image  mode="aspectFill" src="{{from_avatar}}" class="party_image"></image>
+          </view>
+          <view class="font_28 text-center bold black_6" style="width: 74%; margin-top: 22rpx;margin: auto"> <span class="font_36 orange" style="margin-right: 6rpx;">{{marriage}}</span>邀请你加入福恋平台</view>
+        </view>
+      </block>
+      <view style="margin-top: 48rpx;">
+        <view class="text-center flo_l userinfo-avatar" style="margin-top: 48rpx">
+          <!--<block wx:if="{{!avatar}}">-->
+            <!--<image src="http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif" mode="aspectFill" class="avater_user"></image>-->
+          <!--</block>-->
+          <!--<block wx:else>-->
+            <block wx:if="{{showAvatar}}">
+              <image  mode="aspectFill" src="{{avatar}}" class="avater_user"></image>
+            </block>
+            <block wx:else>
+              <open-data type="userAvatarUrl" class="avater_user"></open-data>
+            </block>
+          <!--</block>-->
+        </view>
+        <view class="flo_r">
+          <view>
+            <view class=" h4">
+              <view class="h3 color-666">姓名：</view>
+              <input @input="typing('name')" class="weui-input border_b font_28" value="{{name}}" placeholder="你的真实姓名" style="border-radius:.25em;"/>
+            </view>
+          </view>
+          <view>
+            <view class="h4" style="margin-top: 12rpx">
+              <view class="h3 color-666">手机号：</view>
+              <block wx:if="{{is_disiablad}}">
+                <button class="btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">
+                  <input @input="typing('mobile')" type="number" class="weui-input border_b font_28" value="{{mobile}}" disabled style="border-radius:.25em;"  placeholder="请输入手机号"/>
+                </button>
+              </block>
+              <block wx:else>
+                <input @input="typing('mobile')" type="number" class="weui-input border_b font_28" value="{{mobile}}" disabled style="border-radius:.25em;"  placeholder="请输入手机号"/>
+              </block>
+            </view>
+          </view>
+          <view class="">
+          <view class="weui-label">
+          <view class="btn_red_v1" style="margin-top: 26rpx;width: 240rpx;">
+          <button class="font_28 btn white text-center" style="width: 240rpx;height: 60rpx;line-height: 60rpx;" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">从微信获取手机号</button>
+          </view>
+          </view>
+          </view>
+        </view>
+      </view>
+      <view class="clearfloat"></view>
+      <view style="color: #FFFFFF;margin:32rpx;" class="font_24">
+        <view>
+          <view class="" style="background: #CE7A89;padding: 6rpx 22rpx;">如果您现在是</view>
+          <!--<view class="clearfloat"></view>-->
+        </view>
+        <view style="padding: 0 22rpx;border: 1rpx solid #CE7A89;">
+          <view>单身：进入成为会员，学习预备进入幸福家庭！</view>
+          <view>已婚：进入成为介绍人，帮助周围单身找对象！</view>
+        </view>
+      </view>
+      <view style="margin-top: 100rpx;width: 100%">
+        <view class="text-center flo_l">
+          <view  class="btn_red_v font_28" style="width: 260rpx;" >
+            <form bindsubmit="formSubmit" report-submit>
+              <button formType="submit" class="btn text-center font_28 white" style="width: 240rpx;height: 60rpx;line-height: 60rpx;"  open-type="getUserInfo" @getuserinfo="getuserinfo('marriage')" >我是介绍人</button>
+            </form>
+          </view>
+        </view>
+        <view  class="text-center flo_r">
+          <view  class="btn_red_v font_28" style="width: 260rpx;" >
+            <form bindsubmit="formSubmit" report-submit>
+              <button class="btn text-center font_28 white" style="width: 240rpx;height: 60rpx;line-height: 60rpx;"  formType="submit"  open-type="getUserInfo" @getuserinfo="getuserinfo('single')" >我是单身</button>
+            </form>
+          </view>
+        </view>
+      </view>
+        <!--<view class="  reset-input">-->
+          <!--<view class=" h4">-->
+            <!--<input @input="typing('code')" class="weui-input" value="{{code}}" placeholder="请输入验证码"/>-->
+          <!--</view>-->
+          <!--<view class="weui-cell__ft">-->
+            <!--<view class="weui-label reset-label-right">-->
+              <!--<button @tap="verify" class="weui-btn mini-btn" type="default" size="mini">{{btnText}}</button>-->
+            <!--</view>-->
+          <!--</view>-->
+        <!--</view>-->
+    </view>
+
+    <!--<view style="width: 20%;margin: auto">-->
+      <!--<button @tap="goto('/pages/party/edit_party')" class="weui-btn btn-blue">下一步</button>-->
+    <!--</view>-->
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+
+  export default class Register extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '注册',
+      enablePullDownRefresh: false,
+      navigationBarBackgroundColor: '#CE7A89',
+      navigationBarTextStyle: 'white'
+
+    }
+    data = {
+      // 手机号/验证码
+      name: '',
+      mobile: '',
+      code: '',
+      wechat_code: '',
+      loading: false,
+      timer: null,
+      time: 0,
+      encryptedData: '',
+      iv: '',
+      avatarUrl: '',
+      marriage: '',
+      avatar: '',
+      from_avatar: '',
+      userInfo: {},
+      showAvatar: true,
+      is_disiablad: true,
+      nickName: ''
+    }
+
+//    computed = {
+//      listIndex() {
+//        const arr = this.getArray((this.list || []).filter((item, index_M.wpy) => {
+//          item.TEMPINDEX = index_M.wpy
+//          return this.getString(this.value) === this.getString(item.id)
+//        }))
+//        const index_M.wpy = arr[0] && arr[0].TEMPINDEX
+//        return this.getNumber(index_M.wpy)
+//      },
+//      realPrice() {
+//        const item = this.list && this.list[this.listIndex]
+//        const price = item && item.price
+//        return price || 0
+//      },
+//      btnText() {
+//        return +this.time > 0 ? `${this.time}s后重新获取` : '获取验证码'
+//      }
+//    }
+
+    onLoad(e) {
+      if (e.from_openid) {
+        wx.setStorageSync('from_openid', e.from_openid)
+      }
+      // 初始化页面数据
+//      this.initPageData()
+//      this.getInfo()
+    }
+
+    onShow() {
+      this.initPageData()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onPullDownRefresh() {
+      this.initPageData()
+    }
+
+    // 初始化页面数据
+    initPageData() {
+//      var token = wx.getStorageSync('token')
+//      if (!token) {
+      wepy.login({
+        success: (res) => {
+          console.log('wepy.login.success:', res)
+          // debugger
+          // 根据业务接口处理:业务登陆:异步
+          let data = {code: res.code, from_openid: wx.getStorageSync('from_openid')}
+          this.$post({url: service.login, data}, {
+            success: ({code, data}) => {
+              this.from_avatar = data.from_avatar
+              this.avatar = data.user ? data.user.avatar : ''
+              this.marriage = data.marriage
+              if (!this.avatar) {
+                this.showAvatar = false
+                this.$apply()
+              }
+              this.$apply()
+              if (data.token) {
+                wx.setStorageSync('token', data.token)
+                wx.setStorageSync('openid', data.openid)
+                wx.switchTab({
+                  url: '/pages/tabBar/home'
+                })
+              }
+            }
+          })
+        },
+        fail: (res) => {
+          console.log('wepy.login.fail:', res)
+        }
+      })
+//      }
+//      this.$doLogin()
+//      this.$setCode()
+//      debugger
+//      wepy.getUserInfo({
+//        success: (res) => {
+//          wx.setStorageSync('user', res.userInfo)
+//          code: wx.getStorageSync('code')
+//          this.avatarUrl = res.userInfo.avatarUrl
+//          this.nickName = res.userInfo.nickName
+//          this.encryptedData = res.encryptedData
+//          this.iv = res.iv
+//          debugger
+//          console.log(this.iv)
+//          this.$apply()
+//          let data = {
+//            code: wx.getStorageSync('code'),
+//            iv: this.iv,
+//            encryptedData: this.encryptedData
+//          }
+//          debugger
+//          this.$post({url: service.infor, data}, {
+//            success: ({code, data}) => {
+//              this.$setCode()
+//            },
+//            fail: ({code, data}) => {},
+//            complete: () => { this.loading = false }
+//          })
+//        },
+//        fail: (res) => { }
+//      })
+    }
+
+    getPhoneNumber(e) {
+      wepy.login({
+        success: (res) => {
+          if (e.detail.iv) {
+            let data = {
+              code: res.code,
+              iv: e.detail.iv,
+              encryptedData: e.detail.encryptedData
+            }
+            this.$post({url: service.infor, data}, {
+              success: ({code, data}) => {
+                this.mobile = data.phoneNumber
+                this.$apply()
+                this.$setCode()
+              },
+              fail: ({code, data}) => {
+              },
+              complete: () => {
+                this.loading = false
+              }
+            })
+          }
+        },
+        fail: (res) => {
+          console.log('wepy.login.fail:', res)
+        }
+      })
+    }
+
+    doRegister(type) {
+      // 防抖
+      let that = this
+      if (this.loading) return
+//      if (!this.getString(this.marriage)) {
+//        return wx.showModal({
+//          title: '抱歉！',
+//          content: '需要推荐人才能注册！',
+//          showCancel: false
+//        })
+//      }
+      console.log(this.name)
+      if (!this.getString(this.name)) {
+        return wx.showModal({
+          title: '提示',
+          content: '请返回填写姓名',
+          confirmText: '返回',
+          mask: true,
+          showCancel: false,
+          success: function(res) {
+            if (res.confirm) {
+              console.log('用户点击确定')
+            }
+          }
+        })
+      }
+      if (!this.mobile) {
+        return wx.showModal({
+          title: '提示',
+          content: '请输入正确的手机号码',
+          confirmText: '返回',
+          mask: true,
+          showCancel: false,
+          success: function(res) {
+            if (res.confirm) {
+              console.log('用户点击确定')
+            }
+          }
+        })
+      }
+      wepy.login({
+        success: (res) => {
+          const data = {
+            mobile: that.mobile,
+            code: res.code,
+            name: that.getString(that.name),
+            encryptedData: that.encryptedData,
+            iv: that.iv,
+            from_openid: wx.getStorageSync('from_openid'),
+            type: type,
+            userInfo: that.userInfo
+          }
+          // 绑定手机号
+          that.loading = true
+          that.$post({url: service.register, data}, {
+            success: ({code, data}) => {
+              wx.setStorageSync('token', data.token)
+              wx.showLoading({
+                title: '注册中...',
+                mask: true,
+                showCancel: false,
+                success: (res) => {
+                }
+              })
+              setTimeout(function () {
+                wx.hideLoading()
+                wx.showToast({
+                  title: '注册成功!',
+                  icon: 'success',
+                  duration: 1200,
+                  success: (res) => {
+                    wx.setStorageSync('type', data.user.type)
+                    let url = ''
+                    if (data.user.type == 'single') {
+                      url = '/pages/users/unmarri'
+                    } else {
+                      url = '/pages/users/intro'
+                    }
+                    wx.redirectTo({url: url})
+                  }
+                })
+              }, 1000)
+            },
+            fail: ({code, data}) => {
+            },
+            complete: () => {
+              this.loading = false
+            }
+          })
+        },
+        fail: (res) => {
+          console.log('wepy.login.fail:', res)
+        }
+      })
+    }
+    methods = {
+      getuserinfo(type, e) {
+        console.log(e.detail)
+        console.log(type)
+        if (e.detail.userInfo) {
+          this.encryptedData = e.detail.encryptedData
+          this.iv = e.detail.iv
+          this.userInfo = e.detail.userInfo
+          this.$apply()
+          this.doRegister(type)
+          // 用户按了允许授权按钮
+        } else {
+          // 用户按了拒绝按钮
+        }
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      typing(type, e) {
+        if (this.isDefined(this[type])) {
+          this[type] = e.detail.value
+        }
+        if (type == 'name' && e.detail.value == '测试账号') {
+          this.is_disiablad = false
+          this.mobile = '13800138000'
+          this.$apply()
+        } else {
+          this.is_disiablad = true
+          this.mobile = ''
+          this.$apply()
+        }
+      },
+      verify() {
+        // 防抖
+        if (this.loading || this.time > 0) return
+        if (!this.isPhone(this.mobile)) {
+          return this.$alert('温馨提示', '请输入正确的手机号码')
+        }
+        // 开防抖
+        this.loading = true
+        // 开倒计时
+        this.timing(60)
+
+        // 根据业务接口处理:发送验证码
+        this.$post({url: service.send_register, data: {mobile: this.mobile}}, {
+          success: (res) => {
+          },
+          fail: (res) => {
+            clearTimeout(this.timer)
+            this.timing(0)
+          },
+          complete: () => {
+            this.loading = false
+          }
+        })
+      }
+    }
+
+    timing(time) {
+      this.time = this.getNumber(time)
+      this.$apply()
+      this.timer = setTimeout(() => {
+        if (time > 0) {
+          this.timing(time - 1)
+        }
+      }, 1000)
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  .main-register{
+    background: none;
+    padding: 20rpx;
+    margin: 10rpx auto;
+    z-index: 9999;
+    position: fixed;
+    top: 5%;
+    .weui-media-box__title{
+      padding-bottom: 0.5em;
+    }
+    .main-address{
+      width: 85%;
+      margin-bottom: 1.5em;
+      padding: 12rpx 36rpx;
+      /*padding-top: 48rpx;*/
+      background: none;
+      /*border-radius: 16rpx;*/
+      margin: auto;
+      /*height:600rpx;*/
+      /*box-shadow: 1rpx 1rpx 12rpx #c5cec5;*/
+    }
+    .reset-cell-block{
+      display:block !important;
+      padding-bottom:0;
+
+      & + .weui-cell{
+        &:before{
+          display: none;
+        }
+      }
+    }
+    .reset-label-right{
+      color: #666;
+      line-height: 0;
+      margin-left: 1em;
+      padding-left: 1em;
+    }
+    .weui-input{
+      width: 360rpx;
+      padding-left: 12rpx;
+      background: white;
+    }
+    .border_b{
+      border-bottom: 1rpx solid #e8e8e8;
+    }
+    .weui-cell{padding-right: 0}
+    .reset-input{
+      padding: 6px 15px;
+    }
+    .party_image{
+      overflow: hidden;
+      display: block;
+      width: 160rpx;
+      height: 160rpx;
+      margin: 20rpx;
+      margin-top: 50rpx;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      margin: auto;
+      box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    .avater_user {
+      width: 200rpx;
+      height: 200rpx
+    }
+    .userinfo-avatar {
+      overflow: hidden;
+      display: block;
+      width: 200rpx;
+      height: 200rpx;
+      margin: 20rpx;
+      margin-top: 50rpx;
+      margin-left: -22rpx;
+      /*border-radius: 50%;*/
+      border: 2px solid #fff;
+      box-shadow: 3px 3px 10px rgba(0, 0, 0, 0.2);
+    }
+    }
+</style>

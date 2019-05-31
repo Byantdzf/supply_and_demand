@@ -1,0 +1,227 @@
+<template>
+  <Loading :init.sync="init"></Loading>
+  <view class="page-user">
+    <view class="temp-text" wx:if="{{PageData.remain_num>0}}">你有一个VIP卡待领取</view>
+    <view class="temp-text" wx:else>来迟了，VIP卡已领完</view>
+    <view class="temp-message">{{PageData.month}}个月  {{PageData.rank_name}}VIP</view>
+    <view class="text-center">
+      <image src="http://images.ufutx.com/201901/24/c048496ce6cf9e3646dbad55c18a0f2e.png" mode="aspectFill"></image>
+    </view>
+    <view class="temp-btn text-center" @tap="getTempMember" wx:if="{{PageData.remain_num>0}}">点击领取</view>
+    <view class="temp-btn text-center"  wx:else @tap="redirectTo('/pages/tabBar/welcome')">返回首页</view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  // import ShareMessage from '../../mixins/ShareMessage'
+  import Loading from '../../components/loading'
+  import {service} from '../../config.js'
+
+  export default class groupMember extends wepy.page {
+    mixins = [base, http, user]
+    config = {
+      navigationBarTitleText: '领取礼包',
+      enablePullDownRefresh: true,
+      navigationBarBackgroundColor: '#EBEBEB'
+
+    }
+    data = {
+      is_profile: '',
+      id: 0,
+      PageData: [],
+      init: false,
+      type: '',
+      openid: ''
+    }
+    components = {
+      Loading
+    }
+
+    onShow() {
+      // 初始化页面数据
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    // onShareAppMessage(res) {
+    //   return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    // }
+
+    onLoad(e) {
+      this.id = e.id
+      this.$apply()
+      this.$recordFrom_platform(e)
+      this.getTempType()
+      this.getPageData()
+      if (e.from_openid) {
+        wx.setStorageSync('from_openid', e.from_openid)
+      }
+    }
+
+    onPullDownRefresh() {
+    }
+
+    getPageData() {
+      this.$get({
+        url: `${service.host}/show/fellowing/cards/${this.id}`
+      }, {
+        success: ({code, data}) => {
+          this.init = true
+          this.PageData = data
+          this.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
+
+    // 初始化页面数据
+    getTempType() {
+      let that = this
+      wepy.login({
+        success: (res) => {
+          that.$post({url: service.login, data: {code: res.code}}, {
+            success: ({code, data}) => {
+              this.openid = data.openid
+              this.$apply()
+              if (data.token) {
+                this.type = data.user.type
+                wx.setStorageSync('token', data.token)
+                wx.setStorageSync('openid', data.openid)
+                let userInfo = {
+                  nickName: data.user.name,
+                  avatarUrl: data.user.avatar
+                }
+                wx.setStorageSync('userInfo', userInfo)
+                wx.setStorageSync('user_id', data.user.id)
+//              }else{
+//                wx.showModal({
+//                  title: '提示：',
+//                  content: '你的资料尚未完善！请先填完资料后再来领取！',
+//                  confirmText: '完善资料',
+//                  success: function (res) {
+//                    if (res.confirm) {
+//                      wx.redirectTo({url: '/pages/users/unmarri'})
+//                    }
+//                  }
+//                })
+              }
+            }
+          })
+        },
+        fail: (res) => {
+          console.log('wepy.login.fail:', res)
+        }
+      })
+    }
+
+    methods = {
+      // 领取临时会员
+      redirectTo(url) {
+        wx.redirectTo({url: url})
+      },
+      getTempMember() {
+        let data = {
+          openid: this.openid
+        }
+        let vm = this
+        if (this.type == 'marriage' && this.type) {
+          return wx.showModal({
+            title: '提示：',
+            content: '抱歉！只有单身才能领取...',
+            showCancel: false,
+            confirmText: '进入福恋',
+            success: function (res) {
+              if (res.confirm) {
+                wx.redirectTo({url: '/pages/tabBar/welcome'})
+              }
+            }
+          })
+        }
+        this.$post({url: `${service.host}/gain/fellowing/cards/${vm.id}`, data}, {
+          success: ({code, data}) => {
+            switch (data.result) {
+              case 0:
+                wx.showModal({
+                  title: '提示：',
+                  content: '恭喜你！成功领取VIP',
+                  showCancel: false,
+                  confirmText: '进入福恋',
+                  success: function (res) {
+                    if (res.confirm) {
+                      wx.redirectTo({url: '/pages/tabBar/welcome'})
+                    }
+                  }
+                })
+                break
+              case 1:
+                wx.showModal({
+                  title: '提示：',
+                  content: '抱歉！该VIP卡已被领取完！',
+                  showCancel: false,
+                  confirmText: '进入福恋',
+                  success: function (res) {
+                    if (res.confirm) {
+                      wx.redirectTo({url: '/pages/tabBar/welcome'})
+                    }
+                  }
+                })
+                break
+              case 2:
+                wx.showModal({
+                  title: '提示：',
+                  content: '抱歉！你已领取过该VIP卡！',
+                  showCancel: false,
+                  confirmText: '进入福恋',
+                  success: function (res) {
+                    if (res.confirm) {
+                      wx.redirectTo({url: '/pages/tabBar/welcome'})
+                    }
+                  }
+                })
+                break
+            }
+          }
+        })
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      switchTab(url) {
+        wx.switchTab({url: url})
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/reset.less";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: #EBEBEB;
+  }
+  .temp-text{
+    margin-top: 200rpx;
+    color: #A2414B;
+    font-size: 68rpx;
+    text-align: center;
+  }
+  .temp-message{
+    margin-top: 24rpx;
+    color: #C02536;
+    font-size: 42rpx;
+    text-align: center;
+  }
+  .temp-btn{
+    width: 200rpx;
+    margin: 46rpx auto;
+    border: 2rpx solid #B43750;
+    color: #B43750;
+    padding: 12rpx;
+  }
+</style>

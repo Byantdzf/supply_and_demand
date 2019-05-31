@@ -1,0 +1,526 @@
+<template>
+  <!--<NavBar rgba="#ffffff" bag="#ffffff" title="动态"></NavBar>-->
+  <Loading :init.sync="init"></Loading>
+  <view class="navbar borrow">
+    <view class="page__bd">
+      <view class="weui-tab">
+          <view class="weui-tab__content" >
+            <view class="weui-title ff text-center" style="top: 0;">
+              <image src="{{userImage}}" mode="aspectFill" class="ff flo_l active_user" @tap="gotoFriendPage({{userType}},{{userId}})" @longpress="lookID({{userId}})"></image>
+              <view class="inline-block font_32 bold" @tap="showModal" style="margin-top: 18rpx;">
+                {{typeText}}
+                <image src="http://images.ufutx.com/201903/07/eec619550f2abf17e86a3f0b501105b4.png" mode="aspectFill" @tap="goto('/pages/friendCircle/friendCircleEdit')"  class="icon_down"></image>
+              </view>
+              <image src="http://images.ufutx.com/201903/01/264f8723dcd1b2a06105b136b70b283b.png" mode="aspectFill" @tap="goto('/pages/friendCircle/friendCircleEdit')"  class="friendEdit flo_r"></image>
+            </view>
+            <view class="wrapper">
+              <view class="nav" wx:for="{{list}}" wx:key="{{index}}">
+                <image src="{{item.user.wechat.avatar2}}" @tap.stop="gotoFriendPage({{item.user.type}}, {{item.user.id}})" mode="aspectFill" class="ff active flo_l"></image>
+                <view class="subnav" @tap="goto('/pages/friendCircle/friendCircleDetail?id={{item.id}}')">
+                  <text class="otherName font_32 bold">{{item.user.name}}</text>
+                  <image src="http://images.ufutx.com/201902/21/7b3892dcf60fabda05add35abfa9aec3.png" mode="aspectFill"  wx:if="{{item.user.sex == '2'}}" class=""></image>
+                  <image src="http://images.ufutx.com/201902/21/a309744e67082c4bd46db0df504c32c5.png" mode="aspectFill"  wx:else class=""></image>
+                  <text class="time font_28 flo_r color-666">{{item.time}}</text>
+                </view>
+                <view class="subnav font_22 color-666">
+                  <view class="otherName">{{item.user.age}} <span wx:if="{{item.user.city !== '未知'}}">· {{item.user.city}}</span>  · <span class="orange" wx:if="{{item.user.type == 'single'}}">单身</span><span class="orange" wx:else>介绍人</span>
+                  </view>
+                </view>
+                <view class="clearfloat"></view>
+                <view class="font_28 contText"  @tap="goto('/pages/friendCircle/friendCircleDetail?id={{item.id}}')">
+                  {{item.content}}
+                </view>
+                <view class="photoList text-left">
+                  <block wx:for="{{item.photoList}}" wx:key="{{index}}" wx:for-item="itemImage" wx:for-index="idx">
+                    <block wx:if="{{item.photoList.length == 1}}">
+                      <image class="ff oneSheet Sheet-{{index}}{{idx}}"  src="{{itemImage.show ? itemImage.pic : defPic}}" mode="aspectFill" @tap="previewImages({{itemImage.pic}}, {{item.photos}})" lazy-load="true"></image>
+                    </block>
+                    <block wx:elif="{{item.photoList.length == 2}}">
+                      <image  src="{{itemImage.show ? itemImage.pic : defPic}}" mode="aspectFill" class="ff twoSheet Sheet-{{index}}{{idx}}" @tap="previewImages({{itemImage.pic}}, {{item.photos}})" lazy-load="true"></image>
+                    </block>
+                    <block wx:else>
+                      <image src="{{itemImage.show ? itemImage.pic : defPic}}" mode="aspectFill" class="ff moveSheet Sheet-{{index}}{{idx}}" @tap="previewImages({{itemImage.pic}}, {{item.photos}})" lazy-load="true"></image>
+                    </block>
+                  </block>
+                </view>
+                <view class="setting_box font_26">
+                  <view class="love-box inline-block" hover-class="btn_active" @tap="like({{item.id}},{{index}})">
+                    <image src="http://images.ufutx.com/201903/01/7687e6a6e9579f3a7242bd6e4cd82b23.png" mode="aspectFill" wx:if="{{item.isLkerMoment}}"></image>
+                    <image src="http://images.ufutx.com/201903/01/a234865a9686558b26015a4e8e99d2dd.png" mode="aspectFill" wx:else></image>
+                    <text class="num">{{item.momentLikerCount}}</text>
+                  </view>
+                  <view class="comment-box inline-block"  @tap="goto('/pages/friendCircle/friendCircleDetail?id={{item.id}}')">
+                    <image src="http://images.ufutx.com/201903/01/61da4a103d63bfdc3199087a891d41f6.png" mode="aspectFill"></image>
+                    <text class="num">{{item.momentCommentCount}}</text>
+                  </view>
+                  <view class="more-box inline-block flo_r">
+                    <block wx:if="{{item.is_self}}">
+                      <picker @change="bindPickerChange({{item.id}},{{index}})" value="{{index}}" range="{{setList}}">
+                        <image src="http://images.ufutx.com/201903/01/584c1899c338cd0477fa034a3f0baa58.png" mode="aspectFill"></image>
+                      </picker>
+                    </block>
+                    <block wx:else>
+                      <picker @change="bindPickerChange({{item.id}},{{index}})" value="{{index}}" range="{{setListV2}}">
+                        <image src="http://images.ufutx.com/201903/01/584c1899c338cd0477fa034a3f0baa58.png" mode="aspectFill"></image>
+                      </picker>
+                    </block>
+                  </view>
+                </view>
+                <view class="comment" wx:if="{{item.momentComments.length > 0}}">
+                  <view class="font_24" wx:for="{{item.momentComments}}" wx:key="{{index}}" wx:for-item="itemComments">
+                    <span class="bold">{{itemComments.user.name}}：</span>
+                    <span>{{itemComments.comment}}</span>
+                  </view>
+                  <view class="font_24 orange allComment" @tap="goto('/pages/friendCircle/friendCircleDetail?id={{item.id}}')">
+                    查看全部评论
+                  </view>
+                </view>
+              </view>
+              </view>
+            </view>
+            <view class="clearfloat"></view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <modalUp>
+      <view slot="wrapper">
+        <view class="weui-title ff text-center" style="position: initial;border: none;margin-bottom: 22rpx;">
+          <image src="{{userImage}}" mode="aspectFill" class="ff flo_l active_user" @tap="gotoFriendPage({{userType}},{{userId}})"></image>
+          <view class="inline-block font_32 bold" style="margin-top: 18rpx;" @tap="hideModal">
+            {{typeText}}
+            <image src="http://images.ufutx.com/201903/07/eec619550f2abf17e86a3f0b501105b4.png" mode="aspectFill" @tap="goto('/pages/friendCircle/friendCircleEdit')"  class="icon_down" style="transform:rotate(180deg)"></image>
+          </view>
+          <image src="http://images.ufutx.com/201903/01/264f8723dcd1b2a06105b136b70b283b.png" mode="aspectFill" @tap="goto('/pages/friendCircle/friendCircleEdit')"  class="friendEdit flo_r"></image>
+        </view>
+        <view class="text-center font_28 bold">
+          <block wx:for="{{filtrate}}" wx:key="{{index}}">
+            <view class="filtrate" hover-class="weui-cell_active"  @tap="selectTitle({{index}})">{{item.title}}</view>
+          </block>
+        </view>
+      </view>
+    </modalUp>
+    <pageScroll></pageScroll>
+    <block wx:if="{{loading}}">
+      <view class="weui-loadmore">
+        <view class="weui-loading"></view>
+        <view class="weui-loadmore__tips ff">正在加载</view>
+      </view>
+    </block>
+    <block wx:if="{{noMore}}">
+      <view style="height: 1em;"></view>
+      <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot ff"></view>
+      </view>
+    </block>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import NavBar from '../../components/NavBarV2'
+  import Loading from '../../components/loading'
+  import pageScroll from '../../components/pageScroll'
+  import modalUp from '../../components/modal-up'
+
+  export default class friendCircleList extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '动态'
+      // navigationStyle: 'custom'
+    }
+
+    components = {NavBar, Loading, pageScroll, modalUp}
+    data = {
+      loaded: false,
+      init: false,
+      title: '',
+      mylibs: [],
+      list: [],
+      page: 1,
+      noMore: false,
+      loading: false,
+      inputShowed: false,
+      inputVal: '',
+      userId: 0,
+      userType: '',
+      userImage: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
+      defPic: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
+      typeText: '全部',
+      type: '',
+      totalTopHeight: 88, // navBar的高度
+      photoList: [
+        'https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=2865672302,4153895132&fm=200&gp=0.jpg',
+        'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=2712105594,1652249053&fm=200&gp=0.jpg',
+        'https://ss1.bdstatic.com/70cFvXSh_Q1YnxGkpoWK1HF6hhy/it/u=1511461500,2536850263&fm=200&gp=0.jpg',
+        'https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=697729144,1502048920&fm=200&gp=0.jpg',
+        'https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2112797303,2959648216&fm=26&gp=0.jpg'
+      ],
+      windowHeight: 0,
+      setList: ['举报', '删除'],
+      setListV2: ['举报'],
+      filtrate: [
+        {title: '查看全部', type: ''},
+        {title: '只看单身男', type: 'single_man'},
+        {title: '只看单身女', type: 'single_woman'},
+        {title: '只看介绍人', type: 'marriage'}
+      ]
+    }
+
+    computed = {}
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    async onLoad(e) {
+      let vm = this
+      vm.initPageData()
+      wx.getSystemInfo({
+        success(res) {
+          vm.windowHeight = res.windowHeight
+          vm.$apply()
+        }
+      })
+    }
+    // 初始化页面数据
+    initPageData() {
+      let vm = this
+      vm.$get({url: service.user}, {
+        success: ({code, data}) => {
+          let userInfo = {
+            nickName: data.name,
+            avatarUrl: data.avatar,
+            type: data.type
+          }
+          wx.setStorageSync('userInfo', userInfo)
+          wx.setStorageSync('user_id', data.id)
+          vm.userImage = data.avatar
+          vm.userType = data.type
+          vm.userId = data.id
+          vm.$apply()
+        }
+      })
+    }
+
+    onShow() {
+      this.page = 1
+      this.getLibraries()
+      this.$apply()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onPullDownRefresh() {
+      this.page = 1
+      this.getLibraries()
+    }
+    watch = {
+      // list() {
+      //   for (let item of this.list) {
+      //     item.is_self
+      //   }
+      // }
+    }
+
+    onPageScroll(res) {
+      let top = res.scrollTop,
+        show = top > 380 ? true : false,
+        vm = this
+      vm.$broadcast('showBackTopBtn', show)
+      vm.list.forEach((item, index) => {
+        let group = item.photoList
+        group.forEach((rec, idx) => {
+          wx.createSelectorQuery().select('.Sheet-' + index + idx).boundingClientRect((rect) => {
+            if (rect.top <= vm.windowHeight) { // 判断是否在显示范围内
+              group[idx].show = true // 根据下标改变状态
+            }
+          }).exec()
+        })
+      })
+      console.log(vm.list)
+      vm.$apply()
+    }
+    onReachBottom() {
+      this.getLibraries()
+    }
+
+    onUnload() {
+      this.$invoke('modalUp', 'hideModal')
+    }
+    getLibraries(keyword) {
+      let _this = this
+      _this.loading = true
+      _this.$showLoading('加载数据中')
+      let url = `${service.host}/moments`
+      this.$get({
+        url: url,
+        data: {
+          page: this.page,
+          keyword: this.inputVal,
+          type: this.type
+        }
+      }, {
+        success: ({code, data}) => {
+          _this.init = true
+          _this.noMore = false
+          _this.loading = false
+//           if (data.data.length == 0 && data.last_page == 1) {
+//             _this.loading = false
+//             _this.noMore = true
+//             _this.list = []
+//             return
+//           }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.noMore = true
+            _this.list = []
+            return
+          }
+          if (data.length > 0) {
+            data.forEach((item, index) => {
+              let photoList = []
+              for (let rect of item.photos) {
+                if (index < 3) {
+                  photoList.push({
+                    pic: rect,
+                    show: true
+                  })
+                } else {
+                  photoList.push({
+                    pic: rect,
+                    show: false
+                  })
+                }
+              }
+              item.photoList = photoList
+            })
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = data
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+            })
+          }
+
+          console.log(this.list)
+          _this.noMore = true
+          _this.page += 1
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          wx.hideLoading()
+        }
+      })
+    }
+
+    methods = {
+      lookID(id) { // 查看ID
+        this.$showToast(String(id))
+      },
+      selectTitle(index) {
+        this.typeText = this.filtrate[index].title.substring(2)
+        this.type = this.filtrate[index].type
+        this.page = 1
+        this.$invoke('modalUp', 'hideModal')
+        this.$apply()
+        this.getLibraries()
+      },
+      showModal() {
+        this.$invoke('modalUp', 'showModal')
+      },
+      hideModal() {
+        this.$invoke('modalUp', 'hideModal')
+      },
+      gotoFriendPage(type, id) {
+        this.$gotoFriendPage(type, id)
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      previewImages(item, list) { // 预览图片
+        this.$previewImages(item, list)
+      },
+      like(id, index) { // 点赞
+        this.$post({url: `${service.host}/like/moments/${id}`}, {
+          success: ({code, data}) => {
+            this.page = 1
+            this.list[index].isLkerMoment = !this.list[index].isLkerMoment
+            if (this.list[index].isLkerMoment) {
+              this.list[index].momentLikerCount++
+              this.$apply()
+            } else {
+              this.list[index].momentLikerCount--
+              this.$apply()
+            }
+            this.$apply()
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+          }
+        })
+      },
+      bindPickerChange (id, index, e) { // 更多操作
+        console.log(id)
+        let vm = this
+        if (e.detail.value == 0) {
+          vm.$goto(`/pages/users/inform?id=${id}`)
+        } else {
+          wx.showModal({
+            title: '提示',
+            content: '是否确认删除？',
+            success: function (res) {
+              if (res.confirm) {
+                vm.$delete({url: `${service.host}/moments/${id}`}, {
+                  success: ({code, data}) => {
+                    vm.list.splice(index, 1)
+                    vm.$showToast('已删除')
+                    vm.$apply()
+                  }
+                })
+              } else if (res.cancel) {
+                console.log('用户点击取消')
+              }
+            }
+          })
+        }
+      }
+    }
+    events = {
+      totalTopHeight(value) {
+        this.totalTopHeight = value
+        this.$apply()
+      }
+    }
+  }
+
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: white;
+    .weui-title{
+      border-bottom: 22rpx solid #f8f8f8;
+      padding: 12rpx 0;
+      position: fixed;
+      width: 100%;
+      .active_user{
+        width: 80rpx;
+        height: 80rpx;
+        border-radius: 12rpx;
+        vertical-align: middle;
+        margin-left: 32rpx;
+        /*box-shadow: 1rpx 1rpx 12rpx #d0d0d0;*/
+      }
+      .friendEdit{
+        width: 68rpx;
+        height: 68rpx;
+        margin-right: 32rpx;
+        vertical-align: middle;
+        margin-top: 14rpx;
+      }
+      .icon_down{
+        width: 26rpx;
+        height: 26rpx;
+        vertical-align: middle;
+        margin-left: 12rpx;
+      }
+    }
+    .wrapper{
+      /*padding: 22rpx 32rpx;*/
+      margin-top: 126rpx;
+      .nav{
+        border-bottom:22rpx solid #f8f8f8;
+        padding: 22rpx 32rpx;
+        .active{
+          width: 100rpx;
+          height: 100rpx;
+          border-radius: 12rpx;
+          box-shadow: 1rpx 1rpx 12rpx #d0d0d0;
+          margin-right: 22rpx;
+        }
+        .subnav{
+          width: 100%;
+          .otherName{
+            margin-right: 12rpx;
+          }
+          image{
+            width: 32rpx;height: 32rpx;
+            vertical-align: middle;
+            margin-bottom: 4rpx;
+          }
+        }
+        .contText{
+          padding-top: 18rpx;
+        }
+        .photoList{
+          padding-top: 12rpx;
+          .oneSheet{
+            width: 400rpx;
+            height: 400rpx;
+          }
+          .twoSheet{
+            width: 200rpx;
+            height: 200rpx;
+            margin-right: 22rpx;
+            margin-top: 6rpx;
+          }
+          .moveSheet{
+            width: 200rpx;
+            height: 200rpx;
+            margin-right: 22rpx;
+            margin-top: 6rpx;
+          }
+          /*image{*/
+            /*transition: all .3s ease;*/
+            /*opacity: 0;*/
+          /*}*/
+          .active{
+            opacity: 1;
+          }
+        }
+        .setting_box{
+          margin-top: 22rpx;
+          margin-bottom: 22rpx;
+          .love-box, .comment-box {
+            .num{
+              margin-left: 12rpx;
+              vertical-align: middle;
+              margin-top: -16rpx;
+            }
+            margin-right: 42rpx;
+          }
+          image{
+            width: 32rpx;
+            height: 32rpx;
+          }
+        }
+        .comment{
+          border-top: 4rpx solid #f8f8f8;
+          padding-top: 12rpx;
+          .allComment{
+            margin-top: 8rpx;
+          }
+        }
+      }
+    }
+    .filtrate{
+      padding: 20rpx;
+      border-top: 1rpx solid #ededed;
+    }
+  }
+</style>

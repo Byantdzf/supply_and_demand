@@ -1,0 +1,142 @@
+<template>
+  <view class="page-user">
+    <view class="temp-text">你有一个礼包待领取</view>
+    <view class="temp-message">24小时  VIP体验权限</view>
+    <view class="text-center">
+      <image src="http://images.ufutx.com/201809/19/1350d4a975f6f94325f09e2c11a713c1.png" mode="aspectFill"></image>
+    </view>
+    <view class="temp-btn text-center" @tap="getTempMember">
+      点击领取
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+//  import userTitle from '../../components/userTitle'
+  import { service } from '../../config.js'
+
+  export default class tempMember extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '领取礼包',
+      enablePullDownRefresh: true,
+      navigationBarBackgroundColor: '#EBEBEB'
+
+    }
+    data = {
+      is_profile: ''
+    }
+    components = {
+
+    }
+    onShow() {
+      // 初始化页面数据
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    onLoad() {
+      this.getTempType()
+    }
+
+    onPullDownRefresh() {
+    }
+    // 领取临时会员
+    getTempType() {
+      this.$get({url: service.tempMember}, {
+        success: ({code, data}) => {
+          this.is_profile = data.is_profile
+          if (this.is_profile == 0) {
+            wx.showModal({
+              title: '提示：',
+              content: '你的资料尚未完善！请先填完资料后再来领取！',
+              confirmText: '完善资料',
+              success: function (res) {
+                if (res.confirm) {
+                  wx.redirectTo({url: '/pages/users/unmarriV2'})
+                }
+              }
+            })
+          }
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
+    // 初始化页面数据
+    methods = {
+      getTempMember() {
+        if (this.is_profile == 0) {
+          return wx.showModal({
+            title: '提示：',
+            content: '你的资料尚未完善！请先填完资料后再来领取！',
+            confirmText: '完善资料',
+            success: function (res) {
+              if (res.confirm) {
+                wx.redirectTo({url: '/pages/users/unmarriV2'})
+              }
+            }
+          })
+        }
+        this.$post({url: service.getTempMember}, {
+          success: ({code, data}) => {
+            wx.showModal({
+              title: '提示：',
+              content: '恭喜你！领取成功',
+              showCancel: false,
+              confirmText: '体验VIP',
+              success: function(res) {
+                if (res.confirm) {
+                  wx.redirectTo({url: '/pages/tabBar/welcome'})
+                }
+              }
+            })
+          }
+        })
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      switchTab(url) {
+        wx.switchTab({url: url})
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/reset.less";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: #EBEBEB;
+  }
+  .temp-text{
+    margin-top: 200rpx;
+    color: #A2414B;
+    font-size: 68rpx;
+    text-align: center;
+  }
+  .temp-message{
+    margin-top: 24rpx;
+    color: #C02536;
+    font-size: 42rpx;
+    text-align: center;
+  }
+  .temp-btn{
+    width: 200rpx;
+    margin: 46rpx auto;
+    border: 2rpx solid #B43750;
+    color: #B43750;
+    padding: 12rpx;
+  }
+</style>

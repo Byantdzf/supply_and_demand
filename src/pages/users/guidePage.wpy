@@ -1,0 +1,69 @@
+<template>
+  <view class="page-user">
+    <block wx:for="{{list}}" wx:key="{{index}}">
+      <image src="{{item}}" mode="widthFix" style="width: 100%;margin-bottom: -16rpx;"></image>
+    </block>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  // import {service} from '../../config.js'
+
+  export default class sharing extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '关注公众号',
+      // navigationBarBackgroundColor: '',
+      enablePullDownRefresh: false
+    }
+    data = {
+      list: [
+        'http://images.ufutx.com/201903/08/2c1a26ad391b992a042b6078725f1635.jpeg',
+        'http://images.ufutx.com/201903/08/52a68c56d63bb1960c982efaf07edd46.jpeg',
+        'http://images.ufutx.com/201903/08/b1b77aaee64211d8d90342dc06ac68ed.jpeg',
+        'http://images.ufutx.com/201903/08/fd689eb75a176a7c2995e430a89fcf81.jpeg'
+      ]
+    }
+    components = {}
+    computed = {
+    }
+
+    onShow() {
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    onLoad(e) {
+    }
+
+    onPullDownRefresh() {
+    }
+
+    // 初始化页面数据
+    initPageData() {
+    }
+
+    methods = {
+      goto(url) {
+        wx.navigateTo({url: url})
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  @import "../../styles/custom/reset.less";
+  page{
+  }
+  .page-user{
+  }
+</style>

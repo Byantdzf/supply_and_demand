@@ -1,0 +1,118 @@
+<template>
+  <view class="page-index" wx:for="{{list}}" wx:key="index" @tap="goto('/pages/party/detail?party_id={{item.id}}')">
+    <view class="_bc-party">
+      <view class="flo_l" style="width: 38%">
+        <image src="{{item.poster}}" mode="aspectFit" class="user_image"></image>
+      </view>
+      <view style="width: 62%" class="flo_l">
+        <view class="font_26 bold _bc-title ellipsis_2 text-left color-666">
+          {{item.theme}}
+          <image src="http://images.ufutx.com/201905/28/e4c792af693e669c1a5ee1aae22797aa.png" mode="widthFix"
+                 wx:if="{{item.is_top > 0}}"></image>
+        </view>
+        <view style="position: absolute;bottom: 22rpx;right: 22rpx;width: 58%;">
+          <view class="font_22 ellipsis_2 text-left" style="color: #ababab; margin-left: 22rpx;">
+            <span>{{item.time}}</span>
+            <view class="flo_r bc_fee font_32" style="margin-top: -12rpx;" wx:if="{{item.is_deadline == 0}}">
+              ￥{{item.fee}}
+            </view>
+            <view class="flo_r bold bc_fee font_32 color-bbb"
+                  style="margin-top: -12rpx;text-decoration:line-through" wx:else>￥{{item.fee}}
+            </view>
+          </view>
+          <view class="flo_l font_22" style="color: #ababab;margin-top: 12rpx;">
+            <span class="_bc-address flo_r">{{item.city}} {{item.dist}}</span>
+          </view>
+          <view class="font_22 flo_r _bc-btn" wx:if="{{item.is_deadline == 0}}">立即报名</view>
+          <view class="font_22 flo_r _bc-btn color-bbb" wx:else style="border-color: #bbbbbb">已结束</view>
+        </view>
+      </view>
+      <view class="clearfloat"></view>
+    </view>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../mixins/http'
+  import base from '../mixins/base'
+
+  export default class List extends wepy.component {
+    mixins = [base, http]
+    props = {
+      list: {
+        type: Object,
+        default: []
+      },
+      hideMessage: {
+        type: String,
+        default: false
+      }
+    }
+    data = {}
+//    computed = {
+//    }
+    methods = {
+      goto(url) {
+        wx.navigateTo({url: url})
+      }
+    }
+  }
+</script>
+
+<style type="less">
+  @import "../styles/custom/fn.less";
+  .page-index{
+    .bc_fee{
+      color: @theme;
+      font-weight: 500;
+    }
+    ._bc-party{
+      padding: 26rpx 22rpx 10rpx 22rpx ;
+      background: white;
+      border-top: 20rpx solid @lightgray;
+      position: relative;
+      .user_image{
+        width: 100%;
+        height: 180rpx;
+      }
+      .new{
+        padding: 0 18rpx;
+        background: #ffd048;
+        font-size: 22rpx;
+        border-radius: 4rpx;
+        display: inline-block;
+      }
+      ._bc-title{
+        /*height: 90rpx;*/
+        margin-left: 22rpx;
+        image{
+          width: 80rpx;
+          vertical-align: middle;
+          margin-bottom: 4rpx;
+        }
+      }
+      ._bc-address{
+        margin-left: 22rpx;
+      }
+      ._bc-btn{
+        padding: 0 12rpx;
+        border: 1rpx solid #C6335F;
+        color: #C6335F;
+        margin-top: 12rpx;
+      }
+    }
+    .over{
+      width: 160rpx;
+      height: 160rpx;
+      line-height: 160rpx;
+      border-radius: 50%;
+      background: rgba(0,0,0,0.5);
+      position: absolute;
+      right: 22rpx;
+      bottom: 22rpx;
+      -webkit-transform:rotate(22deg);
+    }
+  }
+
+</style>

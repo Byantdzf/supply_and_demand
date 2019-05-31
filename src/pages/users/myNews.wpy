@@ -1,0 +1,380 @@
+<template>
+  <NavBar rgba="#ffffff" bag="#ffffff" title="通知列表"></NavBar>
+  <Loading :init.sync="init"></Loading>
+  <view class="navbar borrow">
+    <view class="page__bd">
+      <view class="weui-tab">
+          <view class="weui-tab__content" >
+            <block wx:if="{{list.length}}">
+              <view class="page__bd "  wx:for="{{list}}" wx:key="*this" >
+                <view class="flo_l borrowlist" @tap="gototype('{{item}}')">
+                  <view class="flo_l weui-cell__hd" >
+                    <image src="{{item.other_user.wechat.avatar}}" mode="aspectFit"   style="width: 120rpx;height: 120rpx;border-radius: 12rpx;" class="flo_l"></image>
+                  </view>
+                  <view class="flo_l" style="width: 78%;">
+                    <view  class="font_28 flo_l black_6 ellipsis_1 bold" style="margin-left: 12rpx;">
+                      {{item.other_user.name}}
+                    </view>
+                    <view class="font_26 flo_r  ">{{item.created_at}}</view>
+                    <view  class="font_28 flo_l ellipsis_1" style="margin-left: 6rpx;">
+                      <image src="http://images.ufutx.com/201902/21/a309744e67082c4bd46db0df504c32c5.png" mode="aspectFit" wx:if="{{item.other_user.sex == 1}}" style="width: 38rpx;height: 38rpx;" class="flo_l"></image>
+                      <image src="http://images.ufutx.com/201902/21/7b3892dcf60fabda05add35abfa9aec3.png" mode="aspectFit" wx:else   style="width: 38rpx;height: 38rpx;" class="flo_l"></image>
+                    </view>
+                  </view>
+                  <view class="font_26 flo_l orange ellipsis_1" style="margin-left: 16rpx;max-width: 88%;">{{item.content}}</view>
+                  <view class="weui-cell__ft weui-cell__ft_in-access">
+                    <view class="dist flo_r" wx:if="{{!item.status}}"></view>
+                  </view>
+                </view>
+              </view>
+              <view class="clearfloat"></view>
+            </block>
+            <block wx:else>
+              <view  class="text-center" >
+                <view class="font_28 black_6" style="margin-top: 22rpx">
+                  暂无消息列表
+                </view>
+                <view class="clearfloat"></view>
+              </view>
+            </block>
+          </view>
+        </view>
+      </view>
+    </view>
+  <pageScroll></pageScroll>
+  <block wx:if="{{loading}}">
+      <view class="weui-loadmore">
+        <view class="weui-loading"></view>
+        <view class="weui-loadmore__tips">正在加载</view>
+      </view>
+    </block>
+    <block wx:if="{{noMore}}">
+      <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot ff"></view>
+      </view>
+    </block>
+  <goHome></goHome>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import NavBar from '../../components/NavBar'
+  import Loading from '../../components/loading'
+  import pageScroll from '../../components/pageScroll'
+  import goHome from '../../components/goHome'
+
+  export default class myNews extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '通知列表'
+    }
+    components = {NavBar, Loading, pageScroll, goHome}
+
+    data = {
+      loaded: false,
+      mylibs: [],
+      list: [],
+      init: false,
+      activeIndex: 0,
+      sliderOffset: 0,
+      sliderLeft: 0,
+      sliderWidth: 180,
+      screenWidth: 360,
+      page: 1,
+      noMore: false,
+      loading: false,
+      inputShowed: false,
+      inputVal: ''
+    }
+
+    computed = {}
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    async onLoad(e) {
+      // let _this = this
+    }
+    onPageScroll(res) {
+      let top = res.scrollTop,
+        show = top > 380 ? true : false
+      this.$broadcast('showBackTopBtn', show)
+    }
+    onShow() {
+      this.page = 1
+      this.getLibraries()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onPullDownRefresh() {
+      this.page = 1
+      this.getLibraries()
+    }
+
+    onReachBottom() {
+      setTimeout(() => {
+//        if (this.activeIndex == '1') {
+        this.getLibraries()
+//        } else {
+//          this.initPageData()
+//        }
+//        this.$apply()
+      }, 200)
+    }
+
+    getMessage() {
+      var isNew = wx.getStorageSync('is_new')
+      if (!isNew) {
+        this.$get({url: service.user}, {
+          success: ({code, data}) => {
+            wepy.setStorageSync('is_new', data.user.is_news)
+            if (data.user.is_news) {
+              wepy.showTabBarRedDot({
+                index: 4
+              })
+            } else {
+              wepy.hideTabBarRedDot({
+                index: 4
+              })
+            }
+          }
+        })
+      } else {
+        wepy.showTabBarRedDot({
+          index: 4
+        })
+      }
+    }
+    getLibraries(keyword) {
+      let _this = this
+      _this.loading = true
+      this.$get({
+        url: service.notices,
+        data: {
+          page: this.page
+        }
+      }, {
+        success: ({code, data}) => {
+          _this.init = true
+          _this.noMore = false
+          _this.loading = false
+//           if (data.length == 0 && data.last_page == 1) {
+//             _this.loading = false
+//             _this.noMore = true
+//             _this.list = []
+//             return
+//           }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.noMore = true
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = data
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+            })
+          }
+          _this.noMore = true
+          _this.page += 1
+
+          //          _this.libs = data.data
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          this.loaded = false
+        }
+      })
+    }
+
+    methods = {
+      showInput() {
+        this.inputShowed = true
+      },
+      hideInput() {
+        this.inputVal = ''
+        this.inputShowed = false
+      },
+      clearInput() {
+        this.inputVal = ''
+      },
+      inputTyping(e) {
+        this.inputVal = e.detail.value
+        console.log(this.inputVal)
+        this.page = 1
+        this.getLibraries(this.inputVal)
+      },
+      tabClick(e) {
+        this.sliderOffset = e.currentTarget.offsetLeft
+        this.activeIndex = e.currentTarget.id
+//        if (this.activeIndex == '1') {
+        this.getLibraries()
+//        } else {
+//          this.initPageData()
+//        }
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      gototype(item) {
+//        wx.showModal({
+//          title: '提示',
+//          content: type
+//        })
+        let url = ''
+        if (item.type == 'gift') {
+          url = '/pages/users/myGift'
+        } else if (item.type == 'follow') {
+          if (item.other_user.type == 'single') {
+            url = '/pages/home/information?id=' + item.other_user.id
+          } else {
+            url = '/pages/home/introducer?id=' + item.other_user.id
+          }
+        } else if (item.type == 'wechat') {
+          url = '/pages/users/examineWeChat?id=' + item.id
+        } else if (item.type == 'friend') {
+          url = '/pages/users/auditFriend?id=' + item.id
+        } else if (item.type == 'temp') {
+          url = '/pages/users/tempMember'
+        } else if (item.type == 'moment') {
+          url = `/pages/friendCircle/friendCircleDetail?id=${item.type_id}`
+        }
+        wx.navigateTo({url: url})
+      },
+      joinLibrary() {
+        this.$post({
+          url: service.libraries + '/' + this.mylib.id + '/join'
+        }, {
+          success: ({code, data}) => {
+            wx.reLaunch({url: '/pages/borrow'})
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+            this.loaded = false
+          }
+        })
+      },
+
+      scanBook() {
+        wx.scanCode({
+          success: (res) => {
+            console.log('[dev]', 'scancode', res)
+
+            if (res.result) {
+              this.$post({
+                url: service.book_store,
+                data: {
+                  'isbn': res.result
+                }
+              }, {
+                success: ({code, data}) => {
+                  wx.reLaunch({url: '/pages/library/book_edit?id=' + data.id})
+                },
+                fail: ({code, data}) => {
+                },
+                complete: () => {
+                  this.loaded = false
+                }
+              })
+            }
+          }
+        })
+      },
+      scanReturn() {
+        wx.scanCode({
+          success: (res) => {
+            console.log('[dev]', 'scancode', res)
+            wx.navigateTo({url: '/pages/library/borrow?isbn=' + res.result})
+          }
+        })
+      },
+      scanBorrow(libraryId) {
+        wx.scanCode({
+          success: (res) => {
+            console.log('[dev]', 'scancode', res)
+
+            if (res.result) {
+              this.$get({
+                url: service.host + '/libraries/' + libraryId + '/book/isbn/' + res.result
+              }, {
+                success: ({code, data}) => {
+                  wx.navigateTo({url: '/pages/library/book?id=' + data.book_id + '&library_id=' + data.library_id})
+                },
+                fail: ({code, data}) => {
+                },
+                complete: () => {
+                  this.loaded = false
+                }
+              })
+            }
+          }
+        })
+      }
+    }
+  }
+
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: white;
+  }
+  .borrowlist{
+    width: 86%;
+    box-shadow: 1rpx 1rpx 18rpx #d3d3d3;
+    margin-top: 18rpx;
+    border-radius: 6rpx;
+    margin-left: 4%;
+    padding: 22rpx;
+    /*position: relative*/
+  }
+  .weui-cell__ft {
+    margin-top: 10%;
+  }
+  .weui-loadmore__tips{
+    background: #f8f8f8;
+  }
+  .dist{
+    width: 20rpx;height: 20rpx;
+    background: #ff3b30;
+    margin-top: -10rpx;
+    border-radius: 50%;
+    animation: tada 1800ms ease infinite;
+  }
+
+  @keyframes tada {
+    0% {
+      transform: scale(1);
+    }
+    10%, 20% {
+      transform: scale(0.9) rotate(-12deg)
+    }
+    30%, 50%, 70%, 90% {
+      transform: scale(1.1) rotate(12deg)
+    }
+    40%, 60%, 80% {
+      transform: scale(1.1) rotate(-12deg)
+    }
+    100% {
+      transform: scale(1) rotate(0)
+    }
+  }
+</style>

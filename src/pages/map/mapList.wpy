@@ -1,0 +1,444 @@
+<template>
+  <view class="navbar borrow ff">
+    <view class="page__bd">
+      <view class="weui-tab">
+          <view class="weui-tab__content ff" >
+            <!--<view style="position:fixed;left: 0;top: 0; width: 100%;" class="ff">-->
+              <view class="weui-cells__title">
+                <view class="weui-search-bar__box text-left flo_l" style="width: 74%">
+                  <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
+                  <input type="text" class="weui-search-bar__input" placeholder="搜索TA的名字和地址" confirm-type="search" value="{{inputVal}}" focus="{{inputShowed}}" @confirm="inputTyping" />
+                </view>
+                <view class="flo_l _bc-list">
+                  <image src="http://images.ufutx.com/201812/06/1222126e6c582af0af0dccf557510e8b.png" mode="aspectFit" class="flo_l" @tap="goto('/pages/map/index')"></image>
+                  <view class="flo_r _bc-message" @tap="goto('/pages/users/myMessage')">
+                    <image src="http://images.ufutx.com/201812/06/85f92d47c50d8c84a26a4f08c4454b63.png" mode="aspectFit"></image>
+                    <view class="dost white" wx:if="{{message_count !== 0}}">{{message_count}}</view>
+                  </view>
+                </view>
+                <view class="clearfloat"></view>
+              </view>
+              <Search :title.sync="title" :type.sync="type"></Search>
+            <!--</view>-->
+            <!--<view style="height: 200rpx;"></view>-->
+            <view class="page__bd "  wx:for="{{list}}" wx:key="*this" style="position: relative;">
+              <view class="borrowlist" @tap="gotofriends({{item}})">
+                <view >
+                  <image src="{{item.avatar}}" mode="aspectFill"   style="width: 100%;height: 500rpx;"></image>
+                  <view class="is_approved font_26 white" wx:if="{{item.is_approved == 1}}">
+                    <image src="http://images.ufutx.com/201901/17/32f90bdb6e67589a042ffa6536c97997.png" mode="aspectFit" style="width: 30rpx;height: 20rpx;"></image>
+                    已认证
+                  </view>
+                  <view class="is_approved font_26 white" wx:else>
+                    <image src="http://images.ufutx.com/201901/17/32f90bdb6e67589a042ffa6536c97997.png" mode="aspectFit" style="width: 30rpx;height: 20rpx;"></image>
+                    未认证
+                  </view>
+                </view>
+                <view style="width: 91%;padding: 12rpx 32rpx 22rpx 32rpx;">
+                  <view class="flo_l">
+                    <view  class="font_32 flo_l orange ellipsis_1">
+                      <span class="bold">{{item.name}}</span>
+                      <span class="font_26"> · {{item.type == 'single'? '单身':'介绍人'}}</span>
+                    </view>
+                    <view  class="font_28 flo_l" style="margin-left: 6rpx;">
+                      <image src="http://images.ufutx.com/201902/21/a309744e67082c4bd46db0df504c32c5.png" mode="aspectFit" wx:if="{{item.sex == '1'}}" style="width: 38rpx;height: 38rpx;margin-bottom: -12rpx;"></image>
+                      <image src="http://images.ufutx.com/201902/21/7b3892dcf60fabda05add35abfa9aec3.png" mode="aspectFit" wx:else   style="width: 38rpx;height: 38rpx;margin-bottom: -12rpx;"></image>
+                    </view>
+                  </view>
+                  <view class="clearfloat"></view>
+                  <view class="font_26 text-left color-666">
+                    <span class="text-left">{{item.age}}{{item.type == 'single'?' · '+item.stature:''}}</span>
+                    <span class="flo_r">{{item.distance}}km</span>
+                  </view>
+                </view>
+                <!--<image src="http://images.ufutx.com/201811/12/7c1df79371975f2e40994e6924319853.png" mode="aspectFit" class="flo_r date" @tap.stop="appointment({{item.id}})"></image>-->
+                <!--<view class="weui-cell__ft weui-cell__ft_in-access"></view>-->
+                <view class="clearfloat"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+    <pageScroll></pageScroll>
+    <block wx:if="{{loading}}">
+      <view class="weui-loadmore">
+        <view class="weui-loading"></view>
+        <view class="weui-loadmore__tips ff">正在加载</view>
+      </view>
+    </block>
+    <block wx:if="{{noMore}}">
+      <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot ff">
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot ff" ></view>
+      </view>
+    </block>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import { service } from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import Search from '../../components/search'
+  import pageScroll from '../../components/pageScroll'
+
+  export default class mapList extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '地图列表'
+    }
+    components = {
+      Search, pageScroll
+    }
+    data = {
+      loaded: false,
+      mylibs: [],
+      list: [],
+      page: 1,
+      noMore: false,
+      loading: false,
+      inputShowed: false,
+      inputVal: '',
+      active_click: true, // 何时触发点击
+      search_title: [
+        {title: '90后', active: true},
+        {title: '80后', active: false},
+        {title: '70后', active: false},
+        {title: '60后', active: false}
+      ],
+      title: '',
+      message_count: 0,
+      parameter: {},
+      type: '不限'
+    }
+    computed = {}
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+    async onLoad(e) {
+      if (e.title) {
+        this.title = e.title
+        this.type = e.type
+        this.$apply()
+      }
+    }
+    onShow() {
+      this.getLibraries()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onPullDownRefresh() {
+      this.inputVal = ''
+      this.page = 1
+      this.getLibraries()
+      this.$apply()
+    }
+    onReachBottom() {
+      setTimeout(() => {
+        this.getLibraries()
+      }, 200)
+    }
+    getLibraries(keyword) {
+      let _this = this,
+        myLong = wx.getStorageSync('myLong'),
+        myLat = wx.getStorageSync('myLat'),
+        address = wx.getStorageSync('address')
+      _this.loading = true
+      _this.active_click = false
+      let url = `${service.users}/v2?keyword=${this.inputVal}&page=${this.page}`,
+        data = {
+          page: this.page,
+          location_latitude: myLat,
+          location_longitude: myLong,
+          province: address.province,
+          city: address.city,
+          age: '不限',
+          type: _this.type
+        }
+      if (JSON.stringify(_this.parameter) != '{}') {
+        data = _this.parameter
+      }
+      this.$get({
+        url: url,
+        data: data
+      }, {
+        success: ({code, data}) => {
+//          _this.loading = true
+          _this.message_count = data.message_count
+          if (data.users.data.length == 0 && data.users.data.last_page == 1) {
+            _this.loading = false
+            _this.noMore = true
+            _this.list = []
+            return
+          }
+          if (data.users.current_page > data.users.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.users.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.loading = false
+            _this.noMore = true
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.loading = false
+            _this.list = data
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+            })
+          }
+          _this.noMore = true
+          _this.$apply()
+          _this.page += 1
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          _this.active_click = true
+        }
+      })
+    }
+    onPageScroll(res) {
+      let top = res.scrollTop,
+        show = top > 380 ? true : false
+      this.$broadcast('showBackTopBtn', show)
+    }
+    methods = {
+      // 约见
+      appointment(id) {
+        this.$post({
+          url: `${service.host}/appoint/plan/with/users/${id}`
+        }, {
+          success: ({code, data}) => {
+            wx.showModal({
+              title: '申请成功',
+              content: '请留意对方的信息！'
+            })
+          },
+          fail: ({code, data}) => {},
+          complete: () => {}
+        })
+      },
+      searchTitle(index) {
+        if (this.active_click) {
+          this.page = 1
+          this.search_title[index].active = true
+          this.getLibraries()
+          this.search_title.forEach((item, idx) => {
+            if (idx !== index) {
+              this.search_title[idx].active = false
+            }
+          })
+        }
+      },
+      showInput () {
+        this.inputShowed = true
+      },
+      hideInput () {
+        this.inputVal = ''
+        this.inputShowed = false
+      },
+      clearInput () {
+        this.inputVal = ''
+      },
+      inputTyping (e) {
+        this.inputVal = e.detail.value
+        this.page = 1
+        this.getLibraries(this.inputVal)
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      },
+      gotofriends (item) {
+        let url = ''
+        if (item.type == 'single') {
+          url = '/pages/home/information?id=' + item.id
+        } else {
+          url = '/pages/home/introducer?id=' + item.id
+        }
+        wx.navigateTo({url: url})
+      }
+    }
+    events = {
+      'search': (value) => {
+        // 搜索返回值
+        this.page = 1
+        this.parameter = value
+        this.$apply()
+        this.getLibraries()
+        console.log(value)
+      }
+    }
+  }
+
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: #ffffff;
+    .is_approved{
+      position: absolute;
+      left: 8%;
+      top: 6%;
+      background: rgba(0,0,0,0.5);
+      padding: 4rpx 22rpx;
+      border-radius: 32rpx;
+      display: inline-block;
+    }
+  }
+  .borrow{
+    margin-top: -22rpx;
+    .page__bd{
+      /*height: 100%;*/
+    }
+    .page__bd{
+      padding-bottom: 0;
+    }
+    .weui-tab__content{
+      padding-top: 0px;
+      text-align: center;
+    }
+    text-align: center;
+    background: #f4f4f4;
+    .library-title{
+      .h2();
+      text-align: left;
+      color: #666;
+      padding: 20rpx 40rpx 10rpx;
+    }
+    .library-wrapper{
+      padding: 20rpx 0;
+    }
+    .library-item{
+      position: relative;
+      &:before {
+        .setLeftLine(@weuiCellBorderColor);
+      }
+      &:first-child {
+        &:before {
+          display: none;
+        }
+      }
+    }
+    .item-title{
+      .h3();
+      line-height: 1;
+    }
+    .mini-btn{
+      //  margin: 1em auto;
+      margin-left: 5px;
+      margin-right: 5px;
+    }
+  }
+  .list{
+    padding: 22rpx;
+    /*background: red;*/
+    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+  }
+  .inline-block {display: inline-block}
+  .flo_l {float: left}
+  .flo_r {float: right}
+  .font_26 {font-size: 26rpx}
+  .font_28 {font-size: 28rpx}
+  .bold{font-weight: bold}
+  .clearfloat {clear:both}
+  .white {background: white}
+  .ellipsis_2 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+  .ellipsis_1 {
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    overflow:hidden;
+  }
+
+  .imagebox{
+    width: 33%;
+  }
+  .borrowlist{
+    width: 92%;
+    box-shadow: 1rpx 1rpx 18rpx #d3d3d3;
+    border-radius: 6rpx;
+    margin: 22rpx auto;
+    background: white;
+  }
+  .weui-cell__ft {
+    margin-top: 10%;
+  }
+  .search_title{
+    min-width: 80rpx;
+    padding: 2rpx 14rpx;
+    background: #ffffff;
+    border-radius: 28rpx;
+    margin-left: 32rpx;
+  }
+  .active{
+    background: #ffbf58;
+    color: white;
+  }
+  .date{
+    width: 80rpx;height: 80rpx;
+    margin-top: -22rpx;
+    margin-right: 32rpx;
+    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+    border-radius: 12rpx;
+  }
+  .weui-navbar__slider {
+    background-color: #c66584;
+  }
+  .weui-navbar__item.weui-bar__item_on {
+    color:#c66584;
+  }
+  .weui-cells__title{
+    padding: 4rpx 30rpx;
+    border-bottom: 2rpx solid #e6e6e6;
+    .weui-search-bar__box{
+      background: #f2f2f2;
+      padding: 2rpx 60rpx;
+      border-radius: 4rpx;
+      .weui-icon-search_in-box {
+        top: 18rpx;
+      }
+    }
+    ._bc-list{
+      image{
+        width: 60rpx;
+        height: 60rpx;
+        margin-left: 22rpx;
+      }
+      ._bc-message{
+        position: relative;
+        margin-left: 22rpx;
+        image{
+          width: 48rpx;
+          height: 48rpx;
+          margin-top: 4rpx;
+        }
+        .dost{
+          height: 32rpx;
+          min-width: 32rpx;
+          text-align: center;
+          font-size: 20rpx;
+          position: absolute;
+          right: -8rpx;
+          top: 0;
+          border-radius: 50%;
+          background: red;
+        }
+      }
+    }
+  }
+</style>

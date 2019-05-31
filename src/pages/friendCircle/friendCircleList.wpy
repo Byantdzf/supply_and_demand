@@ -431,7 +431,7 @@
         height: 68rpx;
         margin-right: 32rpx;
         vertical-align: middle;
-        margin-top: 14rpx;
+        margin-top: 10rpx;
       }
       .icon_down{
         width: 26rpx;

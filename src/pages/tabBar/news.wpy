@@ -148,19 +148,21 @@
           if (this.list.length === 0 || this.page === 1) {
             this.list = []
             this.list = [...this.typeList]
-            for (let item of data) {
-              this.list.push({
-                icon: item.other_user.wechat.avatar2,
-                title: item.other_user.name,
-                message: {
-                  content: item.last_message.content,
-                  created_at: item.last_message.created_at,
-                  id: item.other_user.id,
-                  type: item.other_user.type,
-                  new_count: item.new_count
-                },
-                path: `/pages/home/chitchat?id=${item.other_user.id}&name=${item.other_user.name}&type=${item.other_user.type}`
-              })
+            if (data.length > 0) {
+              for (let item of data) {
+                this.list.push({
+                  icon: item.other_user.wechat.avatar2,
+                  title: item.other_user.name,
+                  message: {
+                    content: item.last_message.content,
+                    created_at: item.last_message.created_at,
+                    id: item.other_user.id,
+                    type: item.other_user.type,
+                    new_count: item.new_count
+                  },
+                  path: `/pages/home/chitchat?id=${item.other_user.id}&name=${item.other_user.name}&type=${item.other_user.type}`
+                })
+              }
             }
             this.loading = false
             this.$apply()

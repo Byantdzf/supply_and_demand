@@ -1,0 +1,198 @@
+<template>
+  <!--<Loading :init.sync="init"></Loading>-->
+  <form bindsubmit="formSubmit" report-submit>
+    <button formType="submit" class="btn" data-type="click">
+      <view class="iconActive">
+        <image wx:if="{{tabIndex == 0}}" src="http://images.ufutx.com/201905/31/6dbf441f112370befd2abb373edb0486.png" mode="widthFix" style="width: 100%;" class="bc_opcit"></image>
+        <image wx:else src="http://images.ufutx.com/201905/31/f36d431299cd56651ba8ab432727c14c.png" mode="widthFix" style="width: 100%;" class="bc_opcit"></image>
+      </view>
+      <navBarTop :tabs.sync="tabs" @tapClick="tapClick"></navBarTop>
+      <view class="page__bd">
+        <view>
+          <image src="http://images.ufutx.com/201905/31/b6d697e0db3a6a1fe1afe76db815ce36.png"  mode="widthFix" style="width: 100%;"></image>
+        </view>
+      </view>
+    </button>
+  </form>
+</template>
+<script>
+  import wepy from 'wepy'
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import ShareMessage from '../../mixins/ShareMessage'
+  import Loading from '../../components/loading'
+  import navBarTop from '../../components/navBarTop'
+  import {wxPay} from "../../utils/fn"
+
+  export default class loveMate extends wepy.page {
+    mixins = [base, http, user, ShareMessage]
+    config = {
+      navigationBarTitleText: '红娘'
+    }
+    components = {
+      Loading, navBarTop
+    }
+    data = {
+      init: false,
+      tabs: ['人工牵线', '红娘托管'],
+      activeInput: false,
+      loading: false,
+      noMore: false,
+      meet: [],
+      tabIndex: 0,
+      trade_no: '',
+      Hosting: [],
+      table: [
+        {title: '10元', value: '10', active: false},
+        {title: '20元', value: '20', active: false},
+        {title: '50元', value: '50', active: true},
+        {title: '100元', value: '100', active: false},
+        {title: '200元', value: '200', active: false},
+        {title: '500元', value: '500', active: false}
+      ],
+      price: 50 // 奉献金
+    }
+
+    onShareAppMessage(res) {
+      return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
+    }
+
+    onShow() {
+      this.upDatelist()
+      this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+    upDatelist(type) {
+      let _this = this
+      _this.loading = true
+      _this.$get({
+        url: `${service.appointments}`,
+        data: {
+          type: type
+        }
+      }, {
+        success: ({code, data}) => {
+          _this.meet = data.active_appointments
+          _this.Hosting = data.passive_appointments
+          _this.$apply()
+          console.log(_this.meet)
+          console.log(_this.Hosting)
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          _this.loaded = false
+          wx.hideLoading()
+        }
+      })
+    }
+    methods = {
+      selectMoney(index) {
+        for (let item of this.table){
+          item.active = false
+        }
+        this.table[index].active = true
+        this.price = this.table[index].value
+        this.$apply()
+      },
+      getMoney(e) {
+        this.price = e.detail.value
+        this.$apply()
+      },
+      showInput() {
+        this.activeInput = !this.activeInput
+        this.$apply()
+      },
+      // 确认
+      confirm() {
+        console.log(this.price)
+        if (!this.price) {
+          return this.$showToast('请输入金额')
+        }
+        let that = this,
+          data = {
+            price: that.price
+          }
+        that.$post({
+          url: `${service.host}/donation`, data
+        }, {
+          success: ({code, data}) => {
+            that.trade_no = data.trade_no
+            that.$apply()
+            let wxconfig = data.wx_pay.config
+            if (wxconfig.payment_debug) {
+              return that.$post({url: `${service.orderpay}/${that.trade_no}`}, {
+                success: ({code, data}) => {
+                  that.$Toast_success('支付成功')
+                },
+                fail: ({code, data}) => {
+                },
+                complete: () => {
+                }
+              })
+            }
+            wxPay(wxconfig).then(() => {
+              that.$Toast_success('支付成功')
+            }).catch((error) => {
+              console.log(error)
+            })
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+          }
+        })
+      },
+      goto(url) {
+        wx.navigateTo({url: url})
+      }
+    }
+    events = {
+      'tabClick': (value) => { // NavTab返回值
+        // this.$showLoading('加载中...')
+        // this.page = 1
+        this.tabIndex = value
+        this.$apply()
+      }
+    }
+  }
+
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+  page{
+    background: white;
+    .page__bd{
+      border-top: 20rpx solid @lightgray;
+      padding: 28rpx 0;
+    }
+    .bc_opcit {
+      animation: opacity 1.2s;
+      animation-fill-mode: forwards;
+    }
+    .iconActive{
+      transform: rotateZ(0deg);
+      animation: moveActive 300ms;
+      animation-fill-mode: forwards;
+    }
+    @keyframes moveActive {
+      0%{
+        transform:rotate(-90deg);
+      }
+      100%{
+        transform:rotate(0deg);
+      }
+    }
+    @keyframes opacity {
+      0%{
+        opacity: 0.2;
+      }
+      100%{
+        opacity: 1;
+      }
+    }
+  }
+</style>

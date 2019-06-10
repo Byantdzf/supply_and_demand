@@ -15,24 +15,41 @@
               <text class="text_price bold">￥{{item.price}}</text>
               <text class="font_26 text-info">（{{item.name}})</text>
             </view>
-            <view class="flo_r text_foot bold" @tap="btnBuy({{item.id}})">购买</view>
+            <view class="flo_r text_foot bold" @tap="showModal({{item}})">购买</view>
           </view>
         </view>
       </view>
       <view class="bc_call">
         <image src="http://images.ufutx.com/201905/31/c41774b536f913f927eb54592ba71905.png" mode="widthFix" class="image" @tap="makePhoneCall"></image>
-        <view class="call_iphone font_26">热线：4000401707-2</view>
+        <view class="call_iphone font_26">热线：4000401707</view>
       </view>
       <view class=" font_26 state info">
-        <view class="title bold text-left">专业红娘托管规则</view>
-        <view style="margin: 0rpx 22rpx;">
-          <view>1、完全委托红娘按提出的择偶条件筛选对象，安排线下见面。</view>
-          <text>2、红娘推荐不超过４位被约方，约见方从中选取至少一位意向对象。</text>
-          <text>3、红娘主动与意向对象联系，详细核对资料，并了解用户真实愿望，做好备注，开始为用户提供相关服务；约见成功后扣除１次约见次数。</text>
-          <text>4、约见是双方自愿行为，平台不对约见沟通结果和安全负责，请注意自我保护！</text>
-          <text>5、红娘联系双方，确定见面时间，见面地点，红娘在平台做好备注信息。</text>
+        <view class="title bold text-left">{{tabIndex==0?messages[0].title:messages[1].title}}</view>
+        <view style="margin: 6rpx 22rpx;" wx:for="{{tabIndex==0?messages[0].texts:messages[1].texts}}" wx:key="index">
+          <view>{{item}}</view>
         </view>
       </view>
+      <modal>
+        <view slot="wrapper">
+          <view class="bc_text color-666 font_28">
+            <view class="bold text-right" @tap="hideModal">X</view>
+            <scroll-view scroll-y style="max-height: 72vh;">
+              <view class="text-wrapper">
+                {{deal}}
+              </view>
+            </scroll-view>
+          </view>
+          <view class="bc_check">
+            <checkbox-group class="radio-group" bindchange="radioChange">
+              <label class="radio">
+                <checkbox value="{{checkedValue}}" color="#D92553"/>同意遵守协议各项内容
+              </label>
+            </checkbox-group>
+          </view>
+          <view wx:if="{{!consent}}" @tap="showToast" class="bc_btn white text-center ">购买</view>
+          <view @tap="btnBuy({{pay_id}})" wx:else class="bc_buybtn white text-center">购买</view>
+        </view>
+      </modal>
     </button>
   </form>
 </template>
@@ -45,7 +62,8 @@
   import ShareMessage from '../../mixins/ShareMessage'
   import Loading from '../../components/loading'
   import navBarTop from '../../components/navBarTop'
-  import {wxPay} from "../../utils/fn"
+  import modal from '../../components/modal'
+  import {wxPay, callPhone} from '../../utils/fn'
 
   export default class loveMate extends wepy.page {
     mixins = [base, http, user, ShareMessage]
@@ -53,10 +71,12 @@
       navigationBarTitleText: '红娘'
     }
     components = {
-      Loading, navBarTop
+      Loading, navBarTop, modal
     }
     data = {
       init: false,
+      checkedValue: 'consent',
+      consent: false,
       tabs: ['人工牵线', '红娘托管'],
       activeInput: false,
       loading: false,
@@ -66,6 +86,21 @@
       tabIndex: 0,
       trade_no: '',
       Hosting: [],
+      messages: [
+        {
+          title: '什么情况需要破冰牵线',
+          texts: [
+            '1、发现心仪对象需要牵线时', '2、双方在平台有好感，需要安排见面时', '3、心在动，口难开'
+          ]
+        },
+        {
+          title: '什么情况需要红娘托管',
+          texts: [
+            '1、身边缺乏单身', '2、事务繁忙，没精力顾及', '3、对恋爱少根筋'
+          ]
+        }
+      ],
+      pay_id: '',
       table: [
         {title: '10元', value: '10', active: false},
         {title: '20元', value: '20', active: false},
@@ -74,6 +109,7 @@
         {title: '200元', value: '200', active: false},
         {title: '500元', value: '500', active: false}
       ],
+      deal: '',
       price: 50 // 奉献金
     }
 
@@ -82,8 +118,11 @@
     }
 
     onShow() {
-      this.upDatelist()
       this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    onLoad() {
+      this.upDatelist()
     }
     upDatelist(type) {
       let _this = this
@@ -99,8 +138,6 @@
           _this.Hosting = data.passive_appointments
           _this.list = _this.meet
           _this.$apply()
-          console.log(_this.meet)
-          console.log(_this.Hosting)
         },
         fail: ({code, data}) => {
         },
@@ -111,8 +148,30 @@
       })
     }
     methods = {
+      showToast() {
+        this.$showToast('请先同意遵守协议各项内容！')
+      },
+      radioChange(e) {
+        if (e.detail.value.length > 0) {
+          this.consent = true
+        } else {
+          this.consent = false
+        }
+        this.$apply()
+        console.log(this.consent)
+      },
+      showModal(item) {
+        this.pay_id = item.id
+        this.deal = item.deal
+        this.$apply()
+        this.$invoke('modal', 'showModal')
+      },
+      hideModal() {
+        this.$invoke('modal', 'hideModal')
+      },
       btnBuy(id) {
         let that = this
+        that.$invoke('modal', 'hideModal')
         that.$post({
           url: `${service.appointments}/${id}`
         }, {
@@ -167,39 +226,6 @@
             }).catch((error) => {
               console.log(error)
             })
-//             wx.requestPayment({
-//               timeStamp: wxconfig.timestamp, // 支付签名时间戳，注意微信jssdk中的所有使用timestamp字段均为小写。但最新版的支付后台生成签名使用的timeStamp字段名需大写其中的S字符
-//               nonceStr: wxconfig.nonceStr, // 支付签名随机串，不长于 32 位
-//               package: wxconfig.package, // 统一支付接口返回的prepay_id参数值，提交格式如：prepay_id=***）
-//               signType: wxconfig.signType, // 签名方式，默认为'SHA1'，使用新版支付需传入'MD5'
-//               paySign: wxconfig.paySign, // 支付签名
-//               success: function (res) {
-//                 that.$post({url: `${service.pay}/packet/${that.trade_no}`}, {
-//                   success: ({code, data}) => {
-//                     wx.showModal({
-//                       title: '购买成功',
-//                       content: '去约见你心仪的对象吧！',
-//                       cancelText: '取消',
-//                       confirmText: '确定',
-// //                    cancelColor: '#e21918',
-//                       success(res) {
-//                         if (res.confirm) {
-//                           wx.navigateTo({url: '/pages/home/search'})
-//                         } else if (res.cancel) {
-//                           console.log('用户点击取消')
-//                         }
-//                       }
-//                     })
-//                   },
-//                   fail: ({code, data}) => {
-//                   },
-//                   complete: () => {
-//                   }
-//                 })
-//               },
-//               fail: function (res) {
-//               }
-//             })
           },
           fail: ({code, data}) => {
           },
@@ -208,12 +234,11 @@
         })
       },
       makePhoneCall() {
-        wx.makePhoneCall({
-          phoneNumber: '4000401707-2' // 仅为示例，并非真实的电话号码
-        })
+        // let mobile = encodeURIComponent('(400)0401707—2')
+        callPhone('4000401707')
       },
       selectMoney(index) {
-        for (let item of this.table){
+        for (let item of this.table) {
           item.active = false
         }
         this.table[index].active = true
@@ -299,6 +324,7 @@
       padding: 22rpx 0;
     }
     .bc_opcit {
+      height: auto;
       animation: opacity 1.2s;
       animation-fill-mode: forwards;
     }
@@ -352,7 +378,7 @@
     }
     .state{
       background: #f7f7f7;
-      padding: 12rpx 16rpx;
+      padding: 12rpx 16rpx 8rpx 16rpx;
       border: 1rpx solid #d3d3d3;
       border-radius: 10rpx;
       color: @gray;
@@ -381,9 +407,10 @@
       .image{
         width: 100rpx;
         position: absolute;
+        height: auto;
         right: 0;
         top: 0;
-        z-index: 9999;
+        z-index: 1;
       }
       .call_iphone{
         position: absolute;
@@ -395,8 +422,26 @@
         padding: 8rpx 28rpx;
         padding-right: 110rpx;
         border-radius: 26rpx;
-        z-index: 1;
+        z-index: -1;
       }
+    }
+    .bc_text{
+      padding: 12rpx 22rpx 0 22rpx;
+      border-bottom: 1rpx solid @lightgray;
+    }
+    .bc_buybtn,.bc_btn{
+      width: 60%;
+      background: @theme;
+      margin: 12rpx auto;
+      padding: 12rpx 0;
+      border-radius: 8rpx;
+    }
+    .bc_btn{
+      background: @gray;
+    }
+    .bc_check{
+      margin: 22rpx;
+      font-size: 24rpx;
     }
   }
 </style>

@@ -28,14 +28,29 @@
       hide: false,
       hideBtn: false,
       time: 3,
-      startImage: 'http://images.ufutx.com/201901/09/3d0d453feb5ad6b5625ece9670fd7d31.png'
+      startImage: 'http://images.ufutx.com/201906/06/7d08adc288632283af704cbdf4a07e0b.jpeg'
+        // 'http://images.ufutx.com/201901/09/3d0d453feb5ad6b5625ece9670fd7d31.png'
     }
 
     computed = {}
 
     onShow() {
       this.login()
+      this.changeWallpaper()
       this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
+    }
+
+    changeWallpaper() {
+      let myDate = new Date()
+      console.log(myDate.getDate())
+      console.log(myDate.getSeconds())
+      if (myDate.getDate() > 9) {
+        this.startImage = 'http://images.ufutx.com/201901/09/3d0d453feb5ad6b5625ece9670fd7d31.png'
+        this.$apply()
+      } else {
+        this.startImage = 'http://images.ufutx.com/201906/06/7d08adc288632283af704cbdf4a07e0b.jpeg'
+        this.$apply()
+      }
     }
 
     login() {
@@ -64,9 +79,6 @@
                     this.$gotoTab('/pages/tabBar/home')
                   }, 800)
                 }
-                // setTimeout(() => {
-                //   that.$gotoTab('/pages/tabBar/home')
-                // }, 800)
               } else {
                 that.hideBtn = true
                 that.$goto('/pages/users/register')
@@ -122,7 +134,6 @@
 
   page {
     background: #ffffff;
-
     .box {
       width: 100vw;
       height: 100vh;

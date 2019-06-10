@@ -23,10 +23,10 @@
     }
     data = {
       list: [
-        'http://images.ufutx.com/201903/08/2c1a26ad391b992a042b6078725f1635.jpeg',
-        'http://images.ufutx.com/201903/08/52a68c56d63bb1960c982efaf07edd46.jpeg',
-        'http://images.ufutx.com/201903/08/b1b77aaee64211d8d90342dc06ac68ed.jpeg',
-        'http://images.ufutx.com/201903/08/fd689eb75a176a7c2995e430a89fcf81.jpeg'
+        'http://images.ufutx.com/201906/03/061a0fdc9703e16a87e3da6cdaa2c9e6.jpeg',
+        'http://images.ufutx.com/201906/03/da86d7e38fb4b2b3a51a7b89ddf52528.jpeg',
+        'http://images.ufutx.com/201906/03/bc4a4e8cb59c5cf59dea9b83a9af15af.jpeg',
+        'http://images.ufutx.com/201906/03/b0e4a305ff40af619521d25f0e3d49d2.jpeg'
       ]
     }
     components = {}

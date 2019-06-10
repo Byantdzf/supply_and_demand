@@ -6,7 +6,7 @@
   var ga = require('./ga.js')
   var GoogleAnalytics = ga.GoogleAnalytics
   var HitBuilders = ga.HitBuilders
-  const socket = require("./utils/sockte")
+  const socket = require('./utils/sockte')
 
   // 缓存上一个页面
   // console.log(this.getCurrentPages())
@@ -104,7 +104,6 @@
             'address',
             'rule',
             'shareVip',
-            'upgrade',
             'protocol',
             'protocolV2',
             'realName',
@@ -203,6 +202,13 @@
       if (options.referrerInfo.appId) {
         wx.setStorageSync('from_platform', options.referrerInfo.appId)
       }
+      let vm = this
+      wx.getSystemInfo({
+        success(res) {
+          vm.globalData.windowHeight = res.windowHeight
+          vm.globalData.windowWidth = res.windowWidth
+        }
+      })
     }
 
     onShow(options) {

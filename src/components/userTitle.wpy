@@ -11,7 +11,7 @@
           </span>
           <view class="userinfo-info">
             <view class="userinfo-nickname font_32 bold">
-              {{ user.name }} <span class="font_26 blod">({{StateText}})</span>
+              {{ user.name }} <span class="font_26 state">{{StateText}}</span>
               <view style="margin-top: 28rpx;margin-left: -12rpx;">
                 <block wx:if="{{user.type == 'marriage'}}">
                   <view class="orange font_26 text-center flo_l menber" style="padding: 8rpx 16rpx;">
@@ -49,7 +49,10 @@
                       <view class="orange font_26 text-center flo_l menber" style="width: inherit; min-width: 76rpx">
                         <image src="http://images.ufutx.com/201902/21/fea657836c8c203e75c0bb1316a4a827.png" mode="aspectFill" style="width: 32rpx;height: 32rpx;"
                                class="flo_l"></image>
-                        <view style="font-size: 20rpx;margin-top: 8rpx;margin-left: 4rpx;" class="flo_l">{{user.rank_name}}VIP</view>
+                        <view style="font-size: 20rpx;margin-top: 8rpx;margin-left: 4rpx;" class="flo_l">
+                          {{user.rank_name}}VIP
+                          <!--<text wx:if="{{user.deadline}}" class="color-666">到期时间：{{user.deadline}}</text>-->
+                        </view>
                       </view>
                     </span>
                   </block>
@@ -68,8 +71,8 @@
             <!--<view class="message_red {{user.new_notice_count ? 'doudun' : ''}}" wx:if="{{user.new_notice_count}}"></view>-->
           <!--</view>-->
           <view class="message" style="right: 12rpx;" @tap.stop="showModal({{user}})">
-            <image src="http://images.ufutx.com/201901/04/f6404bd7a4103ee0eb4b59b636c1861f.png" mode="aspectFill" class="flo_r"
-                   style="width: 56rpx;height: 56rpx;margin:0 -6rpx 0 12rpx; "></image>
+            <!--<view class="font_26 bc_edit">编辑资料</view>-->
+            <image src="http://images.ufutx.com/201901/04/f6404bd7a4103ee0eb4b59b636c1861f.png" mode="aspectFill" class="flo_r" style="width: 56rpx;height: 56rpx;margin:0 -6rpx 0 12rpx; "></image>
           </view>
         </view>
         <!--</navigator>-->
@@ -245,6 +248,7 @@
             item.active = false
           }
         }
+        this.user.deadline = this.user.deadline.split(' ')[0]
         this.Image = this.user.avatar
         if (this.user.deadline != null) {
           this.deadline = this.user.deadline
@@ -525,7 +529,8 @@
 <style type="less" scoped>
 @import "../styles/custom/fn.less";
 .user_back{
-  background-image: url("http://images.ufutx.com/201901/04/eb2209f12a0499af336476aa462c67a6.png");
+  background: @lightgray;
+  background-image: url("http://images.ufutx.com/201906/06/83732d63ccfe324e0c614319b7ffa0c1.png");
   background-size: contain;
   height: 188rpx;
   position: relative;
@@ -662,7 +667,13 @@
 .message{
   position: absolute;
   right: 112rpx;
-  top: 4rpx;
+  top: 8rpx;
+  color: @theme;
+  // border: 1rpx solid @theme;
+  padding: 4rpx 12rpx;
+  margin-top: 22rpx;
+  border-radius: 4rpx;
+  font-weight: 600;
 }
 .message_red{
   background: red;
@@ -822,6 +833,10 @@
       }
     }
   }
+  .state{
+    color: @theme;
+    font-weight: 500;
+  }
   .hidemodal{
     position: fixed;
     bottom: 100rpx;
@@ -834,5 +849,9 @@
     background: rgba(255,255,255,0.1);
     /*filter: blur(4rpx);*/
   }
+  .bc_edit{
+    font-weight: 500;
+  }
+
 
 </style>

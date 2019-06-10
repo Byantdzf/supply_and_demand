@@ -6,7 +6,7 @@
     <view @tap="goto('/pages/map/mapList')">
       <tabSearch disabled="true"></tabSearch>
     </view>
-    <block wx:if="{{announcements.length>1}}">
+    <block wx:if="{{announcements.length>0}}">
       <swiperV :list.sync="announcements" height="242"></swiperV>
     </block>
     <view class="_bc-tab text-left ff ">
@@ -41,10 +41,10 @@
           <swiper-item  wx:for="{{recommends}}" wx:key="index"  wx:for-index="idx" wx:for-item="otherUser">
             <view class="_bc-list_swiper">
               <view class="item-avatar_swiper {{index ===0 || index === 2?'flo_l':'flo_r'}}" wx:for="{{otherUser}}" wx:key="{{index}}" wx:if="{{index<4}}" @tap="gotofriends({{item}},{{item.user_id}})">
-                <image src="{{item.photo}}" mode="aspectFill" class="image"></image>
+                <image src="{{item.photo?item.photo:defPic}}" mode="aspectFill" class="image"></image>
                 <view class="font_26 _bc-center_swiper color-666">
                   <view class="color-666 ellipsis_1 bold" style="max-width: 80%">{{item.name}}</view>
-                  <view class="font_22 bold" style="color: #919191">{{item.age? item.age + '岁' : ''}} {{item.stature? '· ' +item.stature +'cm': ''}} {{item.city? '· '+item.city: ''}}</view>
+                  <view class="font_22 bold ellipsis_1" style="color: #919191">{{item.age? item.age + '岁' : ''}} {{item.stature? '· ' +item.stature +'cm': ''}} {{item.city? '· '+item.city: ''}}</view>
                 </view>
               </view>
             </view>
@@ -59,7 +59,7 @@
     </view>
     <block wx:if="{{list.length>0}}">
       <view class="_bc-list">
-        <view class="item-avatar" wx:for="{{list}}" wx:key="{{index}}" @tap="gotofriends({{item}})">
+        <view class="item-avatar" wx:for="{{list}}" wx:key="{{index}}" @tap="gotofriends({{item}},{{item.id}})">
           <image src="{{item.avatar}}" mode="aspectFill" class="image"></image>
           <view class="font_28 _bc-center color-666">
             <view class="font_28">
@@ -137,7 +137,7 @@
       swiperV, Loading, Tab_NavBar, pageScroll, tabSearch
     }
     watch = {
-      current(){
+      current() {
         console.log(this.current)
       }
     }
@@ -224,6 +224,7 @@
       trade_no: '',
       Hosting: [],
       watchLocation: false,
+      defPic: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
       price: 50, // 奉献金
       serverData: true // 服务接口开关
     }
@@ -244,6 +245,7 @@
       }
       this.getNewCount()
     }
+
     getNewCount() {
       this.$get({url: `${service.host}/new/message/count`}, {
         success: ({code, data}) => {
@@ -406,25 +408,19 @@
     }
     onPageScroll(res) {
       let top = res.scrollTop,
-        show = top > 380 ? true : false
-      this.$broadcast('showBackTopBtn', show)
-    }
-    getNewCount() {
-      this.$get({url: `${service.host}/new/message/count`}, {
-        success: ({code, data}) => {
-          let {new_count} = data
-          if (new_count > 0) {
-            wx.setTabBarBadge({
-              index: 2,
-              text: `${new_count}`
-            })
-          } else {
-            wx.removeTabBarBadge({
-              index: 2
-            })
-          }
-        }
-      })
+        show = top > 380 ? true : false,
+        vm = this
+      vm.$broadcast('showBackTopBtn', show)
+      // vm.list.forEach((item, index) => {
+      //   let group = item.photoList
+      //   group.forEach((rec, idx) => {
+      //     wx.createSelectorQuery().select('.Sheet-' + index + idx).boundingClientRect((rect) => {
+      //       if (rect.top <= vm.windowHeight) { // 判断是否在显示范围内
+      //         group[idx].show = true // 根据下标改变状态
+      //       }
+      //     }).exec()
+      //   })
+      // })
     }
 
     upDate() {
@@ -598,7 +594,7 @@
               }
             }
           })
-       }
+        }
         wx.navigateTo({url: url})
       },
       goto(url) {
@@ -651,12 +647,14 @@
           vertical-align: middle;
           margin-bottom: 6rpx;
           margin-left: 10rpx;
+          height: auto;
         }
       }
       .moreImage{
         width: 20rpx;
         margin-right: 26rpx;
         margin-top: 38rpx;
+        height: auto;
       }
     }
     .bc_swiper_box{

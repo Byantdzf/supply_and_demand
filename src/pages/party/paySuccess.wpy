@@ -62,11 +62,12 @@
 
     onReachBottom () {
     }
-    getCurrentPageUrlWithArgs(){
-      var pages = getCurrentPages()    // 获取加载的页面
-      var currentPage = pages[pages.length - 1]    // 获取当前页面的对象
-      var url = currentPage.route    // 当前页面url
-      var options = currentPage.options    // 如果要获取url中所带的参数可以查看options
+
+    getCurrentPageUrlWithArgs() {
+      // var pages = getCurrentPages()    // 获取加载的页面
+      // var currentPage = pages[pages.length - 1]    // 获取当前页面的对象
+      // var url = currentPage.route    // 当前页面url
+      // var options = currentPage.options    // 如果要获取url中所带的参数可以查看options
       // 拼接url的参数
       var urlWithArgs = `pages/party/detail?party_id=${this.id}&from_openid=` + wx.getStorageSync('openid')
       // for (var key in options) {
@@ -87,14 +88,14 @@
         title: that.theme,
         path: url,
         imageUrl: that.thumbnail_poster,
-        success: function(res) {
-          let shareTickets = res.shareTickets;
+        success: function (res) {
+          let shareTickets = res.shareTickets
           if (!shareTickets) {
             return false
           }
           console.log('转发成功')
         },
-        fail: function(res) {
+        fail: function (res) {
           console.log('转发成功')
         }
       }

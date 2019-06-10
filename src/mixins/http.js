@@ -245,26 +245,15 @@ export default class httpMixin extends wepy.mixin {
       complete: (res) => {
         wx.hideLoading()
         if (res.errMsg.indexOf('timeout') > -1) {
-          wx.showModal({
-            title: '提示',
-            content: '网络超时！请重试',
-            success(res) {
-              if (res.confirm) {
-                console.log('用户点击确定')
-                wx.hideToast()
-              } else if (res.cancel) {
-                console.log('用户点击取消')
-              }
-            }
+          wx.showToast({
+            title: '当前网络不稳定！请重试...',
+            icon: 'none',
+            duration: 2000
           })
         }
-        // 隐藏加载提示
-        this.init = true
-
-        wx.hideNavigationBarLoading()
-        // 停止下拉状态
-        wx.stopPullDownRefresh()
-        // 完成回调
+        this.init = true // 隐藏加载提示
+        wx.hideNavigationBarLoading() // 停止下拉状态
+        wx.stopPullDownRefresh() // 完成回调
         return (() => {
           let completeExist = this.isFunction(complete)
           completeExist && complete(res)

@@ -194,7 +194,7 @@
               duration: 1000
             })
             setTimeout(() => {
-              wx.redirectTo({url: '/pages/users/myNews'})
+              wx.navigateBack({delta: 1})
             }, 1000)
           },
           fail: ({code, data}) => {
@@ -217,7 +217,7 @@
               duration: 1000
             })
             setTimeout(() => {
-              wx.redirectTo({url: '/pages/users/myNews'})
+              wx.navigateBack({delta: 1})
             }, 1000)
           },
           fail: ({code, data}) => {

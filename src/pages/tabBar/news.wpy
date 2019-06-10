@@ -9,7 +9,7 @@
       </view>
       <view  class="_item-text flo_l">
         <span class="font_28">{{item.title}}</span>
-        <span class="font_22" style="margin-left: 8rpx;color: #FF688A;" wx:if="{{item.message.type == 'marriage'}}">介绍人</span>
+        <span class="font_22 message_type_text" wx:if="{{item.message.type == 'marriage'}}">介绍人</span>
       </view>
       <span class="font_22 flo_r _time">{{item.message.created_at}}</span>
       <view  class="_item-user ellipsis_1 flo_r font_26">
@@ -26,10 +26,9 @@
     </block>
     <block wx:if="{{noMore}}">
       <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
-        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot" style="background: white"></view>
+        <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot" style="background: #fcfcfc"></view>
       </view>
     </block>
-    <official-account style="position:absolute;bottom:0;width:100%;height:168rpx;"></official-account>
   </view>
 </template>
 
@@ -154,8 +153,8 @@
                   icon: item.other_user.wechat.avatar2,
                   title: item.other_user.name,
                   message: {
-                    content: item.last_message.content,
-                    created_at: item.last_message.created_at,
+                    content: item.last_message ? item.last_message.content : '',
+                    created_at: item.last_message ? item.last_message.created_at : '',
                     id: item.other_user.id,
                     type: item.other_user.type,
                     new_count: item.new_count
@@ -173,8 +172,8 @@
                 icon: item.other_user.wechat.avatar2,
                 title: item.other_user.name,
                 message: {
-                  content: item.last_message.content,
-                  created_at: item.last_message.created_at,
+                  content: item.last_message ? item.last_message.content : '',
+                  created_at: item.last_message ? item.last_message.created_at : '',
                   id: item.other_user.id,
                   type: item.other_user.type,
                   new_count: item.new_count
@@ -182,7 +181,7 @@
                 path: `/pages/home/chitchat?id=${item.other_user.id}&name=${item.other_user.name}&type=${item.other_user.type}`
               })
             }
-            this.list = [...this.list,...items]
+            this.list = [...this.list, ...items]
             console.log(this.list)
             this.$apply()
           }
@@ -250,6 +249,11 @@ page{
       border-bottom: 1rpx solid #e2e2e2;
       padding-bottom: 26rpx;
     }
+  }
+
+  .message_type_text {
+    margin-left: 8rpx;
+    color: @theme;
   }
 }
 </style>

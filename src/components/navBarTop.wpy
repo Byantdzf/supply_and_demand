@@ -24,7 +24,7 @@
       sliderOffset: 0,
       sliderLeft: 0,
       sliderWidth: 180,
-      screenWidth: 360,
+      screenWidth: 360
     }
     components = {}
 

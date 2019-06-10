@@ -439,8 +439,9 @@
 <style lang="less">
   @import "../../styles/custom/fn.less";
   .main-register{
+    width: 100%;
     background: none;
-    padding: 20rpx;
+    /*padding: 20rpx;*/
     margin: 10rpx auto;
     z-index: 9999;
     position: fixed;
@@ -449,7 +450,7 @@
       padding-bottom: 0.5em;
     }
     .main-address{
-      width: 85%;
+      width: 82%;
       margin-bottom: 1.5em;
       padding: 12rpx 36rpx;
       /*padding-top: 48rpx;*/

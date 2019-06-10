@@ -16,7 +16,7 @@
             <image src="http://images.ufutx.com/201905/29/c63136413a826ec628d86732ce3a638e.png"  mode="aspectFit" style="width:22rpx;height: 22rpx;" class="{{activeInput?'iconActive': 'icon'}}"></image>
           </view>
           <view class="box_input" wx:if="{{activeInput}}">
-            <input type="number" placeholder="输入金额" class="font_32 bold" value="{{price}}" focus="{{activeInput}}" @input="getMoney" maxlength="8">
+            <input type="number" placeholder="输入金额" class="font_32 bold" value="{{price}}" focus="{{activeInput}}" @input="getMoney" maxlength="8" />
           </view>
           <view style="height: 110rpx" wx:else></view>
           <view class="bc_box">
@@ -40,7 +40,7 @@
   import user from '../../mixins/user'
   import ShareMessage from '../../mixins/ShareMessage'
   import Loading from '../../components/loading'
-  import {wxPay} from "../../utils/fn"
+  import {wxPay} from '../../utils/fn'
 
   export default class loveMate extends wepy.page {
     mixins = [base, http, user, ShareMessage]
@@ -76,7 +76,7 @@
     }
     methods = {
       selectMoney(index) {
-        for (let item of this.table){
+        for (let item of this.table) {
           item.active = false
         }
         this.table[index].active = true

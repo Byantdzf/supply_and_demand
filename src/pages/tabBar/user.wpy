@@ -3,63 +3,43 @@
   <Tab_NavBar rgba="#eeeff1"></Tab_NavBar>
   <view class="page-user">
     <userTitle :user.sync="user"></userTitle>
-    <view style="background: white;width: 100%;height: 100rpx;padding: 12rpx 0;box-shadow: 0rpx -6rpx 12rpx #e3e3e3;position: relative">
+    <view class="bc_tab color-666">
       <view style="width: 33%;height: 100%;" class="text-center flo_l"
             @tap="goto('/pages/users/friendlist?type=friend')">
-        <view class="bold font_32" style="margin: 8rpx 0 4rpx 0">{{user.friend_count}}</view>
+        <view class="bold font_32 bc_num" >{{user.friend_count}}</view>
         <view class=" font_26">我的好友</view>
       </view>
       <view style="width: 33%;height: 100%;" class="text-center flo_l"
             @tap="goto('/pages/users/friendlist?type=attention')">
-        <view class="bold font_32" style="margin: 8rpx 0 4rpx 0">{{user.follow_count}}</view>
+        <view class="bold font_32 bc_num" >{{user.follow_count}}</view>
         <view class=" font_26">我的关注</view>
       </view>
-      <view style="width: 33%;height: 100%;" class="text-center flo_l" @tap="goto('/pages/users/friendlist?type=fans')">
-        <view class="bold font_32" style="margin: 8rpx 0 4rpx 0">{{user.fans_count}}</view>
+      <view style="width: 33%;height: 100%;" class="text-center flo_l " @tap="goto('/pages/users/friendlist?type=fans')">
+        <view class="bold font_32 bc_num" >{{user.fans_count}}</view>
         <view class=" font_26">关注我的</view>
       </view>
-      <!--<view style="width: 25%;height: 100%;" class="text-center flo_l"-->
-            <!--@tap="goto('/pages/users/myMessage?id={{user.id}}')">-->
-        <!--<view class="bold font_32" style="margin: 8rpx 0 -6rpx 0; position: relative;">-->
-          <!--<image src="http://images.ufutx.com/201901/04/51a7884ea7a130b5884f85a37b7946af.png" mode="aspectFill"-->
-                 <!--style="width: 48rpx;height: 48rpx; "></image>-->
-          <!--<text class="dot white font_22" wx:if="{{user.new_count > 0}}">{{user.new_count}}</text>-->
-        <!--</view>-->
-        <!--<view class=" font_26">消息</view>-->
-      <!--</view>-->
     </view>
-    <view style="border-top:26rpx solid #f4f4f4;padding-bottom: 22rpx;" class="ff">
+    <view class="ff color-666 bc_box">
       <block wx:for="{{list}}" wx:key="{{index}}">
         <block wx:if="{{item.type == 'navigateTo'}}">
           <block wx:if="{{item.title == 'vip设置'}}">
-            <view @tap="gotoVipSet" wx:if="{{user.type !== 'marriage'}}" class="text-center inline-block text-center"
-                  style="width: 25%;padding-top: 22rpx;">
+            <view @tap="gotoVipSet" wx:if="{{user.type !== 'marriage'}}" class="text-center inline-block text-center" style="width: 25%;">
               <view hover-class="btn_active" class="box-icon text-center">
-                <image src="{{item.icon}}" style="margin-top: 12rpx;width:26px; height: 26px;vertical-align: middle;"
-                       mode="aspectFill"></image>
+                <image src="{{item.icon}}" mode="aspectFill"></image>
               </view>
               <view class="font_26">{{item.title}}</view>
             </view>
           </block>
           <block wx:else>
-            <navigator url="{{item.path +'?id=' + user.id}}" class="text-center inline-block"
-                       style="width: 25%;padding-top: 22rpx;">
+            <navigator url="{{item.path +'?id=' + user.id}}" class="text-center inline-block" style="width: 25%;">
               <view hover-class="btn_active" class="box-icon text-center">
                 <block wx:if="{{index == 0}}">
-                  <image src="http://images.ufutx.com/201812/29/d26f9a4c175ddbceea2d5e9354ad8a0f.png"
-                         style="margin-top: 12rpx;width:26px; height: 26px;" wx:if="{{user.is_approved == 1}}"
-                         mode="aspectFit"></image>
-                  <image src="{{item.icon}}" style="margin-top: 12rpx;width:26px; height: 26px;vertical-align: middle;"
-                         mode="aspectFit"
-                         wx:else></image>
+                  <image src="http://images.ufutx.com/201906/06/60b617bf82a31ddae11178d69ed0dad5.png" wx:if="{{user.is_approved == 1}}" mode="aspectFit"></image>
+                  <image src="{{item.icon}}"  mode="aspectFit" wx:else></image>
                 </block>
                 <block wx:else>
-                  <image src="{{item.icon}}" style="margin-top: 12rpx;width:32px; height: 32px;vertical-align: middle;"
-                         mode="aspectFill"
-                         wx:if="{{item.icon == 'http://images.ufutx.com/201901/07/259aad006e38cc2b4efcccfde1e6d254.png'}}"></image>
-                  <image src="{{item.icon}}" style="margin-top: 12rpx;width:26px; height: 26px;vertical-align: middle;"
-                         mode="aspectFill"
-                         wx:else></image>
+                  <image src="{{item.icon}}" mode="aspectFit" wx:if="{{item.icon == 'http://images.ufutx.com/201901/07/259aad006e38cc2b4efcccfde1e6d254.png'}}"></image>
+                  <image src="{{item.icon}}" mode="aspectFit" wx:else></image>
                 </block>
               </view>
               <view class="font_26">{{item.title}}</view>
@@ -70,48 +50,44 @@
           <navigator target="miniProgram" open-type="navigate" app-id="wxd2920948e02c5c76" path="/pages/users/integral"
                      extra-data="{{extraData}}" version="develop" class="text-center inline-block" style="width: 25%;">
             <view hover-class="btn_active" class="box-icon text-center">
-              <image src="{{item.icon}}" style="margin-top: 12rpx;width:26px; height: 26px;vertical-align: middle;"
-                     mode="aspectFill"></image>
+              <image src="{{item.icon}}" mode="aspectFit"></image>
             </view>
             <view class="font_26">{{item.title}}</view>
           </navigator>
         </block>
       </block>
-      <navigator url="{{'/pages/users/groupList?id=' + user.id}}" class="text-center inline-block"
-                 wx:if="{{user.is_admin == 1}}" style="width: 25%;padding-top: 22rpx;">
+      <navigator url="{{'/pages/users/groupList?id=' + user.id}}" class="text-center inline-block" wx:if="{{user.is_admin == 1}}" style="width: 25%;">
         <view hover-class="btn_active" class="box-icon text-center">
-          <image src='http://images.ufutx.com/201902/21/9312b52e7bd0635dd10789bc4367e93b.png'
-                 style="margin-top: 12rpx;width:26px; height: 26px;vertical-align: middle;" mode="aspectFill"></image>
+          <image src='http://images.ufutx.com/201906/06/e6f59ac1e95df7039b79191ad486ad72.png' mode="aspectFit"></image>
         </view>
         <view class="font_26">团契VIP</view>
       </navigator>
     </view>
     <!--<button @tap="detection">测试人脸识别</button>-->
-    <view style="border-top:26rpx solid #f4f4f4;padding-bottom: 22rpx;" class="ff">
+    <view  class="ff color-666 bc_box">
       <block wx:for="{{listV2}}" wx:key="{{index}}">
         <block wx:if="{{item.type == 'navigateTo'}}">
           <navigator url="{{item.path +'?id=' + user.id}}" class="text-center inline-block" style="width: 25%;">
-            <view style="margin-top: 8rpx;">
-              <image src="{{item.icon}}" style="margin-bottom: -4rpx;width:50px; height: 56px;"
-                     mode="aspectFill"></image>
+            <view hover-class="btn_active" class="box-icon text-center">
+              <image src="{{item.icon}}" mode="aspectFit"></image>
             </view>
-            <view class="font_26" style="margin-top: -18rpx;">{{item.title}}</view>
+            <view class="font_26">{{item.title}}</view>
             <view class="font_22" style="color: #aeaeb0">{{item.subhead}}</view>
           </navigator>
         </block>
         <block wx:else>
           <button class="btn text-center inline-block " open-type="feedback" style="width: 25%;margin-bottom: -10rpx;">
-            <view style="margin-top: 8rpx;">
-              <image src="{{item.icon}}" style="margin-bottom: -4rpx;width:50px; height: 56px;"
-                     mode="aspectFill"></image>
+            <view hover-class="btn_active" class="box-icon text-center">
+              <image src="{{item.icon}}"  mode="aspectFit"></image>
             </view>
-            <view class="font_26" style="margin-top: -18rpx;">{{item.title}}</view>
+            <view class="font_26">{{item.title}}</view>
             <view class="font_22" style="color: #aeaeb0">{{item.subhead}}</view>
           </button>
         </block>
       </block>
       <!--<view @tap="play">开始播放</view>-->
     </view>
+    <official-account style="position:fixed;bottom:0;width:100%;height:168rpx;"></official-account>
   </view>
 </template>
 <script>
@@ -125,14 +101,14 @@
   import Tab_NavBar from '../../components/Tab_NavBar'
   import {service} from '../../config.js'
 
-  const innerAudioContext = wx.createInnerAudioContext()
+  // const innerAudioContext = wx.createInnerAudioContext()
   export default class User extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
       navigationBarTitleText: '我的',
-      enablePullDownRefresh: true,
-      navigationBarTextStyle: 'black',
-      navigationBarBackgroundColor: '#EEEFF1'
+      enablePullDownRefresh: true
+      // navigationBarTextStyle: 'black',
+      // navigationBarBackgroundColor: '#EEEFF1'
     }
     data = {
       libraries: {},
@@ -144,56 +120,56 @@
       filePath: '',
       list: [
         {
-          icon: 'http://images.ufutx.com/201812/29/31c646a02f34492847c9644a99acc405.png',
+          icon: 'http://images.ufutx.com/201906/06/d0a89b4561063eaf5b50de2c551fcd8d.png',
           title: '实名验证',
           type: 'navigateTo',
           path: '/pages/users/realName'
         },
         {
-          icon: 'http://images.ufutx.com/201902/21/0ce7c196644f26f4d7c48030b4f17f7d.png',
+          icon: 'http://images.ufutx.com/201906/06/cc9dbd4154643115fc396d2eed34500e.png',
           title: '福分商城',
           type: 'navigateApp',
           path: '/pages/users/realName'
         },
         {
-          icon: 'http://images.ufutx.com/201902/21/62be603f0cc16a23c5765e0805e7fa5d.png',
+          icon: 'http://images.ufutx.com/201906/06/22468f70905609ffa626922be573f481.png',
           title: '我的订单',
           type: 'navigateTo',
           path: '/pages/users/myPay'
         },
         {
-          icon: 'http://images.ufutx.com/201902/21/bf3f89ae3647fc15e001a5c9332a64b6.png',
+          icon: 'http://images.ufutx.com/201906/06/a2813c248d3aef6705217eb9ac35ff30.png',
           title: '我的礼物',
           type: 'navigateTo',
           path: '/pages/users/myGift'
         },
 
         {
-          icon: 'http://images.ufutx.com/201902/21/96132fb80dd75d330a83eedb1848f538.png',
+          icon: 'http://images.ufutx.com/201906/06/444e1445817215a83b642b025ca39f13.png',
           title: '我的活动',
           type: 'navigateTo',
           path: '/pages/users/myActivity'
         },
+        // {
+        //   icon: 'http://images.ufutx.com/201902/21/eaf9e40f14b262f337006a78ee54f312.png',
+        //   title: '爱情测试',
+        //   type: 'navigateTo',
+        //   path: '/pages/users/vipSetting'
+        // },
+        // {
+        //   icon: 'http://images.ufutx.com/201902/21/1c974cb866fe63498c2677797182f655.png',
+        //   title: '测试结果',
+        //   type: 'navigateTo',
+        //   path: '/pages/users/myTest'
+        // },
         {
-          icon: 'http://images.ufutx.com/201902/21/eaf9e40f14b262f337006a78ee54f312.png',
-          title: '爱情测试',
-          type: 'navigateTo',
-          path: '/pages/users/vipSetting'
-        },
-        {
-          icon: 'http://images.ufutx.com/201902/21/1c974cb866fe63498c2677797182f655.png',
-          title: '测试结果',
-          type: 'navigateTo',
-          path: '/pages/users/myTest'
-        },
-        {
-          icon: 'http://images.ufutx.com/201902/21/9ebbc7224edf13517d5f2ba759a8831e.png',
+          icon: 'http://images.ufutx.com/201906/06/8cf7ae80af6d20ea35f62ccacf4c38e2.png',
           title: '访客记录',
           type: 'navigateTo',
           path: '/pages/users/visitor'
         },
         {
-          icon: 'http://images.ufutx.com/201902/21/2589683765a5663ac80e129283aeba47.png',
+          icon: 'http://images.ufutx.com/201906/06/dc978fa8252e83b835e705905e4cb3fc.png',
           title: 'vip设置',
           type: 'navigateTo',
           path: '/pages/users/realName'
@@ -201,28 +177,28 @@
       ],
       listV2: [
         {
-          icon: 'http://images.ufutx.com/201901/07/b695b6c00f111be71c6a7388d91e4348.png',
+          icon: 'http://images.ufutx.com/201906/06/a0537fab40210232fc1dbf64185df4d5.png',
           title: '加好友设置',
           type: 'navigateTo',
           subhead: '深入了解对方',
           path: '/pages/users/addFriendSet'
         },
         {
-          icon: 'http://images.ufutx.com/201901/07/61d73f5c00e2ae4e764746ba1d88634e.png',
+          icon: 'http://images.ufutx.com/201906/06/bc5cf19323e802b90aa14c75984d90d4.png',
           title: '上传生活照',
           type: 'navigateTo',
           subhead: '获得更多的关注',
           path: '/pages/users/uploadPic'
         },
         {
-          icon: 'http://images.ufutx.com/201901/07/86499a778378fd136c54be0edecee556.png',
+          icon: 'http://images.ufutx.com/201906/06/d9c45bb3869b616189ac0723887928ad.png',
           title: '分享给好友',
           type: 'navigateTo',
           subhead: '获得更多的祝福',
           path: '/pages/users/myShare'
         },
         {
-          icon: 'http://images.ufutx.com/201901/07/fcf5b0afb1cb3744d41ea54ac2b27239.png',
+          icon: 'http://images.ufutx.com/201906/06/0059f55a19360df71f84b8d90d265f54.png',
           title: '使用反馈',
           type: 'navigateTo',
           subhead: '共同维护福恋',
@@ -322,24 +298,16 @@
           this.user = data
           if (data.type == 'marriage') {
             this.list.splice(4)
-            // this.list.push(
-            //   {
-            //     icon: 'http://images.ufutx.com/201902/21/9312b52e7bd0635dd10789bc4367e93b.png',
-            //     title: '团契VIP',
-            //     type: 'navigateTo',
-            //     path: '/pages/users/groupList'
-            //   }
-            // )
             this.listV2 = [
               {
-                icon: 'http://images.ufutx.com/201901/07/86499a778378fd136c54be0edecee556.png',
+                icon: 'http://images.ufutx.com/201906/06/d9c45bb3869b616189ac0723887928ad.png',
                 title: '分享给好友',
                 type: 'navigateTo',
                 subhead: '获得更多的祝福',
                 path: '/pages/users/myShare'
               },
               {
-                icon: 'http://images.ufutx.com/201901/07/fcf5b0afb1cb3744d41ea54ac2b27239.png',
+                icon: 'http://images.ufutx.com/201906/06/0059f55a19360df71f84b8d90d265f54.png',
                 title: '使用反馈',
                 type: 'navigateTo',
                 subhead: '共同维护福恋',
@@ -491,13 +459,34 @@
     }
 
     .box-icon {
-      border: 12rpx solid #f7f7f7;
+      /*border: 12rpx solid #f7f7f7;*/
       width: 80rpx;
-      height: 80rpx;
-      border-radius: 50%;
-      box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
-      margin: auto;
-      margin-bottom: 6 rpx;
+      height: 68rpx;
+      /*border-radius: 50%;*/
+      /*box-shadow: 1rpx 1rpx 12rpx #d3d3d3;*/
+      margin:  auto;
+      margin-top: 16rpx;
+      image{
+        width: 60rpx;
+        height: 60rpx;
+      }
+    }
+    .bc_num{
+      margin: 8rpx 0 4rpx 0;
+      color: @theme;
+    }
+    .bc_tab{
+      background: white;
+      width: 100%;
+      height: 100rpx;
+      padding: 10rpx 0 16rpx 0;
+      box-shadow: 0rpx -6rpx 12 rpx #e3e3e3;
+      position: relative;
+    }
+    .bc_box{
+      border-top: 26rpx solid @lightgray;
+      padding: 10rpx 0;
+
     }
   }
 </style>

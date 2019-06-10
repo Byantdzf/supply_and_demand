@@ -90,6 +90,7 @@
           width: 80rpx;
           vertical-align: middle;
           margin-bottom: 4rpx;
+          height: auto;
         }
       }
       ._bc-address{

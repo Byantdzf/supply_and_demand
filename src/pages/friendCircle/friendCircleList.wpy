@@ -242,7 +242,6 @@
           }).exec()
         })
       })
-      console.log(vm.list)
       vm.$apply()
     }
     onReachBottom() {

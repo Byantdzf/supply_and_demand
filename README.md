@@ -1,20 +1,14 @@
-﻿# Ufutx Party 
+﻿# Ufutx love 
 
 ## Features
 
-* 友福聚会
-
-1. 聚会可保存为模板，用于发布周期性聚会。
-2. 聚会可设置服待岗位，供报名人选择。
-3. 新报名有通知，即时了解报名情况。
-4. 报名时，备注可能参加，方便管理人员。
-5. 报名时，可填写推荐人，方便跟进。
+* 友福福恋
 ....
 
 
 扫码访问小程序:
 
-![友福聚会](https://party.ufutx.com/imgs/mp_party.jpg)
+![福恋](https://images.ufutx.com/201903/14/1552529823home_qrcode.png)
 
 
 ## Usage

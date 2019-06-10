@@ -28,5 +28,20 @@ const wxPay = (wxconfig) => { // 微信支付
     })
   })
 }
+const callPhone = (phoneNumber) => {
+  return new Promise((resolve, reject) => {
+    wx.makePhoneCall({
+      phoneNumber: phoneNumber,
+      success: function () {
+        console.log('拨打电话成功!')
+        // resolve(res)
+      },
+      fail: function () {
+        console.log('拨打电话失败！')
+        // reject('拨打电话失败')
+      }
+    })
+  })
+}
 
-export {getElement_WH, wxPay}
+export {getElement_WH, wxPay, callPhone}

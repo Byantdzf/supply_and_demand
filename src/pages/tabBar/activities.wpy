@@ -6,7 +6,7 @@
     <partyList :list.sync="list" :hideMessage.sync="hideMessage"></partyList>
     <view wx:if="{{!list.length}}" class="text-center">
       <view class="font_28 bc_empty">
-        <image src="http://images.ufutx.com/201905/29/ea50e95b0b50c1fad3e3aec4827496dd.png" mode="aspectFit"></image>
+        <image src="http://images.ufutx.com/201905/29/ea50e95b0b50c1fad3e3aec4827496dd.png" mode="widthFix"></image>
       </view>
     </view>
   </view>

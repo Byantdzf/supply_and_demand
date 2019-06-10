@@ -69,7 +69,7 @@
 
     methods = {
       showInput() {
-        if(this.disabled) return
+        if (this.disabled) return
         this.inputShowed = true
       },
       hideInput() {

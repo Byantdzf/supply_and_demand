@@ -113,7 +113,7 @@
       // console.log(that.$getCurrentPageUrl())
       // console.log(this.getCurrentPages())
       that.other_userId = e.id
-      if(e.type) that.other_userType = e.type
+      if (e.type) that.other_userType = e.type
       that.name = e.name
       wx.setNavigationBarTitle({
         title: that.name,

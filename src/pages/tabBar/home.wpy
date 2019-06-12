@@ -60,7 +60,7 @@
     <block wx:if="{{list.length>0}}">
       <view class="_bc-list">
         <view class="item-avatar" wx:for="{{list}}" wx:key="{{index}}" @tap="gotofriends({{item}},{{item.id}})">
-          <image src="{{item.avatar}}" mode="aspectFill" class="image"></image>
+          <image src="{{item.avatar}}" mode="widthFix" class="image"></image>
           <view class="font_28 _bc-center color-666">
             <view class="font_28">
               <view class="color-666 ellipsis_1 bold flo_l" style="max-width: 80%">{{item.name}}</view>

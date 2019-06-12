@@ -2,7 +2,7 @@
   <loading :init.sync="init"></loading>
   <view class="_bc-party">
     <view class="_bc-image" >
-      <image src="{{detail.poster}}"   mode="widthFix"></image>
+      <image src="{{detail.poster}}"   mode="widthFix" @tap="previewImage({{detail.poster}})"></image>
     </view>
     <view class="_bc-center">
       <view class="font_32 bold _bc-title ellipsis_2 text-left">
@@ -34,7 +34,7 @@
         </view>
       </view>
     </block>
-    <view class="_bc-wx" @tap="gotoApp({{detail.detail_path}})">
+    <view class="_bc-wx" @tap="gotoApp({{detail.detail_path}})" wx:if="{{detail.detail_path}}">
       <view class="_wx-title font_28" style="border: none;">
         活动详情
         <image src="http://images.ufutx.com/201812/17/38f1fee1f088f1c9c047d654c157b0dc.png"  mode="aspectFit" class="flo_r"></image>
@@ -43,7 +43,7 @@
     <view class="_bc-wx _wx-info text-wrapper font_28" wx:if="{{detail.detail}}">{{detail.detail}}</view>
     <view class=" _wx-more text-center">
       <block wx:for="{{detail.detail_pic}}" wx:key="index" wx:if="{{detail.detail_pic.length>0}}">
-        <image src="{{item}}" mode="widthFix" style="width: 100%;"></image>
+        <image src="{{item}}" mode="widthFix" style="width: 100%;" @tap="previewImages({{item}},{{detail.detail_pic}})"></image>
       </block>
       <block wx:if="{{detail.detail_path}}" >
         <view class="text-center green font_28"  @tap="gotoApp({{detail.detail_path}})">查看更多</view>
@@ -221,7 +221,13 @@
       })
     }
     methods = {
-      pay () {
+      previewImage(image) { // 预览单图
+        this.$previewImage(image)
+      },
+      previewImages(item, images) { // 预览多图
+        this.$previewImages(item, images)
+      },
+      pay() {
         let that = this
         that.$showLoading('报名活动中...')
         this.$post({url: `${service.host}/join/activities/${that.party_id}`}, {

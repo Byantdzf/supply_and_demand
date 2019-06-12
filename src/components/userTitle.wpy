@@ -1,6 +1,8 @@
 <template>
   <view class="weui-panel">
-    <message :time.sync="deadline"></message>
+    <block wx:if="{{user.type == 'single'}}">
+      <message :time.sync="deadline"></message>
+    </block>
     <view class="weui-cells_after-title">
       <view class="weui-cell user_back">
         <!--<navigator url="/pages/user/registerV2" >-->
@@ -248,7 +250,8 @@
             item.active = false
           }
         }
-        this.user.deadline = this.user.deadline.split(' ')[0]
+        this.user.deadline = this.user.deadline ? this.user.deadline.split(' ')[0] : ''
+        console.log(this.user.deadline)
         this.Image = this.user.avatar
         if (this.user.deadline != null) {
           this.deadline = this.user.deadline

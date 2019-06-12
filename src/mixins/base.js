@@ -185,7 +185,7 @@ export default class baseMixin extends wepy.mixin {
       urls: imageArray // 需要预览的图片http链接列表
     })
   }
-  // 预览单图
+  // 预览多图
   $previewImages(image, imageArray) {
     wepy.previewImage({
       current: image, // 当前显示图片的http链接

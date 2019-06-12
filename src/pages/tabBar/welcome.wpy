@@ -45,8 +45,8 @@
       console.log(myDate.getDate())
       console.log(myDate.getSeconds())
       // if (myDate.getDate() > 9) {
-        this.startImage = 'http://images.ufutx.com/201901/09/3d0d453feb5ad6b5625ece9670fd7d31.png'
-        this.$apply()
+      this.startImage = 'http://images.ufutx.com/201901/09/3d0d453feb5ad6b5625ece9670fd7d31.png'
+      this.$apply()
       // } else {
       //   this.startImage = 'http://images.ufutx.com/201906/06/7d08adc288632283af704cbdf4a07e0b.jpeg'
       //   this.$apply()

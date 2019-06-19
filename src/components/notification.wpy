@@ -1,0 +1,71 @@
+<template>
+  <view class="bc_box">
+    <image src="https://images.ufutx.com/201906/18/02f534aaa61d94e98c7a0bb7be7ddeee.png" class="notice" mode="widthFix"></image>
+    <swiper class="swiper_container" vertical="true" autoplay="true" circular="true" interval="2000">
+      <block wx:for="{{msgList}}" wx:key="index">
+        <navigator url="/pages/index/index?title={{item.url}}" open-type="navigate">
+          <swiper-item>
+            <view class="swiper_item">{{item.title}}</view>
+          </swiper-item>
+        </navigator>
+      </block>
+    </swiper>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import http from '../mixins/http'
+  import base from '../mixins/base'
+  import address from '../mixins/address'
+
+  export default class notification extends wepy.component {
+    mixins = [base, http, address]
+    props = {}
+    data = {
+      msgList: [
+        {url: 'url', title: '公告：多地首套房贷利率上浮 热点城市渐迎零折扣时代'},
+        {url: 'url', title: '公告：悦如公寓三周年生日趴邀你免费吃喝欢唱'},
+        {url: 'url', title: '公告：你想和一群有志青年一起过生日嘛？'}
+      ]
+    }
+
+    onLoad() {
+    }
+
+    onShow() {
+    }
+
+    methods = {}
+  }
+</script>
+
+<style lang="less" scoped>
+  @import "../styles/custom/fn.less";
+  .bc_box{
+    margin: 30rpx;
+    position: relative;
+    .notice{
+      width: 36rpx;
+      position: absolute;
+      left: 12rpx;
+      top: 10rpx;
+    }
+    .swiper_container {
+      color: @theme;
+      height: 48rpx;
+      width: 92%;
+      background: @themeBC;
+      border-radius: 8rpx;
+      padding-left: 8%;
+    }
+    .swiper_item {
+      font-size: 25rpx;
+      overflow: hidden;
+      line-height: 48rpx;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      letter-spacing: 2px;
+    }
+  }
+</style>

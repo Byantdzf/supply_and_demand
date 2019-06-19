@@ -1,0 +1,32 @@
+<template>
+  <view>
+    <tabSearch></tabSearch>
+    <contentsList></contentsList>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import contentsList from '../../components/contentsList'
+  import tabSearch from '../../components/tabSearch'
+
+  export default class daily extends wepy.page {
+    config = {
+      navigationBarTitleText: 'daily'
+    }
+    components = {
+      contentsList, tabSearch
+    }
+    data = {}
+    methods = {}
+
+    onLoad() {
+    }
+  }
+</script>
+
+<style lang="less">
+  page{
+    background: white !important;
+  }
+</style>

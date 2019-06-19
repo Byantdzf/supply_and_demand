@@ -1,0 +1,96 @@
+<template>
+  <block wx:for="{{15}}" wx:key="index">
+    <view class="contentsList ff">
+      <view class="item_image flo_l">
+        <image src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=311097710,965735535&fm=27&gp=0.jpg"
+               mode="widthFix"></image>
+      </view>
+      <view class="item_info flo_l">
+        <view class="font_30 bold title ellipsis_1">国美电器</view>
+        <view class="item_subhead font_28 ellipsis_1">福田就近原则,实力碾压</view>
+        <view class="item_time font_26 ellipsis_1">2019--07-12</view>
+        <view class="item_price font_26 bold">月预期6000~8000元+促销费</view>
+        <view class="item_state font_26">招聘中</view>
+      </view>
+    </view>
+  </block>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import base from '../mixins/base'
+
+  export default class contentsList extends wepy.component {
+    mixins = [base]
+    props = {
+      list: {
+        type: Array,
+        default: []
+      }
+    }
+    data = {
+    }
+    components = {}
+
+    onLoad() {
+    }
+
+    methods = {}
+  }
+</script>
+
+<style lang="less" scoped>
+  @import "../styles/custom/fn.less";
+  .contentsList{
+    padding: 26rpx;
+    overflow: hidden;
+    border-bottom: 6rpx solid #f6f6f6;
+    .item_image{
+      width: 132rpx;
+      height: 132rpx;
+      image{
+        width: 100%;
+      }
+    }
+    .item_info{
+      padding: 0 10rpx;
+      width: 76%;
+      position: relative;
+      .title {
+        width: 100%;
+        margin-top: -4rpx;
+      }
+      .item_subhead,.item_time,.item_state{
+        color: @gray;
+        width: 50%;
+      }
+      .item_time{
+        width: 100%;
+        padding-bottom: 30rpx;
+        border-bottom: 1rpx solid @lightgray;
+      }
+      .item_price{
+        width: 50%;
+        position: absolute;
+        right: 0rpx;
+        top: 32rpx;
+        color: @theme;
+      }
+      .item_state{
+        margin-top: 16rpx;
+        padding-left: 22rpx;
+        position: relative;
+        &:before{
+          content: ' ';
+          position: absolute;
+          left: 0;
+          top: 12rpx;
+          width: 14rpx;
+          height: 14rpx;
+          border-radius: 50%;
+          background: @theme;
+        }
+      }
+    }
+  }
+</style>

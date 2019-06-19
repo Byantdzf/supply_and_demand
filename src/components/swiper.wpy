@@ -16,14 +16,14 @@
   <!--</swiper>-->
   <swiper class="swiper" style="height:{{style_height}};" autoplay="{{autoplay}}"
           indicator-color="{{indicatorColor}}"
-          indicator-active-color="{{indicatorActiveColor}}" indicator-dots="true" indicator-color="#b0afb0" indicator-active-color="#d82653">
+          indicator-active-color="{{indicatorActiveColor}}" indicator-dots="true" indicator-color="#b0afb0" indicator-active-color="#0075c5">
     <block wx:for="{{list}}" wx:key="index">
       <swiper-item>
         <navigator wx:if="{{item.url}}" url="{{item.url}}">
           <image src="{{item.pic}}" class="swiper-image" style="height:{{style_height}};"  mode="aspectFill"/>
         </navigator>
         <view wx:else style="height:{{style_height}} position: relative">
-          <image src="{{item.pic}}"  class="swiper-image" style="height:{{style_height}};" mode="widthFix"  @tap="BtnFun({{item}})"/>
+          <image src="{{item.pic}}"  class="swiper-image" style="height:{{style_height}};" mode="aspectFill"  @tap="BtnFun({{item}})"/>
           <!--<view class="dost white text-center font_32">{{item.name}}/{{item.address}}人/{{item.age}}岁/{{item.stature}}cm</view>-->
         </view>
       </swiper-item>
@@ -114,6 +114,7 @@ swiper,
   left: 50%;
   width: 100%;
   transform: translate(-50%, -50%);
+  height: auto;
 }
 .dost{
   position: absolute;

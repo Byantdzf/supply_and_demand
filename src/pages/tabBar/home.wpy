@@ -1,94 +1,110 @@
 <template>
   <Loading :init.sync="init"></Loading>
   <form bindsubmit="formSubmit" report-submit>
-  <button formType="submit" class="btn" data-type="click" style="border: none;">
-  <view class="">
-    <view @tap="goto('/pages/map/mapList')">
-      <tabSearch disabled="true"></tabSearch>
-    </view>
-    <block wx:if="{{announcements.length>0}}">
-      <swiperV :list.sync="announcements" height="242"></swiperV>
-    </block>
-    <view class="_bc-tab text-left ff ">
-      <view class="_bc-tab-item text-center flo_l item{{index}}" wx:for="{{tab}}" wx:key="{{index}}" @tap="gotoV({{item.path+'?title='+item.title+'&type='+item.type}}, {{item.type}})">
-        <image src="{{item.icon}}" class=" {{index===0?'heart':''}}" mode="widthFix" wx:if="{{item.icon}}"></image>
-        <view  class="_item-text font_24 _text{{index}}">{{item.title}}</view>
-      </view>
-      <view class="clearfloat"></view>
-    </view>
-    <view class="recommend font_26"  @tap="goto('/pages/map/index')">
-      <view class="address flo_l" @tap.stop="goto('/pages/map/index')">
-        <view class="ellipsis_1">
-          <image src="http://images.ufutx.com/201905/29/116e3887dd6dcbcaad6a464f96bdcdcb.png" mode="widthFix" class="addressIcon"></image>
-          {{address.city}}
+    <button formType="submit" class="btn" data-type="click" style="border: none;">
+      <view class="">
+        <!--<view @tap="goto('/pages/map/mapList')">-->
+          <tabSearch></tabSearch>
+        <!--</view>-->
+        <block wx:if="{{announcements.length>0}}">
+          <swiperV :list.sync="announcements" height="375"></swiperV>
+        </block>
+        <notification></notification>
+        <view class="bc_center">
+          <view class="mon flo_l font_30 text-center" @tap="gotoTab('/pages/tabBar/daily')">
+            <image src="https://images.ufutx.com/201906/19/93984db0bca813a746608de9a4a1b567.png" class="image" mode="widthFix"></image>
+            月结活动
+          </view>
+          <view class="day flo_r font_30 text-center" @tap="gotoTab('/pages/tabBar/monthly')">
+            <image src="https://images.ufutx.com/201906/19/4b0f9881973e6e91ccb36fae9f965b2a.png" class="image" mode="widthFix"></image>
+            日结活动
+          </view>
+          <view class="clearfloat"></view>
+          <view class="font_32 bold _bc_title">为你推荐</view>
+          <navBarTop :tabs.sync="tabs" @tabClick="tabClick"></navBarTop>
+          <contentsList></contentsList>
         </view>
-      </view>
-      <view class="center flo_l">
-        <span class="display_inlin">附近的人</span>
-        <block wx:if="{{person.circle_avatar}}" >
-          <image src="{{item.circle_avatar}}" mode="widthFix" wx:for="{{person.circle_avatar}}" wx:key="{{index}}"  class="image display_inlin" ></image>
-        </block>
-        <block wx:else>
-          <image src="{{item}}" mode="widthFix" wx:for="{{images}}" wx:key="{{index}}" class="image display_inlin" ></image>
-        </block>
-      </view>
-      <image src="http://images.ufutx.com/201905/29/2eeab012d13d91f16f5a21ad6c578678.png" mode="widthFix" class="moreImage flo_r"></image>
-    </view>
-    <view class="bc_swiper_box">
-      <view class="font_32 bold">推荐</view>
-      <view class="bc_swiper">
-        <swiper @change="getcurrent">
-          <swiper-item  wx:for="{{recommends}}" wx:key="index"  wx:for-index="idx" wx:for-item="otherUser">
-            <view class="_bc-list_swiper">
-              <view class="item-avatar_swiper {{index ===0 || index === 2?'flo_l':'flo_r'}}" wx:for="{{otherUser}}" wx:key="{{index}}" wx:if="{{index<4}}" @tap="gotofriends({{item}},{{item.user_id}})">
-                <image src="{{item.photo?item.photo:defPic}}" mode="aspectFill" class="image"></image>
-                <view class="font_26 _bc-center_swiper color-666">
-                  <view class="color-666 ellipsis_1 bold" style="max-width: 80%">{{item.name}}</view>
-                  <view class="font_22 bold ellipsis_1" style="color: #919191">{{item.age? item.age + '岁' : ''}} {{item.stature? '· ' +item.stature +'cm': ''}} {{item.city? '· '+item.city: ''}}</view>
-                </view>
+        <!--<view class="_bc-tab text-left ff ">-->
+        <!--<view class="_bc-tab-item text-center flo_l item{{index}}" wx:for="{{tab}}" wx:key="{{index}}" @tap="gotoV({{item.path+'?title='+item.title+'&type='+item.type}}, {{item.type}})">-->
+        <!--<image src="{{item.icon}}" class=" {{index===0?'heart':''}}" mode="widthFix" wx:if="{{item.icon}}"></image>-->
+        <!--<view  class="_item-text font_24 _text{{index}}">{{item.title}}</view>-->
+        <!--</view>-->
+        <!--<view class="clearfloat"></view>-->
+        <!--</view>-->
+        <!--<view class="recommend font_26"  @tap="goto('/pages/map/index')">-->
+        <!--<view class="address flo_l" @tap.stop="goto('/pages/map/index')">-->
+        <!--<view class="ellipsis_1">-->
+        <!--<image src="http://images.ufutx.com/201905/29/116e3887dd6dcbcaad6a464f96bdcdcb.png" mode="widthFix" class="addressIcon"></image>-->
+        <!--{{address.city}}-->
+        <!--</view>-->
+        <!--</view>-->
+        <!--<view class="center flo_l">-->
+        <!--<span class="display_inlin">附近的人</span>-->
+        <!--<block wx:if="{{person.circle_avatar}}" >-->
+        <!--<image src="{{item.circle_avatar}}" mode="widthFix" wx:for="{{person.circle_avatar}}" wx:key="{{index}}"  class="image display_inlin" ></image>-->
+        <!--</block>-->
+        <!--<block wx:else>-->
+        <!--<image src="{{item}}" mode="widthFix" wx:for="{{images}}" wx:key="{{index}}" class="image display_inlin" ></image>-->
+        <!--</block>-->
+        <!--</view>-->
+        <!--<image src="http://images.ufutx.com/201905/29/2eeab012d13d91f16f5a21ad6c578678.png" mode="widthFix" class="moreImage flo_r"></image>-->
+        <!--</view>-->
+        <!--<view class="bc_swiper_box">-->
+        <!--<view class="font_32 bold">推荐</view>-->
+        <!--<view class="bc_swiper">-->
+        <!--<swiper @change="getcurrent">-->
+        <!--<swiper-item  wx:for="{{recommends}}" wx:key="index"  wx:for-index="idx" wx:for-item="otherUser">-->
+        <!--<view class="_bc-list_swiper">-->
+        <!--<view class="item-avatar_swiper {{index ===0 || index === 2?'flo_l':'flo_r'}}" wx:for="{{otherUser}}" wx:key="{{index}}" wx:if="{{index<4}}" @tap="gotofriends({{item}},{{item.user_id}})">-->
+        <!--<image src="{{item.photo?item.photo:defPic}}" mode="aspectFill" class="image"></image>-->
+        <!--<view class="font_26 _bc-center_swiper color-666">-->
+        <!--<view class="color-666 ellipsis_1 bold" style="max-width: 80%">{{item.name}}</view>-->
+        <!--<view class="font_22 bold ellipsis_1" style="color: #919191">{{item.age? item.age + '岁' : ''}} {{item.stature? '· ' +item.stature +'cm': ''}} {{item.city? '· '+item.city: ''}}</view>-->
+        <!--</view>-->
+        <!--</view>-->
+        <!--</view>-->
+        <!--</swiper-item>-->
+        <!--</swiper>-->
+        <!--</view>-->
+        <!--<view class='text-center'>-->
+        <!--<block wx:for="{{recommends}}" wx:key="index">-->
+        <!--<text class="bc_dot {{index == current?'bc_dot_active':''}}"></text>-->
+        <!--</block>-->
+        <!--</view>-->
+        <!--</view>-->
+        <block wx:if="{{list.length>0}}">
+          <view class="_bc-list">
+            <!--<view class="item-avatar" wx:for="{{list}}" wx:key="{{index}}" @tap="gotofriends({{item}},{{item.id}})">-->
+            <!--<image src="{{item.avatar}}" mode="widthFix" class="image"></image>-->
+            <!--<view class="font_28 _bc-center color-666">-->
+            <!--<view class="font_28">-->
+            <!--<view class="color-666 ellipsis_1 bold flo_l" style="max-width: 80%">{{item.name}}</view>-->
+            <!--<image src="http://images.ufutx.com/201811/09/df3aa8846ea6f02341f9077198555c39.png" wx:if="{{item.sex=='2'}}" mode="aspectFill" class="flo_l" style="width: 32rpx;height: 32rpx;margin: 6rpx 0 0 6rpx"></image>-->
+            <!--<image src="http://images.ufutx.com/201811/09/fc3a6545c016643bfe5ab2989658900b.png" mode="aspectFill" wx:else class="flo_l" style="width: 32rpx;height: 32rpx;margin: 6rpx 0 0 6rpx"></image>-->
+            <!--<view class="clearfloat"></view>-->
+            <!--</view>-->
+            <!--<view>-->
+            <!--<text class="font_22 bold">{{item.age? item.age + '岁' : ''}} {{item.stature? '· ' +item.stature +'cm': ''}} {{item.city? '· '+item.city: ''}}</text>-->
+            <!--<view class="font_22 ellipsis_1">{{item.introduction? item.introduction : ''}}</view>-->
+            <!--</view>-->
+            <!--</view>-->
+            <!--</view>-->
+            <block wx:if="{{loading}}">
+              <view class="weui-loadmore">
+                <view class="weui-loading"></view>
+                <view class="weui-loadmore__tips" style="background: white">正在加载</view>
               </view>
-            </view>
-          </swiper-item>
-        </swiper>
-      </view>
-      <view class='text-center'>
-        <block wx:for="{{recommends}}" wx:key="index">
-          <text class="bc_dot {{index == current?'bc_dot_active':''}}"></text>
-        </block>
-      </view>
-    </view>
-    <block wx:if="{{list.length>0}}">
-      <view class="_bc-list">
-        <view class="item-avatar" wx:for="{{list}}" wx:key="{{index}}" @tap="gotofriends({{item}},{{item.id}})">
-          <image src="{{item.avatar}}" mode="widthFix" class="image"></image>
-          <view class="font_28 _bc-center color-666">
-            <view class="font_28">
-              <view class="color-666 ellipsis_1 bold flo_l" style="max-width: 80%">{{item.name}}</view>
-              <image src="http://images.ufutx.com/201811/09/df3aa8846ea6f02341f9077198555c39.png" wx:if="{{item.sex=='2'}}" mode="aspectFill" class="flo_l" style="width: 32rpx;height: 32rpx;margin: 6rpx 0 0 6rpx"></image>
-              <image src="http://images.ufutx.com/201811/09/fc3a6545c016643bfe5ab2989658900b.png" mode="aspectFill" wx:else class="flo_l" style="width: 32rpx;height: 32rpx;margin: 6rpx 0 0 6rpx"></image>
-              <view class="clearfloat"></view>
-            </view>
-            <view>
-              <text class="font_22 bold">{{item.age? item.age + '岁' : ''}} {{item.stature? '· ' +item.stature +'cm': ''}} {{item.city? '· '+item.city: ''}}</text>
-              <view class="font_22 ellipsis_1">{{item.introduction? item.introduction : ''}}</view>
-            </view>
-          </view>
-        </view>
-        <block wx:if="{{loading}}">
-          <view class="weui-loadmore">
-            <view class="weui-loading"></view>
-            <view class="weui-loadmore__tips"  style="background: white">正在加载</view>
-          </view>
-        </block>
-        <block wx:if="{{noMore}}">
-          <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
-            <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot" style="background: white"></view>
+            </block>
+            <block wx:if="{{noMore}}">
+              <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+                <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"
+                      style="background: white"></view>
+              </view>
+            </block>
           </view>
         </block>
       </view>
-    </block>
-  </view>
-  </button>
+    </button>
   </form>
   <view class="commodity_screen" bindtap="cancel" wx:if="{{!hide}}"></view>
   <!--弹出框  -->
@@ -99,7 +115,9 @@
       </view>
     </view>
     <view style="width: 100%;" class="text-center">
-      <button class="btn bold text-center" style="width: 100%;height: 100rpx;color: #d92553;margin: auto;line-height: 100rpx;border-top: 2rpx solid #e3e3e3" open-type="openSetting" @opensetting="openSetting_address">
+      <button class="btn bold text-center"
+              style="width: 100%;height: 100rpx;color: #d92553;margin: auto;line-height: 100rpx;border-top: 2rpx solid #e3e3e3"
+              open-type="openSetting" @opensetting="openSetting_address">
         去授权
       </button>
     </view>
@@ -116,9 +134,11 @@
   import ShareMessage from '../../mixins/ShareMessage'
   import swiperV from '../../components/swiper'
   import Loading from '../../components/loading'
-  import Tab_NavBar from '../../components/Tab_NavBar'
+  import navBarTop from '../../components/navBarTop'
   import pageScroll from '../../components/pageScroll'
   import tabSearch from '../../components/tabSearch'
+  import notification from '../../components/notification'
+  import contentsList from '../../components/contentsList'
 
   // 引入SDK核心类
   var QQMapWX = require('../../libs/qqmap-wx-jssdk.min.js')
@@ -134,7 +154,7 @@
       // navigationStyle: 'custom'
     }
     components = {
-      swiperV, Loading, Tab_NavBar, pageScroll, tabSearch
+      swiperV, Loading, pageScroll, tabSearch, notification, navBarTop, contentsList
     }
     watch = {
       current() {
@@ -142,6 +162,7 @@
       }
     }
     data = {
+      tabs: ['月结兼职', '日结兼职'],
       mateActive: 'all',
       serverActive: 'meet',
       type: 'mate',
@@ -231,8 +252,8 @@
 
     computed = {}
 
-    watch = {
-    }
+    watch = {}
+
     onShareAppMessage(res) {
       return this.$parent.onShareAppMessage(this.config.navigationBarTitleText)
     }
@@ -351,6 +372,7 @@
         }
       })
     }
+
     locationSubmit(e) {
       var _this = this
       _this.$showLoading('加载位置中')
@@ -368,12 +390,12 @@
           wx.hideLoading()
           wx.setStorageSync('address', _this.address)
         },
-        fail: function(error) {
+        fail: function (error) {
           console.error(error)
           wx.hideLoading()
           _this.$showToast('加载失败！请下拉刷新...')
         },
-        complete: function(res) {
+        complete: function (res) {
           console.log(res)
         }
       })
@@ -406,6 +428,7 @@
         }
       })
     }
+
     onPageScroll(res) {
       let top = res.scrollTop,
         show = top > 380 ? true : false,
@@ -598,7 +621,24 @@
         wx.navigateTo({url: url})
       },
       goto(url) {
-        wx.navigateTo({url: url})
+        this.$goto(url)
+      },
+      gotoTab(url) {
+        this.$gotoTab(url)
+      }
+    }
+    events = {
+      'tabClick': (value) => { // NavTab返回值
+        console.log(value)
+        // this.$showLoading('加载中...')
+        // this.page = 1
+        // this.tabIndex = value
+        // this.list = this.meet
+        // if (value == 1) {
+        //   this.list = this.Hosting
+        //   this.$apply()
+        // }
+        // this.$apply()
       }
     }
   }
@@ -607,184 +647,53 @@
 <style lang="less">
   @import "../../styles/weui/base/fn.wxss";
   @import "../../styles/custom/fn.less";
-  page{
+
+  page {
     background: #ffffff;
-    ._bc-tab{
-      width: 100%;
-      padding: 35rpx 0 20rpx 0;
-      border-bottom: 20rpx solid #f4f4f4;
-      ._item-text{
-        margin-top: -8rpx;
-      }
-      ._bc-tab-item{
-        width: 100/4%;
-        background: white;
-        image{
-          width: 72rpx;
-        }
-      }
-    }
-    .recommend{
-      height: 112rpx;
-      margin-bottom: 12rpx;
-      border-bottom: 20rpx solid #f4f4f4;
-      .address{
-        width: 22%;
-        line-height: 112rpx;
-        padding-left: 70rpx;
-        .addressIcon{
-          width: 26rpx;
+    .bc_center {
+      margin: 0 30rpx;
+      .mon,.day{
+        width: 330rpx;
+        height: 110rpx;
+        background: #EFF3FC;
+        line-height: 110rpx;
+        border-radius: 8rpx;
+        color: @theme;
+        .image{
+          width: 48rpx;
           vertical-align: middle;
-          margin-bottom: 8rpx;
+          margin-bottom: 6rpx;
           margin-right: 6rpx;
         }
       }
-      .center{
-        width: 60%;
-        line-height: 112rpx;
-        .image{
-          width: 62rpx;
-          vertical-align: middle;
-          margin-bottom: 6rpx;
-          margin-left: 10rpx;
-          height: auto;
-        }
+      .day{
+        color: #75C96F;
+        background: #EFF9F1;
       }
-      .moreImage{
-        width: 20rpx;
-        margin-right: 26rpx;
-        margin-top: 38rpx;
-        height: auto;
+      ._bc_title{
+        margin-top: 42rpx;
       }
     }
-    .bc_swiper_box{
-      padding: 28rpx 28rpx 0 28rpx;
-      .bc_swiper{
-        margin-top: 32rpx;
+
+    .heart {
+      /*animation:heartbeat 1s infinite;*/
+      -webkit-animation: heartbeat 1.4s 3;
+      /*animation-fill-mode: forwards;*/
+    }
+
+    @keyframes heartbeat {
+      0% {
+        transform: rotate(0deg) scale(0.8, 0.8);
+        opacity: 1;
       }
-      swiper{
-        height: 780rpx;
+      25% {
+        transform: rotate(0deg) scale(1.2, 1.2);
+        opacity: 0.8;
       }
-      .bc_dot{
-        width: 40rpx;
-        height: 8rpx;
-        background: #cecece;
-        margin-left: 6rpx;
+      100% {
+        transform: rotate(0deg) scale(0.8, 0.8);
+        opacity: 1;
       }
-      .bc_dot_active{
-        background: #d92553;
-      }
-    }
-    ._bc-list{
-      .item-avatar{
-        width: 92%;
-        margin: 75rpx 28rpx 32rpx 28rpx;
-        border: 3rpx solid #cecece;
-        border-radius: 12rpx;
-        margin-bottom: 40rpx;
-        overflow: hidden;
-        .image{
-          width: 100%;
-          height: 483rpx;
-        }
-        ._bc-center{
-          padding: 6rpx 20rpx 20rpx 20rpx;
-        }
-      }
-    }
-    ._bc-list_swiper{
-      .item-avatar_swiper{
-        width: 48%;
-        border: 3rpx solid #cecece;
-        border-radius: 12rpx;
-        display: inline-block;
-        overflow: hidden;
-        margin-bottom: 20rpx;
-        .image{
-          width: 100%;
-          height: 260rpx;
-        }
-        ._bc-center_swiper{
-          padding: 0 16rpx 12rpx 16rpx;
-        }
-      }
-    }
-    .state{
-      background: #f7f7f7;
-      padding: 12rpx 16rpx;
-      border: 1rpx solid #d3d3d3;
-      border-radius: 10rpx;
-    }
-    .info{
-      margin: 22rpx;
-      margin-top: 46rpx;
-      padding: 22rpx 0;
-      .title{
-        border-bottom: 1rpx solid #d3d3d3;
-        margin: 0 0 0 22rpx;
-        padding-bottom: 12rpx;
-      }
-    }
-    .modelInput{
-      border-bottom: 2px solid #f4f4f4;
-      padding: 2rpx 48rpx;
-    }
-  }
-  .State{
-    padding-right: 8%;
-    span {
-      padding: 6rpx 12rpx;
-      background: #f3f4f9;
-      margin-top: 12rpx;
-      margin-right: 22rpx;
-      border-radius: 4rpx;
-    }
-  }
-  /*使屏幕变暗  */
-  .commodity_screen {
-    width: 100%;
-    height: 100%;
-    position: fixed;
-    top: 0;
-    left: 0;
-    background: #000;
-    opacity: 0.2;
-    overflow: hidden;
-    z-index: 1000;
-    color: #fff;
-  }
-  /*对话框 */
-  .commodity_attr_box {
-    /*height: 300rpx;*/
-    padding-bottom: 4%;
-    width: 100%;
-    overflow: hidden;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    z-index: 2000;
-    background: #fff;
-    padding-top: 20rpx;
-    border-top-right-radius: 22rpx;
-    border-top-left-radius: 22rpx;
-  }
-  .heart {
-    /*animation:heartbeat 1s infinite;*/
-    -webkit-animation:heartbeat 1.4s 3;
-    /*animation-fill-mode: forwards;*/
-  }
-  @keyframes heartbeat {
-    0% {
-      transform:rotate(0deg) scale(0.8,0.8);
-      opacity:1;
-    }
-    25% {
-      transform:rotate(0deg) scale(1.2,1.2);
-      opacity:0.8;
-    }
-    100% {
-      transform:rotate(0deg) scale(0.8,0.8);
-      opacity:1;
     }
   }
 </style>

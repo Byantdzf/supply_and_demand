@@ -22,12 +22,11 @@
     data = {
       activeIndex: 0,
       sliderOffset: 0,
-      sliderLeft: 0,
-      sliderWidth: 180,
-      screenWidth: 360
+      sliderLeft: 56,
+      sliderWidth: 62,
+      screenWidth: 375
     }
     components = {}
-
     onLoad() {
       this.tabIndex()
     }
@@ -36,9 +35,10 @@
       wx.getSystemInfo({
         success: function (rst) {
           _this.screenWidth = rst.screenWidth
-          _this.sliderWidth = _this.screenWidth / _this.tabs.length
-          _this.sliderLeft = 0
+          _this.sliderWidth = _this.screenWidth / _this.tabs.length - 128
+          _this.sliderLeft = 56
           _this.sliderOffset = _this.screenWidth / _this.tabs.length * _this.activeIndex
+          _this.$apply()
         }
       })
     }
@@ -65,15 +65,20 @@
     position: relative;
     text-align: center;
     border: none;
+    border-bottom: 1rpx solid #f3f3f3;
     .weui-navbar__slider{
+      height: 8rpx;
       background: @theme;
+      /*opacity: 0.7;*/
+      border-top-right-radius: 6rpx;
+      border-top-left-radius: 6rpx;
     }
     .weui-navbar__item{
       padding: 12rpx 0 28rpx 0;
-      color: @darkgray;
+      color: @dark;
     }
     .weui-bar__item_on{
-      color: @theme;
+     // color: @theme;
     }
   }
 </style>

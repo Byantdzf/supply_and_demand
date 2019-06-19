@@ -15,15 +15,9 @@
   export default class extends wepy.app {
     config = {
       pages: [
-        'pages/tabBar/welcome',
         'pages/tabBar/home',
-        'pages/tabBar/activities',
-        'pages/tabBar/home/indexv2',
-        'pages/tabBar/news',
-        'pages/tabBar/attention',
-        'pages/tabBar/party/index',
-        'pages/tabBar/books/index',
-        'pages/tabBar/loveMate',
+        'pages/tabBar/daily',
+        'pages/tabBar/monthly',
         'pages/tabBar/user'
       ],
       'permission': {
@@ -31,142 +25,42 @@
           'desc': '你的位置信息将用于小程序位置接口的效果展示'
         }
       },
-      'subPackages': [
-        {
-          'root': 'pages/home',
-          'pages': [
-            'search',
-            'chitchat',
-            'sharePay',
-            'sharing',
-            'information',
-            'introducer',
-            'loveMate',
-            'givingMoney',
-            'swopWeChat',
-            'giveGift',
-            'addFriend'
-          ]
-        },
-        {
-          'root': 'pages/books',
-          'pages': [
-            'bookDetail'
-          ]
-        },
-        {
-          'root': 'pages/party',
-          'pages': [
-            'signSuccess',
-            'luckMember',
-            'start_party',
-            'detail',
-            'member',
-            'trade',
-            'register',
-            'paySuccess'
-          ]
-        },
-        {
-          'root': 'pages/map',
-          'pages': [
-            'index',
-            'mapList'
-          ]
-        },
-        {
-          'root': 'pages/friendCircle',
-          'pages': [
-            'otherFriendCircle',
-            'friendCircleList',
-            'friendCircleDetail',
-            'friendCircleEdit'
-          ]
-        },
-        {
-          'root': 'pages/users',
-          'pages': [
-            'guidePage',
-            'editInfo',
-            'feedback',
-            'logout',
-            'blacklist',
-            'inform',
-            'visitor',
-            'myActivity',
-            'groupList',
-            'groupDetail',
-            'groupMember',
-            'groupShare',
-            'groupVIP',
-            'basicInfo',
-            'uploadPic',
-            'address',
-            'rule',
-            'shareVip',
-            'protocol',
-            'protocolV2',
-            'realName',
-            'register',
-            'integral',
-            'myGift',
-            'vipSetting',
-            'vipData',
-            'integralRecord',
-            'myPay',
-            'friendlist',
-            'examineWeChat',
-            'auditFriend',
-            'intro',
-            'unmarri',
-            'unmarriV2',
-            'vipImage',
-            'sociability',
-            'addFriendSet',
-            'upgradeVIP',
-            'integralAddress',
-            'upgradingVIP',
-            'myTest',
-            'myNews',
-            'myShare',
-            'myMessage',
-            'tempMember',
-            'optimset'
-          ]
-        }
-
-      ],
+      // 'subPackages': [
+      //   {
+      //     'root': 'pages/books',
+      //     'pages': [
+      //       'bookDetail'
+      //     ]
+      //   }
+      // ],
       window: {
         navigationBarTitleText: '福恋',
         navigationBarTextStyle: 'white',
-        navigationBarBackgroundColor: '#D92553',
-//        navigationStyle: 'custom',
-//        backgroundColorTop: '#f43934', // ios
-//        backgroundColorBottom: '#f43934', // ios
+        navigationBarBackgroundColor: '#0075c5',
         backgroundColor: '#eaeaea',
         backgroundTextStyle: 'light',
         enablePullDownRefresh: true
       },
       tabBar: {
         color: '#b4b4b4',
-        selectedColor: '#D92553',
+        selectedColor: '#0075c5',
         backgroundColor: '#ffffff',
         borderStyle: 'black',
         list: [{
           pagePath: 'pages/tabBar/home',
-          selectedIconPath: './images/tabbar/homeActive.png',
-          iconPath: './images/tabbar/home.png',
+          selectedIconPath: './images/tabBarIcon/homeH.png',
+          iconPath: './images/tabBarIcon/home.png',
           text: '首页'
         }, {
-          pagePath: 'pages/tabBar/activities',
+          pagePath: 'pages/tabBar/daily',
           selectedIconPath: './images/tabbar/attentionActive.png',
           iconPath: './images/tabbar/attention.png',
-          text: '活动'
+          text: '月结活动'
         }, {
-          pagePath: 'pages/tabBar/news',
-          selectedIconPath: './images/tabbar/messageActive.png',
-          iconPath: './images/tabbar/message.png',
-          text: '消息'
+          pagePath: 'pages/tabBar/monthly',
+          selectedIconPath: './images/tabBarIcon/dayH.png',
+          iconPath: './images/tabBarIcon/day.png',
+          text: '日结活动'
         }, {
           pagePath: 'pages/tabBar/user',
           selectedIconPath: './images/tabbar/myActive.png',
@@ -174,14 +68,12 @@
           text: '我的'
         }]
       },
-      networkTimeout: {
+      networkTimeout: { // 请求时间
         request: 10000,
         downloadFile: 10000
       },
       debug: true,
-      'navigateToMiniProgramAppIdList': [
-        'wxd2920948e02c5c76',
-        'wxa43b4cb4f447e846'
+      'navigateToMiniProgramAppIdList': [ // 需要关联的小程序
       ]
     }
 
@@ -212,88 +104,88 @@
     }
 
     onShow(options) {
-      this.startWebSocket()
+      // this.startWebSocket()
       UpdateManager
-      if (options.scene == 1037 && arguments.length !== 0) {
-        if (options.referrerInfo.extraData) {
-          wx.setStorageSync('skip', true)
-          let uid = options.referrerInfo.extraData.uid
-          wx.setStorageSync('uid', uid)
-          wepy.login({
-            success: (res) => {
-              let code = res.code
-              let data = {
-                wechat_code: code
-              }
-              wx.request({
-                url: service.register_infor,
-                header: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-                },
-                method: 'get',
-                data: data,
-                success: function (res) {
-                  let isRregister = res.data.data.is_register
-                  if (isRregister == 1) {
-                    wepy.login({
-                      success: (res) => {
-                        let codeV = res.code
-                        wx.request({
-                          url: service.skip + '/infor',
-                          header: {'Content-Type': 'application/x-www-form-urlencoded'},
-                          method: 'get',
-                          data: {
-                            wechat_code: codeV,
-                            uid: uid
-                          },
-                          success: function (res) {
-                            let token = res.data.data.access_token
-                            wx.setStorageSync('token', token)
-                            wx.removeStorageSync('skip')
-                          }
-                        })
-                      },
-                      fail: (res) => {
-                        console.log('wepy.login.fail:', res)
-                      }
-                    })
-                  } else {
-                    let iv = res.iv
-                    let encryptedData = res.encryptedData
-                    wepy.login({
-                      success: (res) => {
-                        let codeV = res.code
-                        wx.request({
-                          url: service.skip,
-                          header: {'Content-Type': 'application/x-www-form-urlencoded'},
-                          method: 'get',
-                          data: {
-                            wechat_code: codeV,
-                            uid: uid,
-                            iv: iv,
-                            encryptedData: encryptedData
-                          },
-                          success: function (res) {
-                            let token = res.data.data.access_token
-                            wx.setStorageSync('token', token)
-                            wx.removeStorageSync('skip')
-                          }
-                        })
-                      },
-                      fail: (res) => {
-                        console.log('wepy.login.fail:', res)
-                      }
-                    })
-                  }
-                }
-              })
-            },
-            fail: (res) => {
-              console.log('wepy.login.fail:', res)
-            }
-          })
-        }
-      }
+      // if (options.scene == 1037 && arguments.length !== 0) {
+      //   if (options.referrerInfo.extraData) {
+      //     wx.setStorageSync('skip', true)
+      //     let uid = options.referrerInfo.extraData.uid
+      //     wx.setStorageSync('uid', uid)
+      //     wepy.login({
+      //       success: (res) => {
+      //         let code = res.code
+      //         let data = {
+      //           wechat_code: code
+      //         }
+      //         wx.request({
+      //           url: service.register_infor,
+      //           header: {
+      //             'Content-Type': 'application/x-www-form-urlencoded'
+      //           },
+      //           method: 'get',
+      //           data: data,
+      //           success: function (res) {
+      //             let isRregister = res.data.data.is_register
+      //             if (isRregister == 1) {
+      //               wepy.login({
+      //                 success: (res) => {
+      //                   let codeV = res.code
+      //                   wx.request({
+      //                     url: service.skip + '/infor',
+      //                     header: {'Content-Type': 'application/x-www-form-urlencoded'},
+      //                     method: 'get',
+      //                     data: {
+      //                       wechat_code: codeV,
+      //                       uid: uid
+      //                     },
+      //                     success: function (res) {
+      //                       let token = res.data.data.access_token
+      //                       wx.setStorageSync('token', token)
+      //                       wx.removeStorageSync('skip')
+      //                     }
+      //                   })
+      //                 },
+      //                 fail: (res) => {
+      //                   console.log('wepy.login.fail:', res)
+      //                 }
+      //               })
+      //             } else {
+      //               let iv = res.iv
+      //               let encryptedData = res.encryptedData
+      //               wepy.login({
+      //                 success: (res) => {
+      //                   let codeV = res.code
+      //                   wx.request({
+      //                     url: service.skip,
+      //                     header: {'Content-Type': 'application/x-www-form-urlencoded'},
+      //                     method: 'get',
+      //                     data: {
+      //                       wechat_code: codeV,
+      //                       uid: uid,
+      //                       iv: iv,
+      //                       encryptedData: encryptedData
+      //                     },
+      //                     success: function (res) {
+      //                       let token = res.data.data.access_token
+      //                       wx.setStorageSync('token', token)
+      //                       wx.removeStorageSync('skip')
+      //                     }
+      //                   })
+      //                 },
+      //                 fail: (res) => {
+      //                   console.log('wepy.login.fail:', res)
+      //                 }
+      //               })
+      //             }
+      //           }
+      //         })
+      //       },
+      //       fail: (res) => {
+      //         console.log('wepy.login.fail:', res)
+      //       }
+      //     })
+      //   }
+      // }
       if (options.scene == 1044) {
         this.openshareTicket(options)
       }
@@ -335,61 +227,61 @@
       })
     }
 
-    startWebSocket() { // 实时通信
-      let that = this
-      socket.connect((status, ws) => {
-        let Authorization = 'Bearer ' + wx.getStorageSync('token')
-        let userId = wx.getStorageSync('user_id')
-        let data = {
-          'channel': 'private-users.' + userId + '.notices',
-          'auth': {'headers': {'Authorization': Authorization}}
-        } // 需要发送数据
-        if (status) {
-          ws.emit('subscribe', data, res => {
-          })
-        }
-      })
-      wx.onSocketOpen(function (res) {
-        console.log('WebSocket连接已打开！')
-      })
-      wx.onSocketError(function (res) {
-        console.log('WebSocket连接打开失败，请检查！')
-      })
-      wx.onSocketClose(function (res) {
-        console.log('WebSocket 已关闭！')
-      })
-      wx.onSocketMessage(function (res) {
-        if (res.data.length > 4) {
-          let reg = /^[0-9]{1,2}/,
-            str2 = res.data.replace(reg, '')
-          if (JSON.parse(str2)[2]) {
-            that.socketNews(JSON.parse(str2)[2])
-          }
-        }
-      })
-    }
+    // startWebSocket() { // 实时通信
+    //   let that = this
+    //   socket.connect((status, ws) => {
+    //     let Authorization = 'Bearer ' + wx.getStorageSync('token')
+    //     let userId = wx.getStorageSync('user_id')
+    //     let data = {
+    //       'channel': 'private-users.' + userId + '.notices',
+    //       'auth': {'headers': {'Authorization': Authorization}}
+    //     } // 需要发送数据
+    //     if (status) {
+    //       ws.emit('subscribe', data, res => {
+    //       })
+    //     }
+    //   })
+    //   wx.onSocketOpen(function (res) {
+    //     console.log('WebSocket连接已打开！')
+    //   })
+    //   wx.onSocketError(function (res) {
+    //     console.log('WebSocket连接打开失败，请检查！')
+    //   })
+    //   wx.onSocketClose(function (res) {
+    //     console.log('WebSocket 已关闭！')
+    //   })
+    //   wx.onSocketMessage(function (res) {
+    //     if (res.data.length > 4) {
+    //       let reg = /^[0-9]{1,2}/,
+    //         str2 = res.data.replace(reg, '')
+    //       if (JSON.parse(str2)[2]) {
+    //         that.socketNews(JSON.parse(str2)[2])
+    //       }
+    //     }
+    //   })
+    // }
 
-    socketNews(data) {
-      if (JSON.stringify(data) != '{}' && data.new_notice_count + data.new_message_count != 0) {
-        let {new_message_count} = data
-        if (new_message_count > 0) {
-          wx.setTabBarBadge({
-            index: 2,
-            text: `${new_message_count}`
-          })
-        } else {
-          wx.removeTabBarBadge({
-            index: 2
-          })
-        }
-      }
-      wx.showToast({
-        title: '有人给你发消息啦！',
-        icon: 'none',
-        duration: 1800
-      })
-      this.vibrateLong()
-    }
+    // socketNews(data) {
+    //   if (JSON.stringify(data) != '{}' && data.new_notice_count + data.new_message_count != 0) {
+    //     let {new_message_count} = data
+    //     if (new_message_count > 0) {
+    //       wx.setTabBarBadge({
+    //         index: 2,
+    //         text: `${new_message_count}`
+    //       })
+    //     } else {
+    //       wx.removeTabBarBadge({
+    //         index: 2
+    //       })
+    //     }
+    //   }
+    //   wx.showToast({
+    //     title: '有人给你发消息啦！',
+    //     icon: 'none',
+    //     duration: 1800
+    //   })
+    //   this.vibrateLong()
+    // }
 
     // 手机震动
     vibrateLong() {

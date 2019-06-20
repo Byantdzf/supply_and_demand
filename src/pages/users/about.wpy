@@ -1,0 +1,33 @@
+<template>
+  <view class="about text-center">
+    <view class="title font_32">//////     关于我们     //////</view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class about extends wepy.page {
+    config = {
+      navigationBarTitleText: '关于我们'
+    }
+    components = {}
+    data = {}
+    methods = {}
+
+    onLoad() {
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+
+  page {
+    background: white !important;
+    .about{
+      .title{
+        margin-top: 32rpx;
+      }
+    }
+  }
+</style>

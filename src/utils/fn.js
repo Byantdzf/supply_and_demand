@@ -44,4 +44,5 @@ const callPhone = (phoneNumber) => {
   })
 }
 
+
 export {getElement_WH, wxPay, callPhone}

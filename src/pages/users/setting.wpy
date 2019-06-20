@@ -1,33 +1,17 @@
 <template>
-  <!--<Loading :init.sync="init"></Loading>-->
   <view class="page-user ff">
-    <view class="user_box text-center">
-      <image src="http://images.ufutx.com/201906/19/c1a56269e21ec58e96fbcb3a02bf9289.png" mode="widthFix" class="bc_image"></image>
-      <view class="user_photo ff">
-        <image src="{{photo}}" mode="aspectFill"></image>
-      </view>
-      <view class="user_name  font_30 color-666" wx:if="{{!showName}}" @tap="getUserName">微信信息授权</view>
-      <view class="user_name noBorder bold font_30 color-666" wx:else>小杨莹</view>
-      <view class="clearfloat"></view>
-    </view>
-    <view class="list_item" wx:for="{{list}}" wx:key="index">
-      <view wx:if="{{item.type == 'navigateTo'}}" @tap="goto({{item.path}})">
-        <image src="{{item.icon}}" mode="widthFix" class="item_icon"></image>
-        <text class="font_32 color-666 item_title">{{item.title}}</text>
-        <image src="http://images.ufutx.com/201906/20/02b0c5873eb2f556ab43d655965644ed.png" mode="widthFix" class="right_icon"></image>
-      </view>
-      <view wx:else  @tap="showModel">
-        <image src="{{item.icon}}" mode="widthFix" class="item_icon"></image>
-        <text class="font_32 color-666 item_title">{{item.title}}</text>
-        <image src="http://images.ufutx.com/201906/20/02b0c5873eb2f556ab43d655965644ed.png" mode="widthFix" class="right_icon"></image>
-      </view>
-    </view>
-    <view class="list_item alone" wx:for="{{listV2}}" wx:key="index" @tap="goto({{item.path}})">
+    <view class="list_item" wx:for="{{list}}" wx:key="index" @tap="goto({{item.path}})">
       <image src="{{item.icon}}" mode="widthFix" class="item_icon"></image>
       <text class="font_32 color-666 item_title">{{item.title}}</text>
       <image src="http://images.ufutx.com/201906/20/02b0c5873eb2f556ab43d655965644ed.png" mode="widthFix" class="right_icon"></image>
     </view>
-    <userInfo></userInfo>
+    <button class="btn weui-cell__bd" open-type="feedback" style=''>
+      <view class="list_item alone" wx:for="{{listV2}}" wx:key="index" >
+        <image src="{{item.icon}}" mode="widthFix" class="item_icon"></image>
+        <text class="font_32 color-666 item_title">{{item.title}}</text>
+        <image src="http://images.ufutx.com/201906/20/02b0c5873eb2f556ab43d655965644ed.png" mode="widthFix" class="right_icon"></image>
+      </view>
+    </button>
   </view>
 </template>
 <script>
@@ -38,16 +22,15 @@
   import ShareMessage from '../../mixins/ShareMessage'
   import userTitle from '../../components/userTitle'
   import Loading from '../../components/loading'
-  import userInfo from '../../components/userInfo'
   import {service} from '../../config.js'
 
-  export default class User extends wepy.page {
+  export default class setting extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
-      navigationBarTitleText: '我的',
+      navigationBarTitleText: '设置',
       enablePullDownRefresh: true
     }
-    components = {userTitle, Loading, userInfo}
+    components = {userTitle, Loading}
     data = {
       libraries: {},
       user: {},
@@ -60,30 +43,30 @@
       filePath: '',
       list: [
         {
-          icon: 'http://images.ufutx.com/201906/20/f46799d6d9236723cee53c08215499e1.png',
-          title: '我的简历',
-          type: 'showModel',
-          path: '/pages/users/setting'
+          icon: 'http://images.ufutx.com/201906/20/d8eb09351de6742c3b0d88d089a1c26e.png',
+          title: '关于我们',
+          type: 'navigateTo',
+          path: '/pages/users/about'
         },
         {
-          icon: 'http://images.ufutx.com/201906/20/0f5153e8421d2d4f114116c61863964d.png',
-          title: '已报名',
+          icon: 'http://images.ufutx.com/201906/20/b57a9422e033359113de776f68575287.png',
+          title: '常见问题',
           type: 'navigateTo',
-          path: '/pages/users/apply'
+          path: '/pages/users/question'
         },
         {
-          icon: 'http://images.ufutx.com/201906/20/cf5c7ccaadbdd84b3fd887b7b5cfb359.png',
-          title: '已收藏',
-          type: 'navigateTo',
-          path: '/pages/users/collect'
+          icon: 'http://images.ufutx.com/201906/20/05f0b2d370645e738b9dd144e6500d71.png',
+          title: '商务合作',
+          type: 'navigateApp',
+          path: '/pages/users/cooperation'
         }
       ],
       listV2: [
         {
-          icon: 'http://images.ufutx.com/201906/20/624fe30cc3c0634f7b2fccf045ee69db.png',
-          title: '设置',
-          type: 'navigateTo',
-          path: '/pages/users/setting'
+          icon: 'http://images.ufutx.com/201906/20/d1eca00d94bcf1b34c7a3ba4a2d08a4b.png',
+          title: '意见反馈',
+          type: 'navigateApp',
+          path: '/pages/users/apply'
         }
       ]
 
@@ -123,9 +106,6 @@
     }
 
     methods = {
-      showModel() {
-        this.$invoke('userInfo', 'showModal')
-      },
       getUserName() {
         this.showName = true
         this.$apply()
@@ -216,6 +196,7 @@
         /*background: pink;*/
         .item_icon{
           width: 52rpx;
+          height: auto;
           vertical-align: middle;
           margin-bottom: 4rpx;
           margin-right: 8rpx;
@@ -227,6 +208,7 @@
         }
         .right_icon{
           width: 36rpx;
+          height: auto;
           vertical-align: middle;
           margin-bottom: 4rpx;
         }

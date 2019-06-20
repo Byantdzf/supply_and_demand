@@ -1,15 +1,18 @@
 <template>
   <view class="weui-navbar ff">
-    <view wx:for="{{tabs}}" wx:key="index" id="{{index}}" class="weui-navbar__item {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
-      <view class="weui-navbar__title bold" >{{item}}</view>
+    <view wx:for="{{tabs}}" wx:key="index" id="{{index}}"
+          class="weui-navbar__item text-center {{activeIndex == index ? 'weui-bar__item_on' : ''}}" @tap="tabClick">
+      <view class="weui-navbar__title {{activeIndex == index ? 'bold' : ''}}">{{item}}</view>
     </view>
-    <view class="weui-navbar__slider" style="width:{{sliderWidth}}px; left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
+    <view class="weui-navbar__slider"
+          style="width:{{sliderWidth}}px; left: {{sliderLeft}}px; transform: translateX({{sliderOffset}}px); -webkit-transform: translateX({{sliderOffset}}px);"></view>
   </view>
 </template>
 
 <script>
   import wepy from 'wepy'
   import base from '../mixins/base'
+  import {getElement_WH} from '../utils/fn'
 
   export default class navBarTop extends wepy.component {
     mixins = [base]
@@ -29,18 +32,32 @@
     components = {}
     onLoad() {
       this.tabIndex()
+      this.$apply()
     }
     tabIndex() {
       let _this = this
-      wx.getSystemInfo({
-        success: function (rst) {
-          _this.screenWidth = rst.screenWidth
-          _this.sliderWidth = _this.screenWidth / _this.tabs.length - 128
-          _this.sliderLeft = 56
-          _this.sliderOffset = _this.screenWidth / _this.tabs.length * _this.activeIndex
+      getElement_WH('.weui-navbar').then((value) => {
+        getElement_WH('.weui-navbar__title').then((valueItem) => {
+          _this.sliderWidth = valueItem.width
+          _this.sliderOffset = value.width / _this.tabs.length * _this.activeIndex
+          _this.sliderLeft = valueItem.left
           _this.$apply()
-        }
+        }).catch((error) => {
+          console.log(error)
+        })
+        // _this.sliderOffset = rst.screenWidth / _this.tabs.length * _this.activeIndex
+        // _this.sliderLeft = _this.tabs.length > 2 ? value.left : value.left - 12
+        // _this.$apply()
+      }).catch((error) => {
+        console.log(error)
       })
+      // wx.getSystemInfo({
+      //   success: function (rst) {
+      //     // _this.screenWidth = rst.screenWidth
+      //     // _this.sliderWidth = rst.screenWidth / _this.tabs.length
+      //     // _this.$apply()
+      //   }
+      // })
     }
 
     methods = {
@@ -69,7 +86,6 @@
     .weui-navbar__slider{
       height: 8rpx;
       background: @theme;
-      /*opacity: 0.7;*/
       border-top-right-radius: 6rpx;
       border-top-left-radius: 6rpx;
     }

@@ -12,16 +12,18 @@
         <notification></notification>
         <view class="bc_center">
           <view class="mon flo_l font_30 text-center" @tap="gotoTab('/pages/tabBar/daily')">
-            <image src="https://images.ufutx.com/201906/19/93984db0bca813a746608de9a4a1b567.png" class="image" mode="widthFix"></image>
+            <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
             月结活动
           </view>
           <view class="day flo_r font_30 text-center" @tap="gotoTab('/pages/tabBar/monthly')">
-            <image src="https://images.ufutx.com/201906/19/4b0f9881973e6e91ccb36fae9f965b2a.png" class="image" mode="widthFix"></image>
+            <image src="http://images.ufutx.com/201906/20/b31621d7348e6f5ed56d33f4434a38d1.png" class="image" mode="widthFix"></image>
             日结活动
           </view>
           <view class="clearfloat"></view>
           <view class="font_32 bold _bc_title">为你推荐</view>
-          <navBarTop :tabs.sync="tabs" @tabClick="tabClick"></navBarTop>
+        </view>
+        <navBarTop :tabs.sync="tabs" @tabClick="tabClick"></navBarTop>
+        <view class="bc_center">
           <contentsList></contentsList>
         </view>
         <!--<view class="_bc-tab text-left ff ">-->
@@ -163,6 +165,7 @@
     }
     data = {
       tabs: ['月结兼职', '日结兼职'],
+      // tabs: ['已完成', '已取消', '待开始', '进行中'],
       mateActive: 'all',
       serverActive: 'meet',
       type: 'mate',

@@ -116,6 +116,20 @@ export default class baseMixin extends wepy.mixin {
       mask: true
     })
   }
+  $copyText(text) {
+    wx.setClipboardData({
+      data: text,
+      success: function (res) {
+        wx.getClipboardData({
+          success: function (res) {
+            wx.showToast({
+              title: '复制成功'
+            })
+          }
+        })
+      }
+    })
+  }
 
   // 警告框
   $alert(item = '标题', item2) {

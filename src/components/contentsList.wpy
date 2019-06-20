@@ -44,7 +44,7 @@
   .contentsList{
     padding: 26rpx;
     overflow: hidden;
-    border-bottom: 6rpx solid #f6f6f6;
+    border-bottom: 6rpx solid @f6;
     .item_image{
       width: 132rpx;
       height: 132rpx;
@@ -70,7 +70,7 @@
         border-bottom: 1rpx solid @lightgray;
       }
       .item_price{
-        width: 50%;
+        width: 46%;
         position: absolute;
         right: 0rpx;
         top: 32rpx;

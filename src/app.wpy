@@ -15,6 +15,7 @@
   export default class extends wepy.app {
     config = {
       pages: [
+        'pages/register',
         'pages/tabBar/home',
         'pages/tabBar/daily',
         'pages/tabBar/monthly',
@@ -25,14 +26,19 @@
           'desc': '你的位置信息将用于小程序位置接口的效果展示'
         }
       },
-      // 'subPackages': [
-      //   {
-      //     'root': 'pages/books',
-      //     'pages': [
-      //       'bookDetail'
-      //     ]
-      //   }
-      // ],
+      'subPackages': [
+        {
+          'root': 'pages/users',
+          'pages': [
+            'collect',
+            'apply',
+            'setting',
+            'about',
+            'cooperation',
+            'question'
+          ]
+        }
+      ],
       window: {
         navigationBarTitleText: '福恋',
         navigationBarTextStyle: 'white',
@@ -42,29 +48,29 @@
         enablePullDownRefresh: true
       },
       tabBar: {
-        color: '#b4b4b4',
+        color: '#666666',
         selectedColor: '#0075c5',
         backgroundColor: '#ffffff',
         borderStyle: 'black',
         list: [{
           pagePath: 'pages/tabBar/home',
-          selectedIconPath: './images/tabBarIcon/homeH.png',
+          selectedIconPath: './images/tabBarIcon/homeA.png',
           iconPath: './images/tabBarIcon/home.png',
           text: '首页'
         }, {
           pagePath: 'pages/tabBar/daily',
-          selectedIconPath: './images/tabbar/attentionActive.png',
-          iconPath: './images/tabbar/attention.png',
+          selectedIconPath: './images/tabBarIcon/munA.png',
+          iconPath: './images/tabBarIcon/mun.png',
           text: '月结活动'
         }, {
           pagePath: 'pages/tabBar/monthly',
-          selectedIconPath: './images/tabBarIcon/dayH.png',
+          selectedIconPath: './images/tabBarIcon/dayA.png',
           iconPath: './images/tabBarIcon/day.png',
           text: '日结活动'
         }, {
           pagePath: 'pages/tabBar/user',
-          selectedIconPath: './images/tabbar/myActive.png',
-          iconPath: './images/tabbar/my.png',
+          selectedIconPath: './images/tabBarIcon/userA.png',
+          iconPath: './images/tabBarIcon/user.png',
           text: '我的'
         }]
       },

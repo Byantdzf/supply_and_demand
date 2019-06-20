@@ -1,0 +1,81 @@
+<template>
+  <view class="text-center">
+    <view class="card_box">
+      <view class="bc_top"></view>
+      <view class="font_32 bc_title bold">//////////   合作方式   //////////</view>
+      <view class="font_28 bc_info color-666">月结兼职、日结兼职发布</view>
+      <view class="font_28 bc_info color-666">广告发布</view>
+      <view class="bc_bottom text-center white font_30" @tap="copyText('XXXXXXX12345')">
+        业务微信： XXXXXXX12345
+        <image src="http://images.ufutx.com/201906/20/7b09aae087268629cf0605fe38ab84e8.png" mode="widthFix" class="copy_icon"></image>
+      </view>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import base from '../../mixins/base'
+
+  export default class cooperation extends wepy.page {
+    mixins = [base]
+
+    config = {
+      navigationBarTitleText: '商务合作'
+    }
+    components = {
+    }
+    data = {}
+    methods = {
+      copyText(text) {
+        this.$copyText(text)
+      }
+    }
+
+    onLoad() {
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+  page {
+    background: white !important;
+    .card_box{
+      width: 684rpx;
+      height: 474rpx;
+      margin:42rpx auto;
+      border-radius: 20rpx;
+      box-shadow: 1rpx 1rpx 22rpx #d4d4d4;
+      position: relative;
+      overflow: hidden;
+      .bc_top,.bc_bottom{
+        width: 100%;
+        height: 22rpx;
+        background: @theme;
+        .copy_icon{
+          width: 28rpx;
+          height: auto;
+          vertical-align: middle;
+          margin-bottom: 4rpx;
+          margin-right: 18rpx;
+        }
+      }
+      .bc_title{
+        color: @theme;
+        margin-top: 42rpx;
+        margin-bottom: 76rpx;
+      }
+
+      .bc_info {
+        margin-bottom: 18rpx;
+      }
+      .bc_bottom{
+        height: 80rpx;
+        line-height: 80rpx;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+      }
+    }
+  }
+</style>

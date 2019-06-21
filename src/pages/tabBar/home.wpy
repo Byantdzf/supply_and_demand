@@ -13,11 +13,11 @@
         <view class="bc_center">
           <view class="mon flo_l font_30 text-center" @tap="gotoTab('/pages/tabBar/daily')">
             <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
-            月结活动
+            月结兼职
           </view>
           <view class="day flo_r font_30 text-center" @tap="gotoTab('/pages/tabBar/monthly')">
             <image src="http://images.ufutx.com/201906/20/b31621d7348e6f5ed56d33f4434a38d1.png" class="image" mode="widthFix"></image>
-            日结活动
+            日结兼职
           </view>
           <view class="clearfloat"></view>
           <view class="font_32 bold _bc_title">为你推荐</view>
@@ -151,7 +151,7 @@
   export default class home extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
-      navigationBarTitleText: '福恋',
+      navigationBarTitleText: '兼职网',
       onReachBottomDistance: 10
       // navigationStyle: 'custom'
     }

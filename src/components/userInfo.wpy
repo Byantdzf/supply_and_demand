@@ -4,11 +4,17 @@
   <view animation="{{animationData}}" class="commodity_attr_box" wx:if="{{showModalStatus}}">
     <view class="model_page-user ff">
       <view class="user_box text-center">
-        <image src="http://images.ufutx.com/201906/19/c1a56269e21ec58e96fbcb3a02bf9289.png" mode="widthFix" class="bc_image"></image>
+        <image src="http://images.ufutx.com/201906/21/65a1e16f455b3f05feb9fa1035bde05d.png" mode="widthFix" class="bc_image"></image>
         <view class="user_photo ff">
           <image src="{{photo}}" mode="aspectFill"></image>
         </view>
-        <view></view>
+        <view class="userInfoBox" wx:for="{{userInfoList}}" wx:key="index">
+          <view class="item_title flo_l font_30">{{item.title}}:</view>
+          <view class="item_value flo_r font_30 bold">
+            <input type="text" value="{{item.value}}">
+          </view>
+        </view>
+        <view class="font_30 bc_btn white">提交</view>
       </view>
     </view>
     <view class="clearfloat"></view>
@@ -36,7 +42,17 @@
       showChangeState: false,
       animationData: {},
       photo: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
-      StateText: ''
+      StateText: '',
+      userInfoList: [
+        {title: '真实姓名', value: '小杨莹'},
+        {title: '性别', value: '小杨莹'},
+        {title: '出生年月日', value: '小杨莹'},
+        {title: '手机号', value: '小杨莹'},
+        {title: '学历', value: '小杨莹'},
+        {title: '地址', value: '小杨莹'},
+        {title: '想要做的工作类型', value: '小杨莹'},
+        {title: '倾向的兼职类型', value: '小杨莹'},
+      ]
     }
     watch = {
     }
@@ -154,17 +170,20 @@
 .commodity_attr_box {
   width: 100%;
   overflow: hidden;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 10001;
   background: #fff;
+  box-shadow: 1rpx 6rpx 88rpx #ffffff;
 }
 .model_page-user{
+  overflow-y: auto;
   .user_box{
     position: relative;
-    padding-top: 140rpx;
+    padding-top: 40rpx;
     .bc_image{
+      height: auto;
       width: 100%;
       position: absolute;
       left: 0;
@@ -206,6 +225,7 @@
       width: 52rpx;
       vertical-align: middle;
       margin-bottom: 4rpx;
+      height: auto;
       margin-right: 8rpx;
     }
     .item_title{
@@ -224,6 +244,31 @@
     margin: 0;
     border-top: 16rpx solid @f6;
     padding: 0 42rpx;
+  }
+  .userInfoBox{
+    overflow: hidden;
+    margin: 0 30rpx;
+    padding: 16rpx 10rpx;
+    border-bottom: 2px solid @f6;
+    .item_title{
+      margin-left: 10rpx;
+      /*text-align: justify;*/
+      /*text-align-last:justify;*/
+      /*width: 260rpx;*/
+    }
+    .item_value{
+      margin-left: 14rpx;
+    }
+  }
+  .bc_btn{
+    width: 200rpx;
+    height: 68rpx;
+    line-height: 68rpx;
+    background: @theme;
+    border-radius: 46rpx;
+    display: inline-block;
+    margin: 32rpx;
+    box-shadow: 1rpx 1rpx 12rpx @themeBC;
   }
 }
 </style>

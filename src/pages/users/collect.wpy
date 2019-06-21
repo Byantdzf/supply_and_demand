@@ -1,6 +1,5 @@
 <template>
   <view>
-    <tabSearch></tabSearch>
     <contentsList></contentsList>
   </view>
 </template>
@@ -10,9 +9,9 @@
   import contentsList from '../../components/contentsList'
   import tabSearch from '../../components/tabSearch'
 
-  export default class daily extends wepy.page {
+  export default class collect extends wepy.page {
     config = {
-      navigationBarTitleText: '日结兼职'
+      navigationBarTitleText: '我的收藏'
     }
     components = {
       contentsList, tabSearch
@@ -26,7 +25,9 @@
 </script>
 
 <style lang="less">
-  page{
+  @import "../../styles/custom/fn.less";
+
+  page {
     background: white !important;
   }
 </style>

@@ -92,7 +92,7 @@
     computed = {}
 
     onShow() {
-      this.initPageData()
+      // this.initPageData()
       this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
     }
     onShareAppMessage(res) {
@@ -101,6 +101,7 @@
 
     onLoad(e) {
       setTimeout(() => {
+        this.$invoke('userInfo', 'showModal')
         this.photo = 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=4259300811,497831842&fm=27&gp=0.jpg'
         this.$apply()
       }, 1200)
@@ -219,6 +220,7 @@
           vertical-align: middle;
           margin-bottom: 4rpx;
           margin-right: 8rpx;
+          height: auto;
         }
         .item_title{
           line-height: 124rpx;

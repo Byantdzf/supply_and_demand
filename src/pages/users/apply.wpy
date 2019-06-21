@@ -1,0 +1,43 @@
+<template>
+  <view>
+    <navBarTop :tabs.sync="tabs" @tapClick="tapClick"></navBarTop>
+    <contentsList></contentsList>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import contentsList from '../../components/contentsList'
+  import tabSearch from '../../components/tabSearch'
+  import navBarTop from '../../components/navBarTop'
+
+  export default class apply extends wepy.page {
+    config = {
+      navigationBarTitleText: '我的报名'
+    }
+    components = {
+      contentsList, tabSearch, navBarTop
+    }
+    data = {
+      tabs: ['已完成', '已取消', '待开始', '进行中']
+    }
+    onLoad() {
+    }
+    methods = {
+
+    }
+    events = {
+      'tabClick': (value) => { // NavTab返回值
+        console.log(value)
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+
+  page {
+    background: white !important;
+  }
+</style>

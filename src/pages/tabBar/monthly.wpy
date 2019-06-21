@@ -13,7 +13,7 @@
 
   export default class monthly extends wepy.page {
     config = {
-      navigationBarTitleText: 'monthly'
+      navigationBarTitleText: '月结兼职'
     }
     components = {
       contentsList, tabSearch

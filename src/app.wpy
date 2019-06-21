@@ -58,12 +58,12 @@
           iconPath: './images/tabBarIcon/home.png',
           text: '首页'
         }, {
-          pagePath: 'pages/tabBar/daily',
+          pagePath: 'pages/tabBar/monthly',
           selectedIconPath: './images/tabBarIcon/munA.png',
           iconPath: './images/tabBarIcon/mun.png',
           text: '月结活动'
         }, {
-          pagePath: 'pages/tabBar/monthly',
+          pagePath: 'pages/tabBar/daily',
           selectedIconPath: './images/tabBarIcon/dayA.png',
           iconPath: './images/tabBarIcon/day.png',
           text: '日结活动'

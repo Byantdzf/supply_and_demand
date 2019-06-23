@@ -37,6 +37,13 @@
             'cooperation',
             'question'
           ]
+        },
+        {
+          'root': 'pages/job',
+          'pages': [
+            'detail',
+            'member'
+          ]
         }
       ],
       window: {

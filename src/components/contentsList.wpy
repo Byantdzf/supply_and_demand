@@ -1,6 +1,6 @@
 <template>
   <block wx:for="{{15}}" wx:key="index">
-    <view class="contentsList ff">
+    <view class="contentsList ff" @tap="goto('/pages/job/detail')">
       <view class="item_image flo_l">
         <image src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=311097710,965735535&fm=27&gp=0.jpg"
                mode="widthFix"></image>
@@ -35,7 +35,11 @@
     onLoad() {
     }
 
-    methods = {}
+    methods = {
+      goto(url) {
+        this.$goto(url)
+      }
+    }
   }
 </script>
 
@@ -50,6 +54,7 @@
       height: 132rpx;
       image{
         width: 100%;
+        height: auto;
       }
     }
     .item_info{

@@ -10,8 +10,8 @@
         </view>
         <view class="userInfoBox" wx:for="{{userInfoList}}" wx:key="index">
           <view class="item_title flo_l font_30">{{item.title}}:</view>
-          <view class="item_value flo_r font_30 bold">
-            <input type="text" value="{{item.value}}">
+          <view class="item_value flo_r font_30 {{item.title == '真实姓名'?'bold':''}}">
+            <input type="text" class="font_28" value="{{item.value}}">
           </view>
         </view>
         <view class="font_30 bc_btn white">提交</view>
@@ -45,13 +45,13 @@
       StateText: '',
       userInfoList: [
         {title: '真实姓名', value: '小杨莹'},
-        {title: '性别', value: '小杨莹'},
-        {title: '出生年月日', value: '小杨莹'},
-        {title: '手机号', value: '小杨莹'},
-        {title: '学历', value: '小杨莹'},
-        {title: '地址', value: '小杨莹'},
-        {title: '想要做的工作类型', value: '小杨莹'},
-        {title: '倾向的兼职类型', value: '小杨莹'},
+        {title: '性别', value: '女'},
+        {title: '出生年月日', value: '1997-7-8'},
+        {title: '手机号', value: '15707431234'},
+        {title: '学历', value: '本科'},
+        {title: '地址', value: '深圳市南山区阳光科创中心'},
+        {title: '想要做的工作类型', value: '软件开发工程师'},
+        {title: '倾向的兼职类型', value: '前端工程师'}
       ]
     }
     watch = {
@@ -258,6 +258,7 @@
     }
     .item_value{
       margin-left: 14rpx;
+      width: 55%;
     }
   }
   .bc_btn{

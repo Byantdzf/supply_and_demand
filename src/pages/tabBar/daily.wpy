@@ -1,6 +1,8 @@
 <template>
   <view>
-    <tabSearch></tabSearch>
+    <view>
+      <tabSearch></tabSearch>
+    </view>
     <contentsList></contentsList>
   </view>
 </template>

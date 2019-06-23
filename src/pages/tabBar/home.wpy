@@ -3,13 +3,43 @@
   <form bindsubmit="formSubmit" report-submit>
     <button formType="submit" class="btn" data-type="click" style="border: none;">
       <view class="">
-        <!--<view @tap="goto('/pages/map/mapList')">-->
-          <tabSearch></tabSearch>
-        <!--</view>-->
+        <view>
+          <tabSearch :noSearch.sync="noSearch"></tabSearch>
+        </view>
         <block wx:if="{{announcements.length>0}}">
           <swiperV :list.sync="announcements" height="375"></swiperV>
         </block>
         <notification></notification>
+        <view class="bc_swiper_box">
+          <view class="font_30 bold bc_title">文章</view>
+          <view class="bc_swiper">
+            <swiper @change="getcurrent" style="margin-top: -32rpx">
+              <swiper-item wx:for="{{3}}" wx:key="index">
+                <view class="_bc-list_swiper flo_l" wx:for="{{3}}" wx:key="index">
+                  <image src="http://img0.imgtn.bdimg.com/it/u=3104981247,4075892569&fm=11&gp=0.jpg"
+                         mode="widthFix" class="image"></image>
+                  <view class="font_28 ellipsis_1">小米手环4NFC版本发布会</view>
+                  <view class="font_24 ellipsis_1">地址：深圳市南山区...</view>
+                </view>
+                <!--<view class="_bc-list_swiper">-->
+                  <!--<view class="item-avatar_swiper {{index ===0 || index === 2?'flo_l':'flo_r'}}" wx:for="{{otherUser}}" wx:key="{{index}}" wx:if="{{index<4}}" @tap="gotofriends({{item}},{{item.user_id}})">-->
+                    <!--<image src="{{item.photo}}" mode="aspectFill" class="image"></image>-->
+                    <!--<view class="font_26 _bc-center_swiper color-666">-->
+                      <!--<view class="color-666 ellipsis_1 bold" style="max-width: 80%">{{item.name}}</view>-->
+                      <!--<view class="font_22 bold" style="color: #919191">{{item.age? item.age + '岁' : ''}} {{item.stature? '· ' +item.stature +'cm': ''}} {{item.city? '· '+item.city: ''}}</view>-->
+                    <!--</view>-->
+                  <!--</view>-->
+                <!--</view>-->
+              </swiper-item>
+            </swiper>
+          </view>
+          <view class="clearfloat"></view>
+          <!--<view class='text-center'>-->
+            <!--<block wx:for="{{recommends}}" wx:key="index">-->
+              <!--<text class="bc_dot {{index == current?'bc_dot_active':''}}"></text>-->
+            <!--</block>-->
+          <!--</view>-->
+        </view>
         <view class="bc_center">
           <view class="mon flo_l font_30 text-center" @tap="gotoTab('/pages/tabBar/daily')">
             <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
@@ -20,7 +50,7 @@
             日结兼职
           </view>
           <view class="clearfloat"></view>
-          <view class="font_32 bold _bc_title">为你推荐</view>
+          <view class="font_30 bold _bc_title">为你推荐</view>
         </view>
         <navBarTop :tabs.sync="tabs" @tabClick="tabClick"></navBarTop>
         <view class="bc_center">
@@ -171,6 +201,7 @@
       type: 'mate',
       init: false,
       loading: false,
+      noSearch: 'true',
       noMore: false,
       current: 0,
       myLong: '',
@@ -675,9 +706,34 @@
       }
       ._bc_title{
         margin-top: 42rpx;
+        position: relative;
+        padding-left: 16rpx;
+        &:after{
+          content: " ";
+          width: 6rpx;
+          height: 24rpx;
+          background: @theme;
+          position: absolute;
+          left: 0;
+          top: 14rpx;
+        }
       }
     }
-
+    .bc_title{
+      /*margin-top: 42rpx;*/
+      margin-left: 30rpx;
+      padding-left: 16rpx;
+      position: relative;
+      &:after{
+        content: " ";
+        width: 6rpx;
+        height: 24rpx;
+        background: @theme;
+        position: absolute;
+        left: 0;
+        top: 14rpx;
+      }
+    }
     .heart {
       /*animation:heartbeat 1s infinite;*/
       -webkit-animation: heartbeat 1.4s 3;
@@ -696,6 +752,38 @@
       100% {
         transform: rotate(0deg) scale(0.8, 0.8);
         opacity: 1;
+      }
+    }
+    .bc_swiper_box{
+      /*padding: 28rpx 0rpx 0rpx;*/
+      .bc_swiper{
+        height: 300rpx;
+        margin-top: 32rpx;
+      }
+      swiper{
+        /*height: 780rpx;*/
+      }
+      .bc_dot{
+        width: 40rpx;
+        height: 8rpx;
+        background: #cecece;
+        margin-left: 6rpx;
+      }
+      .bc_dot_active{
+        background: #d92553;
+      }
+      ._bc-list_swiper{
+        /*background: pink;*/
+        width: 29%;
+        height: 89%;
+        padding: 2%;
+        .image{
+          width: 100%;
+          height: auto;
+          vertical-align: middle;
+          border-radius: 12rpx;
+          box-shadow: 1rpx 1rpx 12rpx #f1f1f1;
+        }
       }
     }
   }

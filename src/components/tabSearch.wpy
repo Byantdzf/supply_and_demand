@@ -1,6 +1,9 @@
 <template>
-  <view class="weui-tab__content bc_BoxTab" >
+  <view class="weui-tab__content bc_BoxTab_123" >
     <view class="weui-search-bar"  style="background-color: {{BColor}} !important;">
+      <view class="search_address font_28 ellipsis_1">深圳市
+        <image src="http://images.ufutx.com/201906/23/573d28ce2a86504b1192d411c01d029d.png" mode="widthFix" class="right_icon"></image>
+      </view>
       <view class="weui-search-bar__form">
         <view class="weui-search-bar__box">
           <!--<image src="http://images.ufutx.com/201905/28/828547386e36c11a03b10e41fae92374.png" class="weui-icon-search_in-box" mode="widthFix" style="width: 28rpx;"></image>-->
@@ -16,7 +19,22 @@
           <view class="weui-search-bar__text">{{title}}</view>
         </label>
       </view>
-      <view class="weui-search-bar__cancel-btn font_32" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
+      <view class="weui-search-bar__cancel-btn font_28" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
+    </view>
+    <view class="bc_searchIist font_26 text-center ff" wx:if="{{noSearch == 'false'}}">
+      <view class="bc_searchItem flo_l">
+        类型
+        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
+      </view>
+      <view class="bc_searchItem flo_l">
+        区域
+        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
+      </view>
+      <view class="bc_searchItem flo_l">
+        排序
+        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
+      </view>
+      <view class="clearfloat"></view>
     </view>
     <slot></slot>
   </view>
@@ -51,20 +69,32 @@
       BColor: {
         type: String,
         default: 'white'
+      },
+      noSearch: {
+        type: String,
+        default: 'false'
       }
     }
     data = {
       inputShowed: false,
       inputVal: '',
-      bc_height: ''
+      bc_height: '81px'
     }
     onLoad() {
-      getElement_WH('.bc_BoxTab').then((value) => {
-        this.bc_height = value.height + 'px'
+      if (this.noSearch == 'true') {
+        this.bc_height = '40px'
         this.$apply()
-      }).catch((error) => {
-        console.log(error)
-      })
+      } else {
+        this.bc_height = '81px'
+        this.$apply()
+      }
+
+      // getElement_WH('.bc_BoxTab_123').then((value) => {
+      //   this.bc_height = value.height + 'px'
+      //   this.$apply()
+      // }).catch((error) => {
+      //   console.log(error)
+      // })
     }
 
     methods = {
@@ -95,10 +125,34 @@
 
 <style lang="less">
   @import "../styles/custom/fn.less";
-  .weui-search-bar{border: none;}
+
+  .weui-search-bar {
+    border: none;
+    padding-left: 22%;
+    position: relative;
+    border-bottom: 1rpx solid #f1f1f1;
+  }
+  .search_address{
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 16%;
+    padding: 22rpx 22rpx;
+    .right_icon{
+      width: 36rpx;
+      vertical-align: middle;
+      margin-bottom: 2rpx;
+      height: auto;
+      margin-left: -4rpx;
+    }
+  }
+  .weui-search-bar__box{
+  }
   .weui-search-bar__form, .weui-search-bar__label{
-    background: #EBEaEA !important;
+    background: #f3f3f3 !important;
     color: @darkgray;
+    border-radius: 36rpx;
+    border: none;
   }
   .weui-search-bar__text{
     color: @gray;
@@ -115,5 +169,19 @@
     position: fixed;
     top: 0;
     z-index: 9999;
+  }
+  .bc_searchIist{
+    width: 100%;
+    overflow: hidden;
+    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+    .bc_searchItem{
+      width: 33.3%;
+      padding: 16rpx 0;
+      .down_icon{
+        width: 22rpx;
+        height: auto;
+        vertical-align: middle;
+      }
+    }
   }
 </style>

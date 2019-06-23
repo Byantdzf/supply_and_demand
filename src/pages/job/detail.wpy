@@ -1,0 +1,135 @@
+<template>
+  <view class="bc_detail">
+    <view class="bc_conter">
+      <view class="image_box">
+        <image src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3959347532,13644892&fm=26&gp=0.jpg"
+               mode="aspectFill" ></image>
+      </view>
+      <view class="detail_box">
+        <view class="message_box ff">
+          <view class="title font_32 bold ellipsis_1">国美电器招聘需求</view>
+          <view class="message font_26">
+            <span class="text">储备店长/储备副店长</span>
+            <span class="text">广东/深圳/南山区</span>
+            <span class="text">不限</span>
+          </view>
+          <view class="price font_30">月预期6000~8000元+促销费</view>
+        </view>
+        <view>
+          <image src="http://images.ufutx.com/201906/23/6baaf70c7c39ed93b089af3e1ca4973d.png" mode="widthFix" style="width: 100%;"></image>
+          <image src="http://images.ufutx.com/201906/23/f470b1ff07a6d18d8952527c247a3b17.png" mode="widthFix" style="width: 100%;"></image>
+          <image src="http://images.ufutx.com/201906/23/8198e01da0ee35343001e8a80fcfa539.png" mode="widthFix" style="width: 100%;"></image>
+          <image src="http://images.ufutx.com/201906/23/51a9f72d7f0ec4a38f3bc276c44998ad.png" mode="widthFix" style="width: 100%;"></image>
+          <image src="http://images.ufutx.com/201906/23/9ced1b34f2ede9b986cf9c279ae98fc4.png" mode="widthFix" style="width: 100%;margin-top: -40rpx;"></image>
+          <image src="http://images.ufutx.com/201906/23/1421f0068dfbfe1a63f9eff6de4dfe6e.png" mode="widthFix" style="width: 100%;" @tap="goto('/pages/job/member')"></image>
+        </view>
+        <view>
+
+        </view>
+      </view>
+      <view style="height: 100rpx;"></view>
+      <view class="bc_detail_btn fixed_bot text-center ff">
+        <view class="shear flo_l font_24">
+          <image src="http://images.ufutx.com/201906/23/cd4de9597c203328c5e6abb737ccfc51.png" mode="widthFix" class="right_icon"></image>
+          <text>收藏</text>
+        </view>
+        <view class="collect flo_l font_24">
+          <image src="http://images.ufutx.com/201906/23/6c8580be7e2173a9939752ac3e34c8f3.png" mode="widthFix" class="right_icon"></image>
+          <text>分享</text>
+        </view>
+        <view class="apply flo_l font_32">立即报名</view>
+      </view>
+    </view>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+  import base from '../../mixins/base'
+
+  export default class detail extends wepy.page {
+    mixins = [base]
+    config = {
+      navigationBarTitleText: '兼职详情'
+    }
+    components = {}
+    data = {}
+    methods = {
+      goto(url){
+        this.$goto(url)
+      }
+    }
+
+    onLoad() {
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+
+  page {
+    background: white !important;
+    .bc_detail{
+      .bc_conter{
+        .image_box{
+          width: 100vw;
+          height: 60vw;
+          image{
+            width: 100%;
+            height: 100%;
+          }
+        }
+        .detail_box{
+          /*background: #f8f8f8;*/
+          /*padding-bottom: 22rpx;*/
+          .message_box{
+            margin: 0 22rpx;
+            border: 1rpx solid #f1f1f1;
+            padding: 12rpx;
+            border-radius: 14rpx;
+            box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+            margin-top: -22rpx;
+            position: relative;
+            .title{ color: #666666}
+            .text{ color: #cdcdcd}
+            .price{color: #ff3d1e}
+          }
+        }
+        .bc_detail_btn{
+          width: 100%;
+          height: 100rpx;
+          /*background: #0a9ec7;*/
+          border-top: 1rpx solid #dedede;
+          .shear,.collect{
+            width: 22%;
+            /*background: pink;*/
+            height: 100rpx;
+            line-height: 50rpx;
+            color: #666666;
+            image{
+              width: 32rpx;
+              height: auto;
+              vertical-align: middle;
+              margin-top: 12rpx;
+            }
+            text{
+              width: 100%;
+              /*margin-top: -8rpx;*/
+            }
+          }
+          .collect{
+            /*background: #0aba07;*/
+          }
+          .apply {
+            width: 56%;
+            background: @theme;
+            line-height: 100rpx;
+            color: white;
+            height: 100rpx
+          }
+        }
+      }
+    }
+  }
+</style>

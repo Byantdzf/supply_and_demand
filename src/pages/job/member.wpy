@@ -1,0 +1,91 @@
+<template>
+  <view>
+    <image src="http://images.ufutx.com/201906/23/52400e66d22067711d0cb96378fc83a2.png" mode="widthFix"
+           style="width: 100%;"></image>
+  </view>
+</template>
+<script>
+  import wepy from 'wepy'
+
+  export default class detail extends wepy.page {
+    config = {
+      navigationBarTitleText: '报名成员'
+    }
+    components = {}
+    data = {}
+    methods = {}
+
+    onLoad() {
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+
+  page {
+    background: white !important;
+    .bc_detail{
+      .bc_conter{
+        .image_box{
+          width: 100vw;
+          height: 60vw;
+          image{
+            width: 100%;
+            height: 100%;
+          }
+        }
+        .detail_box{
+          /*background: #f8f8f8;*/
+          /*padding-bottom: 22rpx;*/
+          .message_box{
+            margin: 0 22rpx;
+            border: 1rpx solid #f1f1f1;
+            padding: 12rpx;
+            border-radius: 14rpx;
+            box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+            margin-top: -22rpx;
+            position: relative;
+            .title{ color: #666666}
+            .text{ color: #cdcdcd}
+            .price{color: #ff3d1e}
+          }
+        }
+        .bc_detail_btn{
+          width: 100%;
+          height: 100rpx;
+          /*background: #0a9ec7;*/
+          border-top: 1rpx solid #dedede;
+          .shear,.collect{
+            width: 22%;
+            /*background: pink;*/
+            height: 100rpx;
+            line-height: 50rpx;
+            color: #666666;
+            image{
+              width: 32rpx;
+              height: auto;
+              vertical-align: middle;
+              margin-top: 12rpx;
+            }
+            text{
+              width: 100%;
+              /*margin-top: -8rpx;*/
+            }
+          }
+          .collect{
+            /*background: #0aba07;*/
+          }
+          .apply {
+            width: 56%;
+            background: @theme;
+            line-height: 100rpx;
+            color: white;
+            height: 100rpx
+          }
+        }
+      }
+    }
+  }
+</style>

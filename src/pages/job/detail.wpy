@@ -7,59 +7,131 @@
       </view>
       <view class="detail_box">
         <view class="message_box ff">
-          <view class="title font_32 bold ellipsis_1">国美电器招聘需求</view>
-          <view class="message font_26">
+          <view class="title font_30 bold ellipsis_1">国美电器活动需求</view>
+          <view class="message font_24">
             <span class="text">储备店长/储备副店长</span>
             <span class="text">广东/深圳/南山区</span>
             <span class="text">不限</span>
           </view>
-          <view class="price font_30">月预期6000~8000元+促销费</view>
+          <view class="price font_28 bold">月预期6000~8000元+促销费</view>
+          <view class="_bc_progress color-666">
+            <span class="font_26 flo_l">报名成员：</span>
+            <progress percent="{{count}}"  border-radius="24" class="flo_l font_26"  active="true" stroke-width="12" activeColor="#0075c5" backgroundColor="#f1f1f1"/>
+            <span class="font_26 flo_l" style="margin-left: 14rpx;">20/100</span>
+          </view>
+          <!--<view class="model"></view>-->
+        </view>
+        <view style="margin: 12rpx 22rpx;">
+          <!--<image src="http://images.ufutx.com/201906/23/6baaf70c7c39ed93b089af3e1ca4973d.png" mode="widthFix" style="width: 100%;"></image>-->
+          <image src="http://images.ufutx.com/201906/23/f470b1ff07a6d18d8952527c247a3b17.png" mode="widthFix" style="width: 100%;" @tap="makePhoneCall('0755-XXXX')"></image>
+          <!--<image src="http://images.ufutx.com/201906/23/8198e01da0ee35343001e8a80fcfa539.png" mode="widthFix" style="width: 100%;"></image>-->
+          <!--<image src="http://images.ufutx.com/201906/23/51a9f72d7f0ec4a38f3bc276c44998ad.png" mode="widthFix" style="width: 100%;"></image>-->
+          <!--<image src="http://images.ufutx.com/201906/23/9ced1b34f2ede9b986cf9c279ae98fc4.png" mode="widthFix" style="width: 100%;margin-top: -40rpx;" @tap="openLocation"></image>-->
+          <image src="http://images.ufutx.com/201906/23/1421f0068dfbfe1a63f9eff6de4dfe6e.png" mode="widthFix" style="width: 100%;"></image>
         </view>
         <view>
-          <image src="http://images.ufutx.com/201906/23/6baaf70c7c39ed93b089af3e1ca4973d.png" mode="widthFix" style="width: 100%;"></image>
-          <image src="http://images.ufutx.com/201906/23/f470b1ff07a6d18d8952527c247a3b17.png" mode="widthFix" style="width: 100%;"></image>
-          <image src="http://images.ufutx.com/201906/23/8198e01da0ee35343001e8a80fcfa539.png" mode="widthFix" style="width: 100%;"></image>
-          <image src="http://images.ufutx.com/201906/23/51a9f72d7f0ec4a38f3bc276c44998ad.png" mode="widthFix" style="width: 100%;"></image>
-          <image src="http://images.ufutx.com/201906/23/9ced1b34f2ede9b986cf9c279ae98fc4.png" mode="widthFix" style="width: 100%;margin-top: -40rpx;"></image>
-          <image src="http://images.ufutx.com/201906/23/1421f0068dfbfe1a63f9eff6de4dfe6e.png" mode="widthFix" style="width: 100%;" @tap="goto('/pages/job/member')"></image>
-        </view>
-        <view>
-
         </view>
       </view>
       <view style="height: 100rpx;"></view>
       <view class="bc_detail_btn fixed_bot text-center ff">
-        <view class="shear flo_l font_24">
-          <image src="http://images.ufutx.com/201906/23/cd4de9597c203328c5e6abb737ccfc51.png" mode="widthFix" class="right_icon"></image>
+        <view class="shear flo_l font_24" @tap="collect" >
+          <view hover-class="btn_active">
+            <image src="http://images.ufutx.com/201906/25/c9db4580b201590933b0bba0036f0957.png" wx:if="{{collect}}" mode="widthFix" class="right_icon"></image>
+            <image src="http://images.ufutx.com/201906/23/cd4de9597c203328c5e6abb737ccfc51.png" wx:else mode="widthFix" class="right_icon"></image>
+          </view>
           <text>收藏</text>
         </view>
         <view class="collect flo_l font_24">
-          <image src="http://images.ufutx.com/201906/23/6c8580be7e2173a9939752ac3e34c8f3.png" mode="widthFix" class="right_icon"></image>
-          <text>分享</text>
+          <button class="btn font_24 text-center" open-type="share" style=''>
+            <view hover-class="btn_active">
+              <image src="http://images.ufutx.com/201906/23/6c8580be7e2173a9939752ac3e34c8f3.png" mode="widthFix" class="right_icon"></image>
+            </view>
+            <text class="font_24">分享</text>
+          </button>
         </view>
-        <view class="apply flo_l font_32">立即报名</view>
+        <view class="apply  flo_l font_32" @tap="showRule">立即报名</view>
       </view>
     </view>
   </view>
+  <modal>
+    <view slot="wrapper" class="color-666 font_28 wrapperModal ">
+      <image src="http://images.ufutx.com/201906/25/f6990555f2016f45f84836c931cdc69a.png" mode="widthFix" class="close" @tap="hideModal"></image>
+      <view class="title">报名须知：</view>
+      <view class="rule">
+        <view>1、报名商铺要达到4星以上、支持在线交易</view>
+        <view>2、商铺需绑定QQ客服，可在线沟通</view>
+        <view>3、会员注册质量高，保证商铺信息完整</view>
+        <view>4、需有相关授权书、产品相关信息真实有效</view>
+        <view>5、报名商家在线商机产品数量要求达到20条以上</view>
+        <view>6、参与活动的价格有效期：活动结束后 15天内有效</view>
+      </view>
+      <view class="apply text-center white" @tap="showUserInfo">立即报名</view>
+    </view>
+  </modal>
+  <userInfo></userInfo>
 </template>
 <script>
   import wepy from 'wepy'
   import base from '../../mixins/base'
+  import modal from '../../components/modal'
+  import userInfo from '../../components/userInfo'
 
   export default class detail extends wepy.page {
     mixins = [base]
     config = {
-      navigationBarTitleText: '兼职详情'
+      navigationBarTitleText: '活动详情'
     }
-    components = {}
-    data = {}
+    components = {modal, userInfo}
+    data = {
+      count: 20,
+      collect: false // 收藏
+    }
     methods = {
-      goto(url){
+      hideModal() {
+        this.$invoke('modal', 'hideModal')
+      },
+      goto(url) {
         this.$goto(url)
+      },
+      showRule() {
+        this.$invoke('modal', 'showModal')
+      },
+      collect() {  // 收藏
+        this.collect = !this.collect
+        this.$apply()
+        if (this.collect) {
+          this.$Toast_success('收藏成功')
+        } else {
+          this.$showToast('已取消')
+        }
+      },
+      makePhoneCall(iphone) { // 拨打电话
+        this.$makePhoneCall(iphone)
+      },
+      showUserInfo() {
+        this.$invoke('modal', 'hideModal')
+        setTimeout(() => {
+          this.$invoke('userInfo', 'showModal')
+        })
+      },
+      openLocation() {
+        wx.getLocation({
+          type: 'gcj02', // 返回可以用于wx.openLocation的经纬度
+          success(res) {
+            const latitude = res.latitude
+            const longitude = res.longitude
+            wx.openLocation({
+              latitude,
+              longitude,
+              scale: 18
+            })
+          }
+        })
       }
     }
 
     onLoad() {
+      // this.$invoke('modal', 'showModal')
     }
   }
 </script>
@@ -83,17 +155,33 @@
         .detail_box{
           /*background: #f8f8f8;*/
           /*padding-bottom: 22rpx;*/
+          ._bc_progress{
+            overflow: hidden;
+            margin-top: 6rpx;
+            span {color: #666666}
+            progress{
+              width: 60%;
+              margin-top: 8rpx;
+              /*margin-left: 16%;*/
+            }
+          }
           .message_box{
-            margin: 0 22rpx;
+            position: relative;
+            margin: 0 12rpx;
             border: 1rpx solid #f1f1f1;
-            padding: 12rpx;
+            padding: 12rpx 32rpx;
             border-radius: 14rpx;
             box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
-            margin-top: -22rpx;
+            margin-top: -32rpx;
             position: relative;
+            .message{
+              .text{
+                margin-right: 12rpx;
+                color: #b7b7b7;
+              }
+            }
             .title{ color: #666666}
-            .text{ color: #cdcdcd}
-            .price{color: #ff3d1e}
+            .price{color: orange}
           }
         }
         .bc_detail_btn{
@@ -129,6 +217,34 @@
             height: 100rpx
           }
         }
+      }
+    }
+    .wrapperModal{
+      position: relative;
+      .title{
+        margin: 0 32rpx;
+        margin-top: 36rpx;
+      }
+      .rule{
+        margin: 0 32rpx;
+        white-space: pre-wrap;
+        line-height: 2;
+        margin-bottom: 32rpx;
+      }
+      .apply{
+        margin: 22rpx 32rpx;
+        background: @theme;
+        height: 80rpx;
+        line-height: 80rpx;
+        border-radius: 8rpx;
+      }
+      .close{
+        width: 42rpx;
+        height: auto;
+        position: absolute;
+        right: 22rpx;
+        top: -12rpx;
+
       }
     }
   }

@@ -8,13 +8,36 @@
         <view class="user_photo ff">
           <image src="{{photo}}" mode="aspectFill"></image>
         </view>
-        <view class="userInfoBox" wx:for="{{userInfoList}}" wx:key="index">
+        <view class="userInfoBox" wx:for="{{information}}" wx:key="index">
           <view class="item_title flo_l font_30">{{item.title}}:</view>
-          <view class="item_value flo_r font_30 {{item.title == '真实姓名'?'bold':''}}">
-            <input type="text" class="font_28" value="{{item.value}}">
+          <view class="item_value flo_r font_30">
+            <block wx:if="{{item.type === 'input'}}">
+              <input class="_bc_value flo_r text-right" type="text" placeholder="点击填写" value="{{item.value}}"  @change="pickerChange({{index}})"/>
+            </block>
+            <block wx:if="{{item.type === 'picker'}}">
+              <view class="_bc_picker flo_r text-right">
+                <block wx:if="{{item.mode === 'selector'}}">
+                  <picker value="{{item.pickerIndex}}" mode="{{item.mode}}" range="{{item.pickerList}}" @change="pickerChange({{index}})">
+                    <view class="picker ">{{item.pickerList[item.pickerIndex]}}</view>
+                  </picker>
+                </block>
+                <block wx:if="{{item.mode === 'date'}}">
+                  <picker mode="{{item.mode}}"  value="{{item.pickerIndex}}"  @change="pickerChange({{index}})">
+                    <view class="picker">{{item.value===''?'请选择':item.value}}</view>
+                  </picker>
+                </block>
+                <block wx:if="{{item.mode === 'job_type'}}">
+                  <picker mode="multiSelector" @change="bindMultiPickerChange2" @columnchange="bindMultiPickerColumnChange2" value="{{multiIndex2}}" range="{{objectMultiArray}}" range-key="name">
+                    <view class="picker">
+                      阿萨斯
+                    </view>
+                  </picker>
+                </block>
+              </view>
+            </block>
           </view>
         </view>
-        <view class="font_30 bc_btn white">提交</view>
+        <view class="font_30 bc_btn white" @tap="save">提交</view>
       </view>
     </view>
     <view class="clearfloat"></view>
@@ -43,27 +66,172 @@
       animationData: {},
       photo: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
       StateText: '',
-      userInfoList: [
-        {title: '真实姓名', value: '小杨莹'},
-        {title: '性别', value: '女'},
-        {title: '出生年月日', value: '1997-7-8'},
-        {title: '手机号', value: '15707431234'},
-        {title: '学历', value: '本科'},
-        {title: '地址', value: '深圳市南山区阳光科创中心'},
-        {title: '想要做的工作类型', value: '软件开发工程师'},
-        {title: '倾向的兼职类型', value: '前端工程师'}
-      ]
+      information: [
+        {
+          title: '真实姓名',
+          name: 'name',
+          value: '',
+          type: 'input',
+          pickerIndex: 0
+        },
+        {
+          title: '性别',
+          name: 'sex',
+          value: '1',
+          type: 'picker',
+          mode: 'selector',
+          pickerList: ['男', '女'],
+          pickerIndex: 0
+        },
+        {
+          title: '出生日期',
+          name: 'birthday',
+          value: '',
+          mode: 'date',
+          type: 'picker',
+          pickerList: [],
+          pickerIndex: 0
+        },
+        {
+          title: '学历',
+          name: 'belief',
+          value: '大专',
+          mode: 'selector',
+          type: 'picker',
+          pickerList: ['大专', '本科', '硕士', '博士', '其他'],
+          pickerIndex: 0
+        },
+        {
+          title: '学校',
+          name: 'school',
+          value: '',
+          type: 'input',
+          pickerIndex: 0
+        },
+        {
+          title: '地址',
+          name: 'belief',
+          value: '其他',
+          mode: 'selector',
+          type: 'picker',
+          pickerList: ['基督教', '佛教', '伊斯兰教', '其他'],
+          pickerIndex: 3
+        },
+        {
+          title: '想要做的工作类型',
+          name: 'job_type',
+          value: '其他',
+          mode: 'job_type',
+          type: 'picker',
+          pickerList: ['基督教', '佛教', '伊斯兰教', '其他'],
+          pickerIndex: 3
+        },
+        {
+          title: '倾向的活动类型',
+          name: 'belief',
+          value: '日结',
+          mode: 'selector',
+          type: 'picker',
+          pickerList: ['日结', '月结'],
+          pickerIndex: 0
+        }
+      ],
+      industry: '',
+      industry_sub: '',
+      multiIndex2: [0, 0],
+      objectMultiArray: [],
+      Business: []
     }
     watch = {
     }
 
     onLoad() {
       setTimeout(() => {
-        this.photo = 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=4259300811,497831842&fm=27&gp=0.jpg'
+        this.photo = this.user.wechat.avatar
         this.$apply()
       }, 1200)
+      this.objectMultiArray = []
+      this.geJobType()
+    }
+
+    geJobType() {
+      let that = this
+      this.$get({url: `${service.host}/job/categories`}, {
+        success: ({code, data}) => {
+          let result = data
+          that.Business = result
+          let IndustryArr = []
+          result.forEach(function (item, index, arr) {
+            IndustryArr.push(arr[index])
+          })
+          console.log(IndustryArr)
+          that.objectMultiArray.push(IndustryArr)
+          that.objectMultiArray.push(result[0].sub_categories)
+          that.$apply()
+          console.log(that.objectMultiArray)
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          this.loading = false
+        }
+      })
+    }
+
+    hideModal(){
+      var animation = wx.createAnimation({
+        duration: 200,
+        timingFunction: 'linear',
+        delay: 0
+      })
+      this.animation = animation
+      animation.translateY(-300).step()
+      this.animationData = animation.export()
+      setTimeout(function () {
+        animation.translateY(0).step()
+        this.animationData = animation.export()
+        this.showModalStatus = false
+        this.$apply()
+      }.bind(this), 200)
     }
     methods = {
+      pickerChange(index, e) { // picker fn
+        switch (this.information[index].name) {
+          case 'name':case 'birthday':
+            this.information[index].value = e.detail.value
+            break
+          case 'sex':
+            this.information[index].pickerIndex = e.detail.value
+            this.information[index].value = e.detail.value === '0' ? '1' : '2'
+            break
+          case 'belief':
+            this.information[index].value = this.information[index].pickerList[e.detail.value]
+            break
+        }
+        console.log(this.information)
+        this.$apply()
+      },
+      bindMultiPickerChange2(e) {
+        console.log(e)
+        console.log('picker发送选择改变，携带值为', e.detail.value)
+        this.multiIndex2 = e.detail.value
+        this.$apply()
+      },
+      bindMultiPickerColumnChange2(e) {
+        let that = this
+        that.multiIndex2[e.detail.column] = e.detail.value
+        switch (e.detail.column) {
+          case 0:
+            for (let i = 0; i < that.Business.length; i++) {
+              if (that.multiIndex2[0] === i) {
+                that.objectMultiArray[1] = that.Business[i].sub_categories
+              }
+            }
+            that.multiIndex2[1] = 0
+            break
+        }
+        that.$apply()
+      },
       ChangeState() {
         if (this.showChangeState) {
           this.showChangeState = false
@@ -120,20 +288,7 @@
       // 隐藏对话框
       hideModal() {
         // 隐藏遮罩层
-        var animation = wx.createAnimation({
-          duration: 200,
-          timingFunction: 'linear',
-          delay: 0
-        })
-        this.animation = animation
-        animation.translateY(-300).step()
-        this.animationData = animation.export()
-        setTimeout(function () {
-          animation.translateY(0).step()
-          this.animationData = animation.export()
-          this.showModalStatus = false
-          this.$apply()
-        }.bind(this), 200)
+        this.hideModal()
       },
       gotofriends(item) {
         let url = ''
@@ -146,6 +301,10 @@
       },
       goto(url) {
         wx.navigateTo({url: url})
+      },
+      save() {
+        this.hideModal()
+        this.$Toast_success('提交成功')
       }
     }
   }
@@ -214,6 +373,15 @@
       height: 182rpx;
       border-radius: 50%;
       z-index: 99;
+      animation:rotate 1500ms 1;
+    }
+    @keyframes rotate {
+      0%{
+        transform:rotate(0deg);
+      }
+      100%{
+        transform:rotate(360deg);
+      }
     }
   }
   .list_item{
@@ -252,13 +420,27 @@
     border-bottom: 2px solid @f6;
     .item_title{
       margin-left: 10rpx;
-      /*text-align: justify;*/
-      /*text-align-last:justify;*/
-      /*width: 260rpx;*/
     }
     .item_value{
-      margin-left: 14rpx;
+      margin: 0 14rpx;
       width: 55%;
+    }
+    ._bc_item{
+      margin-left: 20rpx;
+      padding: 32rpx 20rpx 32rpx 0;
+      border-bottom: 1rpx solid @gray;
+      overflow: hidden;
+      ._bc_title{
+        color: @dark;
+        font-weight: 600;
+      }
+      ._bc_value,.picker{
+        color: @gray;
+      }
+    }
+    ._bc_picker,.picker{
+      min-width: 50%;
+      height: 100%;
     }
   }
   .bc_btn{

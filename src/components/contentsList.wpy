@@ -6,11 +6,14 @@
                mode="widthFix"></image>
       </view>
       <view class="item_info flo_l">
-        <view class="font_30 bold title ellipsis_1">国美电器</view>
+        <view class="font_30 bold title ellipsis_1">国美电器
+          <image src="http://images.ufutx.com/201905/28/e4c792af693e669c1a5ee1aae22797aa.png" mode="widthFix"
+                 wx:if="{{index < 3}}" class="topIcon"></image>
+        </view>
         <view class="item_subhead font_28 ellipsis_1">福田就近原则,实力碾压</view>
         <view class="item_time font_26 ellipsis_1">2019--07-12</view>
         <view class="item_price font_26 bold">月预期6000~8000元+促销费</view>
-        <view class="item_state font_26">招聘中</view>
+        <view class="item_state font_26">活动中</view>
       </view>
     </view>
   </block>
@@ -64,6 +67,12 @@
       .title {
         width: 100%;
         margin-top: -4rpx;
+        .topIcon{
+          width: 80rpx;
+          vertical-align: middle;
+          margin-bottom: 6rpx;
+          height: auto;
+        }
       }
       .item_subhead,.item_time,.item_state{
         color: @gray;

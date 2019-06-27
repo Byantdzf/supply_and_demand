@@ -109,10 +109,8 @@ export default class httpMixin extends wepy.mixin {
         wx.removeStorageSync('message')
         // 控制台调试日志
         console.log('[SUCCESS]', statusCode, typeof data === 'object' ? data : data.toString().substring(0, 100))
-
         // 状态码正常 & 确认有数据
-        if (0 === +data.code && data.data) {
-          // 成功回调
+        if (0 === +data.code && data.data) {// 成功回调
           wx.removeStorageSync('formId')
           return setTimeout(() => {
             let successExist = this.isFunction(success)
@@ -160,7 +158,7 @@ export default class httpMixin extends wepy.mixin {
                     wx.setStorageSync('user_id', data.user.id)
                   }
                   var route = wx.getStorageSync('jump');
-                  if (route == '/pages/users/register') {
+                  if (route == '/pages/register') {
                     return
                   }
                   if (route.includes('/pages/tabBar/home')) {
@@ -168,8 +166,7 @@ export default class httpMixin extends wepy.mixin {
                     this.upDate()
                   }
                   if (!data.token) {
-                    // wx.reLaunch({url: '/pages/users/register'})
-                    wx.navigateTo({url: '/pages/users/register?from_openid=' + wx.getStorageSync('from_openid')})
+                    wx.navigateTo({url: '/pages/register?from_openid=' + wx.getStorageSync('from_openid')})
                   } else {
                     if (route.includes('tabBar')) {
                       route = route.split('?')[0]

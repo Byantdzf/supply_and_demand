@@ -1,72 +1,21 @@
 <template>
-  <!--<view class="main-register" >-->
-    <!--<view class="main-address">-->
-      <!--<view style="margin-top: 48rpx;">-->
-        <!--<view class="text-center flo_l userinfo-avatar" style="margin-top: 48rpx">-->
-            <!--<block wx:if="{{showAvatar}}">-->
-              <!--<image  mode="aspectFill" src="{{avatar}}" class="avater_user"></image>-->
-            <!--</block>-->
-            <!--<block wx:else>-->
-              <!--<open-data type="userAvatarUrl" class="avater_user"></open-data>-->
-            <!--</block>-->
-        <!--</view>-->
-        <!--<view class="flo_r">-->
-          <!--<view>-->
-            <!--<view class=" h4">-->
-              <!--<view class="h3 color-666">姓名：</view>-->
-              <!--<input @input="typing('name')" class="weui-input border_b font_28" value="{{name}}" placeholder="你的真实姓名" style="border-radius:.25em;"/>-->
-            <!--</view>-->
-          <!--</view>-->
-          <!--<view>-->
-            <!--<view class="h4" style="margin-top: 12rpx">-->
-              <!--<view class="h3 color-666">手机号：</view>-->
-              <!--<block wx:if="{{is_disiablad}}">-->
-                <!--<button class="btn" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">-->
-                  <!--<input @input="typing('mobile')" type="number" class="weui-input border_b font_28" value="{{mobile}}" disabled style="border-radius:.25em;"  placeholder="请输入手机号"/>-->
-                <!--</button>-->
-              <!--</block>-->
-              <!--<block wx:else>-->
-                <!--<input @input="typing('mobile')" type="number" class="weui-input border_b font_28" value="{{mobile}}" disabled style="border-radius:.25em;"  placeholder="请输入手机号"/>-->
-              <!--</block>-->
-            <!--</view>-->
-          <!--</view>-->
-          <!--<view class="">-->
-          <!--<view class="weui-label">-->
-          <!--<view class="btn_red_v1" style="margin-top: 26rpx;width: 240rpx;">-->
-          <!--<button class="font_28 btn white text-center" style="width: 240rpx;height: 60rpx;line-height: 60rpx;" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">从微信获取手机号</button>-->
-          <!--</view>-->
-          <!--</view>-->
-          <!--</view>-->
-        <!--</view>-->
-      <!--</view>-->
-      <!--<view class="clearfloat"></view>-->
-      <!--<view style="margin-top: 100rpx;width: 100%">-->
-        <!--<view class="text-center flo_l">-->
-          <!--<view  class="btn_red_v font_28" style="width: 260rpx;" >-->
-            <!--<form bindsubmit="formSubmit" report-submit>-->
-              <!--<button formType="submit" class="btn text-center font_28 white" style="width: 240rpx;height: 60rpx;line-height: 60rpx;"  open-type="getUserInfo" @getuserinfo="getuserinfo('marriage')" >我是介绍人</button>-->
-            <!--</form>-->
-          <!--</view>-->
-        <!--</view>-->
-        <!--<view  class="text-center flo_r">-->
-          <!--<view  class="btn_red_v font_28" style="width: 260rpx;" >-->
-            <!--<form bindsubmit="formSubmit" report-submit>-->
-              <!--<button class="btn text-center font_28 white" style="width: 240rpx;height: 60rpx;line-height: 60rpx;"  formType="submit"  open-type="getUserInfo" @getuserinfo="getuserinfo('single')" >我是单身</button>-->
-            <!--</form>-->
-          <!--</view>-->
-        <!--</view>-->
-      <!--</view>-->
-    <!--</view>-->
-
-  <!--</view>-->
   <view class="bc_box">
     <view>
-      <image mode="widthFix" src="http://images.ufutx.com/201906/20/59b3e1bad1873d0e7fac976fe91c4038.jpeg"
+      <image mode="aspectFit" src="http://images.ufutx.com/201906/20/59b3e1bad1873d0e7fac976fe91c4038.jpeg"
              class="logo"></image>
     </view>
-    <button class="btn bc_code text-center white font_32" open-type="getPhoneNumber" bindgetphonenumber="getPhoneNumber">微信授权登录
-    </button>
-    <view class="font_28 color-666">找兼职就上"XX兼职网"</view>
+    <view class="dost"></view>
+    <view class="font_30 bc_text color-666">申请获取以下权限</view>
+    <view class="font_28 bc_text text">获取您的手机号授权</view>
+    <block wx:if="{{mobile == ''}}">
+      <button hover-class="btn_active" class="btn bc_code text-center white font_32" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录
+      </button>
+    </block>
+    <block wx:else>
+      <view class="btn bc_code text-center white font_32" @tap="mobileRegister">
+        手机号授权
+      </view>
+    </block>
   </view>
 </template>
 
@@ -77,38 +26,22 @@
   import base from '../mixins/base'
   import user from '../mixins/user'
   import ShareMessage from '../mixins/ShareMessage'
+  import {wx_login} from '../utils/fn'
 
   export default class Register extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
-      navigationBarTitleText: '兼职',
+      navigationBarTitleText: '猴赛雷',
       enablePullDownRefresh: false
     }
     data = {
       // 手机号/验证码
       name: '',
-      mobile: '',
-      code: '',
-      wechat_code: '',
-      loading: false,
-      timer: null,
-      time: 0,
-      encryptedData: '',
-      iv: '',
-      avatarUrl: '',
-      marriage: '',
-      avatar: '',
-      from_avatar: '',
-      userInfo: {},
-      showAvatar: true,
-      is_disiablad: true,
-      nickName: ''
+      mobile: ''
     }
 
     onLoad(e) {
-      // if (e.from_openid) {
-      //   wx.setStorageSync('from_openid', e.from_openid)
-      // }
+      this.login()
     }
 
     onShow() {
@@ -120,292 +53,101 @@
       this.initPageData()
     }
     onReady() {
-      this.getCenterLocation()
+      // this.getCenterLocation()
     }
-    getCenterLocation() {
-      let that = this
-      wx.getLocation({
-        type: 'gcj02',
-        success: function (res) {
-          console.log(res)
-          // that.myLong = res.longitude
-          // that.myLat = res.latitude
-          // if (!wx.getStorageSync('myLong')) {
-            wx.setStorageSync('myLong', res.longitude)
-            wx.setStorageSync('myLat', res.latitude)
-          //   setTimeout(() => {
-          //     return that.updataMap()
-          //   }, 500)
-          // }
-          // wx.setStorageSync('myLong', res.longitude)
-          // wx.setStorageSync('myLat', res.latitude)
-          // that.$apply()
-        },
-        fail: function () {
-          // that.showMap = false
-          // that.hide = false
-          // that.$apply()
-        }
-      })
-    }
+    // getCenterLocation() {
+    //   wx.getLocation({
+    //     type: 'gcj02',
+    //     success: function (res) {
+    //       console.log(res)
+    //         wx.setStorageSync('myLong', res.longitude)
+    //         wx.setStorageSync('myLat', res.latitude)
+    //     },
+    //     fail: () => {}
+    //   })
+    // }
 
     // 初始化页面数据
-    initPageData() {
+    initPageData() {}
 
-      // wepy.login({
-      //   success: (res) => {
-      //     console.log('wepy.login.success:', res)
-      //     let data = {code: res.code, from_openid: wx.getStorageSync('from_openid')}
-      //     this.$post({url: service.login, data}, {
-      //       success: ({code, data}) => {
-      //         this.from_avatar = data.from_avatar
-      //         this.avatar = data.user ? data.user.avatar : ''
-      //         this.marriage = data.marriage
-      //         if (!this.avatar) {
-      //           this.showAvatar = false
-      //           this.$apply()
-      //         }
-      //         this.$apply()
-      //         if (data.token) {
-      //           wx.setStorageSync('token', data.token)
-      //           wx.setStorageSync('openid', data.openid)
-      //           wx.switchTab({
-      //             url: '/pages/tabBar/home'
-      //           })
-      //         }
-      //       }
-      //     })
-      //   },
-      //   fail: (res) => {
-      //     console.log('wepy.login.fail:', res)
-      //   }
-      // })
-//      }
-//      this.$doLogin()
-//      this.$setCode()
-//      debugger
-//      wepy.getUserInfo({
-//        success: (res) => {
-//          wx.setStorageSync('user', res.userInfo)
-//          code: wx.getStorageSync('code')
-//          this.avatarUrl = res.userInfo.avatarUrl
-//          this.nickName = res.userInfo.nickName
-//          this.encryptedData = res.encryptedData
-//          this.iv = res.iv
-//          debugger
-//          console.log(this.iv)
-//          this.$apply()
-//          let data = {
-//            code: wx.getStorageSync('code'),
-//            iv: this.iv,
-//            encryptedData: this.encryptedData
-//          }
-//          debugger
-//          this.$post({url: service.infor, data}, {
-//            success: ({code, data}) => {
-//              this.$setCode()
-//            },
-//            fail: ({code, data}) => {},
-//            complete: () => { this.loading = false }
-//          })
-//        },
-//        fail: (res) => { }
-//      })
-    }
-
-    getPhoneNumber(e) {
+    getPhoneNumber(e) { // 获取手机号
       let vm = this
-      wepy.login({
-        success: (res) => {
-          if (e.detail.iv) {
-            let data = {
-              code: res.code,
-              iv: e.detail.iv,
-              encryptedData: e.detail.encryptedData
-            }
-            vm.$gotoTab('/pages/tabBar/home')
-
-            // this.$post({url: service.infor, data}, {
-            //   success: ({code, data}) => {
-            //     this.mobile = data.phoneNumber
-            //     this.$apply()
-            //     this.$setCode()
-            //   },
-            //   fail: ({code, data}) => {
-            //   },
-            //   complete: () => {
-            //     this.loading = false
-            //   }
-            // })
+      wx_login().then((code) => {
+        if (e.detail.iv) {
+          let data = {
+            code: code,
+            iv: e.detail.iv,
+            encryptedData: e.detail.encryptedData
           }
-        },
-        fail: (res) => {
-          console.log('wepy.login.fail:', res)
-        }
-      })
-    }
-
-    doRegister(type) {
-      // 防抖
-      let that = this
-      if (this.loading) return
-//      if (!this.getString(this.marriage)) {
-//        return wx.showModal({
-//          title: '抱歉！',
-//          content: '需要推荐人才能注册！',
-//          showCancel: false
-//        })
-//      }
-      console.log(this.name)
-      if (!this.getString(this.name)) {
-        return wx.showModal({
-          title: '提示',
-          content: '请返回填写姓名',
-          confirmText: '返回',
-          mask: true,
-          showCancel: false,
-          success: function(res) {
-            if (res.confirm) {
-              console.log('用户点击确定')
-            }
-          }
-        })
-      }
-      if (!this.mobile) {
-        return wx.showModal({
-          title: '提示',
-          content: '请输入正确的手机号码',
-          confirmText: '返回',
-          mask: true,
-          showCancel: false,
-          success: function(res) {
-            if (res.confirm) {
-              console.log('用户点击确定')
-            }
-          }
-        })
-      }
-      wepy.login({
-        success: (res) => {
-          const data = {
-            mobile: that.mobile,
-            code: res.code,
-            name: that.getString(that.name),
-            encryptedData: that.encryptedData,
-            iv: that.iv,
-            from_openid: wx.getStorageSync('from_openid'),
-            type: type,
-            userInfo: that.userInfo
-          }
-          // 绑定手机号
-          that.loading = true
-          that.$post({url: service.register, data}, {
+          vm.$showLoading('注册账号中...')
+          vm.$post({url: `${service.mobile}`, data}, {
             success: ({code, data}) => {
-              wx.setStorageSync('token', data.token)
-              wx.showLoading({
-                title: '注册中...',
-                mask: true,
-                showCancel: false,
-                success: (res) => {
-                }
-              })
-              setTimeout(function () {
-                wx.hideLoading()
-                wx.showToast({
-                  title: '注册成功!',
-                  icon: 'success',
-                  duration: 1200,
-                  success: (res) => {
-                    wx.setStorageSync('type', data.user.type)
-                    let url = ''
-                    if (data.user.type == 'single') {
-                      url = '/pages/users/unmarri'
-                    } else {
-                      url = '/pages/users/intro'
-                    }
-                    wx.redirectTo({url: url})
-                  }
-                })
-              }, 1000)
-            },
-            fail: ({code, data}) => {
-            },
-            complete: () => {
-              this.loading = false
+              vm.register(data.phoneNumber)
+              vm.mobile = data.phoneNumber
+              vm.$apply()
+              wx.setStorageSync('mobile', data.phoneNumber)
             }
           })
-        },
-        fail: (res) => {
-          console.log('wepy.login.fail:', res)
         }
+      }).catch((error) => {
+        console.log(error)
       })
     }
-    methods = {
-      getuserinfo(type, e) {
-        console.log(e.detail)
-        console.log(type)
-        if (e.detail.userInfo) {
-          this.encryptedData = e.detail.encryptedData
-          this.iv = e.detail.iv
-          this.userInfo = e.detail.userInfo
-          this.$apply()
-          this.doRegister(type)
-          // 用户按了允许授权按钮
-        } else {
-          // 用户按了拒绝按钮
-        }
-      },
-      goto(url) {
-        wx.navigateTo({url: url})
-      },
-      typing(type, e) {
-        if (this.isDefined(this[type])) {
-          this[type] = e.detail.value
-        }
-        if (type == 'name' && e.detail.value == '测试账号') {
-          this.is_disiablad = false
-          this.mobile = '13800138000'
-          this.$apply()
-        } else {
-          this.is_disiablad = true
-          this.mobile = ''
-          this.$apply()
-        }
-      },
-      verify() {
-        // 防抖
-        if (this.loading || this.time > 0) return
-        if (!this.isPhone(this.mobile)) {
-          return this.$alert('温馨提示', '请输入正确的手机号码')
-        }
-        // 开防抖
-        this.loading = true
-        // 开倒计时
-        this.timing(60)
 
-        // 根据业务接口处理:发送验证码
-        this.$post({url: service.send_register, data: {mobile: this.mobile}}, {
-          success: (res) => {
-          },
-          fail: (res) => {
-            clearTimeout(this.timer)
-            this.timing(0)
-          },
-          complete: () => {
-            this.loading = false
+    login() {
+      let vm = this,
+        data = {}
+      wx_login().then((code) => {
+        data = {
+          code: code
+        }
+        vm.$showLoading('加载中...')
+        vm.$post({url: `${service.login}`, data}, {
+          success: ({code, data}) => {
+            wx.setStorageSync('token', data.token)
+            vm.$Toast_success('登录成功')
+            setTimeout(() => {
+              vm.$gotoTab('/pages/tabBar/home')
+            }, 500)
           }
         })
-      }
+      }).catch((error) => {
+        console.log(error)
+      })
     }
 
-    timing(time) {
-      this.time = this.getNumber(time)
-      this.$apply()
-      this.timer = setTimeout(() => {
-        if (time > 0) {
-          this.timing(time - 1)
+    register() {
+      let vm = this,
+        data = {}
+      wx_login().then((code) => {
+        data = {
+          code: code,
+          mobile: vm.mobile
         }
-      }, 1000)
+        vm.$post({url: `${service.register}`, data}, {
+          success: ({code, data}) => {
+            wx.setStorageSync('token', data.token)
+            vm.$Toast_success('登录成功')
+            setTimeout(() => {
+              vm.$gotoTab('/pages/tabBar/home')
+            }, 500)
+          }
+        })
+      }).catch((error) => {
+        console.log(error)
+      })
+    }
+
+    methods = {
+      mobileRegister() {
+        this.register()
+      },
+      goto(url) {
+        this.$goto(url)
+      },
+      gotoTab(url) {
+        this.$gotoTab(url)
+      }
     }
   }
 </script>
@@ -418,17 +160,32 @@
     .bc_box{
       text-align: center;
       .logo{
-        width: 42%;
-        height: auto;
-        margin-top: 8%;
+        width: 280rpx;
+        height: 280rpx;
+        margin: 12% 2%;
+        border: 2px solid #f2f2f2;
+      }
+      .dost{
+        width: 84%;
+        margin: auto;
+        border-bottom: 2px solid #f2f2f2;
       }
       .bc_code{
-        margin: 12rpx auto;
+        margin: 22rpx auto;
         display: inline-block;
-        width: 68%;
+        width: 84%;
         background: @theme;
-        padding: 10rpx 0;
-        border-radius: 42rpx;
+        padding: 14rpx 0;
+        border-radius: 12rpx;
+      }
+      .bc_text{
+        width: 84%;
+        text-align: left;
+        margin: 22rpx auto;
+      }
+      .text{
+        color: #bfbfbf;
+        margin-top: -18rpx;
       }
     }
   }

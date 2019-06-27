@@ -43,6 +43,18 @@ const callPhone = (phoneNumber) => {
     })
   })
 }
+const wx_login = () => { // 微信登录
+  return new Promise((resolve, reject) => {
+    wx.login({
+      success: (res) => {
+        resolve(res.code) // 返回code
+      },
+      fail: (res) => {
+        reject('微信登录失败')
+      }
+    })
+  })
+}
 
 
-export {getElement_WH, wxPay, callPhone}
+export {getElement_WH, wxPay, callPhone, wx_login}

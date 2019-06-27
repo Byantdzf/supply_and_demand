@@ -68,7 +68,7 @@
     }
     gotoApp(item) {
       console.log(encodeURIComponent(item))
-      wx.navigateTo({url: '/pages/books/bookDetail?url=' + encodeURIComponent(item)})
+      wx.navigateTo({url: '/pages/users/bookDetail?url=' + encodeURIComponent(item)})
     }
 
     methods = {

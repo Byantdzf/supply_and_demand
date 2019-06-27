@@ -227,4 +227,10 @@ export default class baseMixin extends wepy.mixin {
       title: title
     })
   }
+  // 拨打电话
+  $makePhoneCall(iphone) {
+    wx.makePhoneCall({
+      phoneNumber: iphone //仅为示例，并非真实的电话号码
+    })
+  }
 }

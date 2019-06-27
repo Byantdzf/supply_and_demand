@@ -1,8 +1,9 @@
 <template>
   <view class="weui-tab__content bc_BoxTab_123" >
     <view class="weui-search-bar"  style="background-color: {{BColor}} !important;">
-      <view class="search_address font_28 ellipsis_1">深圳市
-        <image src="http://images.ufutx.com/201906/23/573d28ce2a86504b1192d411c01d029d.png" mode="widthFix" class="right_icon"></image>
+      <view class="search_address font_28 ellipsis_1">
+        深圳市
+        <!--<image src="http://images.ufutx.com/201906/23/573d28ce2a86504b1192d411c01d029d.png" mode="widthFix" class="right_icon"></image>-->
       </view>
       <view class="weui-search-bar__form">
         <view class="weui-search-bar__box">
@@ -22,15 +23,15 @@
       <view class="weui-search-bar__cancel-btn font_28" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
     </view>
     <view class="bc_searchIist font_26 text-center ff" wx:if="{{noSearch == 'false'}}">
-      <view class="bc_searchItem flo_l">
+      <view class="bc_searchItem flo_l" @tap="showModal">
         类型
         <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
       </view>
-      <view class="bc_searchItem flo_l">
+      <view class="bc_searchItem flo_l" @tap="showModal">
         区域
         <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
       </view>
-      <view class="bc_searchItem flo_l">
+      <view class="bc_searchItem flo_l" @tap="showModal">
         排序
         <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
       </view>
@@ -39,16 +40,25 @@
     <slot></slot>
   </view>
   <view style="height: {{bc_height}}"></view>
+  <modalUp>
+    <view slot="wrapper" class="color-666 font_28 text-center " style="margin-top: {{bc_height}};padding: 12%;">
+      <!--<image src="http://images.ufutx.com/201906/25/f6990555f2016f45f84836c931cdc69a.png" mode="widthFix" class="close" @tap="hideModal"></image>-->
+      <image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix" style="width: 50%;" class="close" @tap="hideModal"></image>
+      <view class="title color-666">暂无数据</view>
+    </view>
+  </modalUp>
 </template>
 
 <script>
   import wepy from 'wepy'
   import http from '../mixins/http'
   import base from '../mixins/base'
+  import modalUp from '../components/modal-up'
   import {getElement_WH} from '../utils/fn'
 
   export default class tabSearch extends wepy.component {
     mixins = [base, http]
+    components = {modalUp}
     props = {
       list: {
         type: Object,
@@ -78,7 +88,8 @@
     data = {
       inputShowed: false,
       inputVal: '',
-      bc_height: '81px'
+      bc_height: '81px',
+      showModal: false
     }
     onLoad() {
       if (this.noSearch == 'true') {
@@ -98,6 +109,15 @@
     }
 
     methods = {
+      showModal() {
+        this.showModal = !this.showModal
+        this.$apply()
+        if (this.showModal) {
+          this.$invoke('modalUp', 'showModal')
+        } else {
+          this.$invoke('modalUp', 'hideModal')
+        }
+      },
       showInput() {
         if (this.disabled) return
         this.inputShowed = true
@@ -128,7 +148,7 @@
 
   .weui-search-bar {
     border: none;
-    padding-left: 22%;
+    padding-left: 20%;
     position: relative;
     border-bottom: 1rpx solid #f1f1f1;
   }
@@ -136,7 +156,7 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 16%;
+    width: 14%;
     padding: 22rpx 22rpx;
     .right_icon{
       width: 36rpx;
@@ -168,7 +188,7 @@
     width: 100%;
     position: fixed;
     top: 0;
-    z-index: 9999;
+    z-index: 10010;
   }
   .bc_searchIist{
     width: 100%;

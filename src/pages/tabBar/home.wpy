@@ -9,17 +9,17 @@
         <block wx:if="{{announcements.length>0}}">
           <swiperV :list.sync="announcements" height="375"></swiperV>
         </block>
-        <notification></notification>
+        <!--<notification></notification>-->
         <view class="bc_swiper_box">
-          <view class="font_30 bold bc_title">文章</view>
+          <view class="font_30 bold bc_title">推荐文章</view>
           <view class="bc_swiper">
-            <swiper @change="getcurrent" style="margin-top: -32rpx">
-              <swiper-item wx:for="{{3}}" wx:key="index">
+            <swiper @change="getcurrent" autoplay="{{autoplay}}">
+              <swiper-item wx:for="{{3}}" wx:key="index" style="width: 96%;">
                 <view class="_bc-list_swiper flo_l" wx:for="{{3}}" wx:key="index">
                   <image src="http://img0.imgtn.bdimg.com/it/u=3104981247,4075892569&fm=11&gp=0.jpg"
                          mode="widthFix" class="image"></image>
-                  <view class="font_28 ellipsis_1">小米手环4NFC版本发布会</view>
-                  <view class="font_24 ellipsis_1">地址：深圳市南山区...</view>
+                  <view class="font_26 ellipsis_1 text-left color-666" style="margin-left: 6rpx;">小米手环4NFC版本发布会</view>
+                  <view class="font_24 ellipsis_1 text-left color-666" style="margin-left: 6rpx;">地址：深圳市南山区...</view>
                 </view>
                 <!--<view class="_bc-list_swiper">-->
                   <!--<view class="item-avatar_swiper {{index ===0 || index === 2?'flo_l':'flo_r'}}" wx:for="{{otherUser}}" wx:key="{{index}}" wx:if="{{index<4}}" @tap="gotofriends({{item}},{{item.user_id}})">-->
@@ -41,16 +41,16 @@
           <!--</view>-->
         </view>
         <view class="bc_center">
-          <view class="mon flo_l font_30 text-center" @tap="gotoTab('/pages/tabBar/daily')">
+          <view class="mon flo_r font_30 text-center" @tap="gotoTab('/pages/tabBar/daily')">
             <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
-            月结兼职
+            日结
           </view>
-          <view class="day flo_r font_30 text-center" @tap="gotoTab('/pages/tabBar/monthly')">
+          <view class="day flo_l font_30 text-center" @tap="gotoTab('/pages/tabBar/monthly')">
             <image src="http://images.ufutx.com/201906/20/b31621d7348e6f5ed56d33f4434a38d1.png" class="image" mode="widthFix"></image>
-            日结兼职
+            月结
           </view>
           <view class="clearfloat"></view>
-          <view class="font_30 bold _bc_title">为你推荐</view>
+          <view class="font_30 bold _bc_title">推荐活动</view>
         </view>
         <navBarTop :tabs.sync="tabs" @tabClick="tabClick"></navBarTop>
         <view class="bc_center">
@@ -181,7 +181,7 @@
   export default class home extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
-      navigationBarTitleText: '兼职网',
+      navigationBarTitleText: '活动网',
       onReachBottomDistance: 10
       // navigationStyle: 'custom'
     }
@@ -194,8 +194,8 @@
       }
     }
     data = {
-      tabs: ['月结兼职', '日结兼职'],
-      // tabs: ['已完成', '已取消', '待开始', '进行中'],
+      tabs: ['月结活动', '日结活动'],
+      autoplay: true,
       mateActive: 'all',
       serverActive: 'meet',
       type: 'mate',
@@ -211,7 +211,23 @@
       person: {},
       recommends: [],
       animationData: {},
-      announcements: [], // 通知
+      announcements: [
+        {
+          pic: 'http://img5.imgtn.bdimg.com/it/u=1593210585,628574966&fm=26&gp=0.jpg',
+          title: 'test',
+          path: 'https://www.baidu.com/'
+        },
+        {
+          pic: 'http://img1.imgtn.bdimg.com/it/u=1472900178,248414317&fm=26&gp=0.jpg',
+          title: 'test',
+          path: 'https://www.baidu.com/'
+        },
+        {
+          pic: 'http://img4.imgtn.bdimg.com/it/u=2141437044,2010426400&fm=26&gp=0.jpg',
+          title: 'test',
+          path: 'https://www.baidu.com/'
+        }
+      ], // 通知
       tab: [
         {
           icon: 'http://images.ufutx.com/201905/29/fd66e63bb476a29958044c1dfc46c506.png',
@@ -293,12 +309,12 @@
     }
 
     async onLoad(e) {
-      this.page = 1
-      this.getCenterLocation()
-      if (wx.getStorageSync('token')) {
-        // this.getNewCount()
-      }
-      this.getNewCount()
+      // this.page = 1
+      // this.getCenterLocation()
+      // if (wx.getStorageSync('token')) {
+      //   // this.getNewCount()
+      // }
+      // this.getNewCount()
     }
 
     getNewCount() {
@@ -320,35 +336,39 @@
     }
 
     onShow() {
-      let that = this
-      that.upDate()
-      that.getLikers()
-      if (that.watchLocation) {
-        wx.getSetting({
-          success(res) {
-            if (!res.authSetting['scope.userLocation']) {
-              if (!wx.getStorageSync('myLong')) {
-                that.hide = false
-                that.$apply()
-              }
-            }
-          }
-        })
-      }
+      setTimeout(() => {
+        this.init = true
+        this.$apply()
+      }, 500)
+      // let that = this
+      // that.upDate()
+      // that.getLikers()
+      // if (that.watchLocation) {
+      //   wx.getSetting({
+      //     success(res) {
+      //       if (!res.authSetting['scope.userLocation']) {
+      //         if (!wx.getStorageSync('myLong')) {
+      //           that.hide = false
+      //           that.$apply()
+      //         }
+      //       }
+      //     }
+      //   })
+      // }
       this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
     }
 
     onPullDownRefresh() {
-      this.page = 1
-      this.upDate()
-      this.getLikers()
+      // this.page = 1
+      // this.upDate()
+      // this.getLikers()
     }
 
     onReachBottom() {
-      if (JSON.stringify(this.address) == '{}') {
-        return
-      }
-      this.getLikers()
+      // if (JSON.stringify(this.address) == '{}') {
+      //   return
+      // }
+      // this.getLikers()
     }
 
     getLikers() {
@@ -697,7 +717,7 @@
           width: 48rpx;
           vertical-align: middle;
           margin-bottom: 6rpx;
-          margin-right: 6rpx;
+          margin-right: 12rpx;
         }
       }
       .day{
@@ -756,12 +776,16 @@
     }
     .bc_swiper_box{
       /*padding: 28rpx 0rpx 0rpx;*/
+      margin-top: 32rpx;
       .bc_swiper{
+        width: 97%;
         height: 300rpx;
-        margin-top: 32rpx;
+        margin: auto;
+        margin-top: 22rpx;
       }
       swiper{
         /*height: 780rpx;*/
+        text-align: center;
       }
       .bc_dot{
         width: 40rpx;

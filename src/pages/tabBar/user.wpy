@@ -2,12 +2,28 @@
   <!--<Loading :init.sync="init"></Loading>-->
   <view class="page-user ff">
     <view class="user_box text-center">
+      <!--<view class="sea">-->
+        <!--&lt;!&ndash;<text class="title">the sea</text>&ndash;&gt;-->
+        <!--<view class="wave move1"></view>-->
+        <!--<span class="wave move2"></span>-->
+        <!--<span class="wave move3"></span>-->
+      <!--</view>-->
       <image src="http://images.ufutx.com/201906/19/c1a56269e21ec58e96fbcb3a02bf9289.png" mode="widthFix" class="bc_image"></image>
       <view class="user_photo ff">
-        <image src="{{photo}}" mode="aspectFill"></image>
+        <block wx:if={{photo}}>
+          <image src="{{photo}}"  mode="aspectFill"></image>
+        </block>
+        <block wx:else>
+          <open-data type="userAvatarUrl"></open-data>
+        </block>
       </view>
-      <view class="user_name  font_30 color-666" wx:if="{{!showName}}" @tap="getUserName">微信信息授权</view>
-      <view class="user_name noBorder bold font_30 color-666" wx:else>小杨莹</view>
+      <block wx:if="{{user.name}}">
+        <view class="user_name noBorder bold font_30 color-666">{{user.name}}</view>
+      </block>
+      <block wx:else>
+        <button class="btn user_name font_30 color-666" open-type="getUserInfo" @getuserinfo="getUserInfo">微信信息授权
+        </button>
+      </block>
       <view class="clearfloat"></view>
     </view>
     <view class="list_item" wx:for="{{list}}" wx:key="index">
@@ -27,7 +43,7 @@
       <text class="font_32 color-666 item_title">{{item.title}}</text>
       <image src="http://images.ufutx.com/201906/20/02b0c5873eb2f556ab43d655965644ed.png" mode="widthFix" class="right_icon"></image>
     </view>
-    <userInfo></userInfo>
+    <userInfo :user.sync="user"></userInfo>
   </view>
 </template>
 <script>
@@ -67,13 +83,13 @@
         },
         {
           icon: 'http://images.ufutx.com/201906/20/0f5153e8421d2d4f114116c61863964d.png',
-          title: '已报名',
+          title: '我的报名',
           type: 'navigateTo',
           path: '/pages/users/apply'
         },
         {
           icon: 'http://images.ufutx.com/201906/20/cf5c7ccaadbdd84b3fd887b7b5cfb359.png',
-          title: '已收藏',
+          title: '我的收藏',
           type: 'navigateTo',
           path: '/pages/users/collect'
         }
@@ -92,7 +108,7 @@
     computed = {}
 
     onShow() {
-      // this.initPageData()
+      this.initPageData()
       this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
     }
     onShareAppMessage(res) {
@@ -100,11 +116,10 @@
     }
 
     onLoad(e) {
-      setTimeout(() => {
-        this.$invoke('userInfo', 'showModal')
-        this.photo = 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=4259300811,497831842&fm=27&gp=0.jpg'
-        this.$apply()
-      }, 1200)
+      // setTimeout(() => {
+      //   this.photo = 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=4259300811,497831842&fm=27&gp=0.jpg'
+      //   this.$apply()
+      // }, 1200)
     }
 
     onPullDownRefresh() {
@@ -113,14 +128,29 @@
 
     // 初始化页面数据
     initPageData() {
-      this.$get({url: service.user}, {
+      this.$get({url: `${service.host}/user`}, {
         success: ({code, data}) => {
           this.init = true
           this.user = data
+          this.photo = data.wechat.avatar
           this.$apply()
           wx.setStorageSync('type', data.type)
         }
       })
+    }
+
+    getUserInfo(e) {
+      this.$put({
+        url: `${service.host}/wechat`,
+        data: {
+          user_info: e.detail.userInfo
+        }
+      }, {
+        success: ({code, data}) => {
+          console.log(data)
+        }
+      })
+
     }
 
     methods = {
@@ -174,6 +204,71 @@
   page {
     background: #F6F6F6;
     .page-user{
+
+      .sea {
+        width: 100%;
+        height: 300px;
+        background-color: linear-gradient(to top, @themeBC 0%, @theme 100%);
+        background-image: linear-gradient(
+          darkblue,
+          rgba(255, 255, 255, 0) 80%,
+          rgba(255, 255, 255, 0.5));
+        /*border-radius: 5px;*/
+        /*box-shadow: 0 2px 30px rgba(0, 0, 0, 0.2);*/
+        position: relative;
+        overflow: hidden;
+        /*position: absolute;*/
+        /*left: 0;*/
+        /*top: 0;*/
+      }
+
+      .sea .title {
+        color: white;
+        font-size: 24px;
+        font-family: serif;
+        text-align: center;
+        line-height: 250px;
+        text-transform: uppercase;
+        letter-spacing: 0.4em;
+        position: absolute;
+        z-index: 1;
+        width: 100%;
+      }
+
+      .sea .wave {
+        position: absolute;
+        top: -250px;
+        left: -68px;
+        width: 500px;
+        height: 530px;
+        background: deepskyblue;
+        border-radius: 43%;
+        filter: opacity(0.4);
+        animation: drift linear infinite;
+        transform-origin: 50% 48%;
+      }
+
+      .sea .move1 {
+        animation-duration: 5s;
+      }
+
+      .sea .move2 {
+        animation-duration: 7s;
+      }
+
+      .sea .move3 {
+        animation-duration: 9s;
+        background-color: orangered;
+        filter: opacity(0.1);
+      }
+
+      @keyframes drift {
+        from {
+          transform: rotate(360deg);
+        }
+      }
+
+      /*--------------*/
       .user_box{
         position: relative;
         padding-top: 140rpx;
@@ -182,15 +277,19 @@
           position: absolute;
           left: 0;
           top: 0;
+          z-index: 1;
         }
       }
       .user_name{
         background: #F8F8F8;
         border: 1rpx solid #d2d2d2;
         padding: 0 16rpx;
-        border-radius: 4rpx;
+        border-radius: 6rpx;
         display: inline-block;
         margin: auto;
+        position: relative;
+        margin-top: 16rpx;
+        z-index: 99;
       }
       .noBorder{
         border: none;
@@ -203,6 +302,8 @@
         border-radius: 50%;
         margin: auto;
         position: relative;
+        z-index: 990;
+        overflow: hidden;
         image{
           width: 182rpx;
           height: 182rpx;

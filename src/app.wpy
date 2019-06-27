@@ -3,10 +3,10 @@
   import 'wepy-async-function'
   import {service} from './config.js'
   import UpdateManager from './mixins/UpdateManager'
-  var ga = require('./ga.js')
-  var GoogleAnalytics = ga.GoogleAnalytics
-  var HitBuilders = ga.HitBuilders
-  const socket = require('./utils/sockte')
+  // var ga = require('./ga.js')
+  // var GoogleAnalytics = ga.GoogleAnalytics
+  // var HitBuilders = ga.HitBuilders
+  // const socket = require('./utils/sockte')
 
   // 缓存上一个页面
   // console.log(this.getCurrentPages())
@@ -31,6 +31,7 @@
           'root': 'pages/users',
           'pages': [
             'collect',
+            'bookDetail',
             'apply',
             'setting',
             'about',
@@ -200,7 +201,7 @@
       //   }
       // }
       if (options.scene == 1044) {
-        this.openshareTicket(options)
+        // this.openshareTicket(options)
       }
     }
 
@@ -332,24 +333,24 @@
 
     // Google analytics
     getTracker(name, text) {
-      if (!this.globalData.tracker) {
-        // 初始化GoogleAnalytics Tracker
-        this.globalData.tracker = GoogleAnalytics.getInstance(this)
-          .setAppName('福恋')
-          .setAppVersion('v0.1')
-          .newTracker('UA-98664364-7')
-      }
-      var t = this.globalData.tracker
-      t.setScreenName(text)
-      t.send(new HitBuilders.ScreenViewBuilder().build())
-      t.send(new HitBuilders.ExceptionBuilder()
-        .setDescription(wx.getStorageSync('message'))
-        .setFatal(false).build())
-      t.set('&uid', '12345')
-      t.send(new HitBuilders.EventBuilder()
-        .setCategory('UX')
-        .setAction('User Sign In')
-        .build())
+    //   if (!this.globalData.tracker) {
+    //     // 初始化GoogleAnalytics Tracker
+    //     this.globalData.tracker = GoogleAnalytics.getInstance(this)
+    //       .setAppName('福恋')
+    //       .setAppVersion('v0.1')
+    //       .newTracker('UA-98664364-7')
+    //   }
+    //   var t = this.globalData.tracker
+    //   t.setScreenName(text)
+    //   t.send(new HitBuilders.ScreenViewBuilder().build())
+    //   t.send(new HitBuilders.ExceptionBuilder()
+    //     .setDescription(wx.getStorageSync('message'))
+    //     .setFatal(false).build())
+    //   t.set('&uid', '12345')
+    //   t.send(new HitBuilders.EventBuilder()
+    //     .setCategory('UX')
+    //     .setAction('User Sign In')
+    //     .build())
     }
 
     /* ========================= 更新缓存信息 ======================== */

@@ -129,10 +129,10 @@
         {
           title: '倾向的活动类型',
           name: 'belief',
-          value: '日结',
+          value: '每日',
           mode: 'selector',
           type: 'picker',
-          pickerList: ['日结', '月结'],
+          pickerList: ['每日', '每月'],
           pickerIndex: 0
         }
       ],

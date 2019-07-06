@@ -4,7 +4,7 @@
       <view class="bc_top"></view>
       <view class="font_32 bc_title bold">//////////   合作方式   //////////</view>
       <image src="http://images.ufutx.com/201906/25/cfbebe80d83faca341bcad7a2267d983.jpeg" mode="widthFix" class="qr" @tap="previewImage"></image>
-      <view class="font_28 bc_info color-666">月结活动、日结活动发布</view>
+      <view class="font_28 bc_info color-666">每月活动、每日活动发布</view>
       <view class="font_28 bc_info color-666">广告发布</view>
       <view style="height: 100rpx;"></view>
       <view class="bc_bottom text-center white font_30" @tap="copyText('XXXXXXX12345')">

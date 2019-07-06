@@ -11,8 +11,8 @@
                  wx:if="{{index < 3}}" class="topIcon"></image>
         </view>
         <view class="item_subhead font_28 ellipsis_1">福田就近原则,实力碾压</view>
-        <view class="item_time font_26 ellipsis_1">2019--07-12</view>
-        <view class="item_price font_26 bold">月预期6000~8000元+促销费</view>
+        <view class="item_time font_26 ellipsis_1">2019-07-12</view>
+        <view class="item_price font_26 bold text-right">6000元</view>
         <view class="item_state font_26">活动中</view>
       </view>
     </view>

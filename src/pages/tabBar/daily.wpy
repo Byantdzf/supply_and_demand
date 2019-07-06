@@ -14,7 +14,7 @@
 
   export default class daily extends wepy.page {
     config = {
-      navigationBarTitleText: '日结活动'
+      navigationBarTitleText: '每日活动'
     }
     components = {
       contentsList, tabSearch

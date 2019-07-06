@@ -69,12 +69,12 @@
           pagePath: 'pages/tabBar/monthly',
           selectedIconPath: './images/tabBarIcon/munA.png',
           iconPath: './images/tabBarIcon/mun.png',
-          text: '月结活动'
+          text: '每月活动'
         }, {
           pagePath: 'pages/tabBar/daily',
           selectedIconPath: './images/tabBarIcon/dayA.png',
           iconPath: './images/tabBarIcon/day.png',
-          text: '日结活动'
+          text: '每日活动'
         }, {
           pagePath: 'pages/tabBar/user',
           selectedIconPath: './images/tabBarIcon/userA.png',

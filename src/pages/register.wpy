@@ -7,15 +7,15 @@
     <view class="dost"></view>
     <view class="font_30 bc_text color-666">申请获取以下权限</view>
     <view class="font_28 bc_text text">获取您的手机号授权</view>
-    <block wx:if="{{mobile == ''}}">
-      <button hover-class="btn_active" class="btn bc_code text-center white font_32" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录
-      </button>
-    </block>
-    <block wx:else>
+    <!--<block wx:if="{{mobile == ''}}">-->
+      <!--<button hover-class="btn_active" class="btn bc_code text-center white font_32" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录-->
+      <!--</button>-->
+    <!--</block>-->
+    <!--<block wx:else>-->
       <view class="btn bc_code text-center white font_32" @tap="mobileRegister">
         手机号授权
       </view>
-    </block>
+    <!--</block>-->
   </view>
 </template>
 
@@ -41,16 +41,16 @@
     }
 
     onLoad(e) {
-      this.login()
+      // this.login()
     }
 
     onShow() {
-      this.initPageData()
+      // this.initPageD+ata()
       this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
     }
 
     onPullDownRefresh() {
-      this.initPageData()
+      // this.initPageData()
     }
     onReady() {
       // this.getCenterLocation()
@@ -140,7 +140,11 @@
 
     methods = {
       mobileRegister() {
-        this.register()
+        // this.register()
+        this.$Toast_success('登录成功')
+        setTimeout(() => {
+          this.$gotoTab('/pages/tabBar/home')
+        }, 500)
       },
       goto(url) {
         this.$goto(url)

@@ -9,11 +9,11 @@
         <view class="message_box ff">
           <view class="title font_30 bold ellipsis_1">国美电器活动需求</view>
           <view class="message font_24">
-            <span class="text">储备店长/储备副店长</span>
+            <span class="text">储备成员</span>
             <span class="text">广东/深圳/南山区</span>
             <span class="text">不限</span>
           </view>
-          <view class="price font_28 bold">月预期6000~8000元+促销费</view>
+          <view class="price font_28 bold">6000</view>
           <view class="_bc_progress color-666">
             <span class="font_26 flo_l">报名成员：</span>
             <progress percent="{{count}}"  border-radius="24" class="flo_l font_26"  active="true" stroke-width="12" activeColor="#0075c5" backgroundColor="#f1f1f1"/>

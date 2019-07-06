@@ -77,7 +77,7 @@
       list: [
         {
           icon: 'http://images.ufutx.com/201906/20/f46799d6d9236723cee53c08215499e1.png',
-          title: '我的简历',
+          title: '我的信息',
           type: 'showModel',
           path: '/pages/users/setting'
         },

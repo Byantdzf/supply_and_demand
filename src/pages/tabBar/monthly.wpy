@@ -3,7 +3,23 @@
     <view>
       <tabSearch></tabSearch>
     </view>
-    <contentsList></contentsList>
+    <contentsList :list.sync="list"></contentsList>
+    <block wx:if="{{list.length>0}}">
+      <view class="_bc-list">
+        <block wx:if="{{loading}}">
+          <view class="weui-loadmore">
+            <view class="weui-loading"></view>
+            <view class="weui-loadmore__tips" style="background: white">正在加载</view>
+          </view>
+        </block>
+        <block wx:if="{{noMore}}">
+          <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+            <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"
+                  style="background: white"></view>
+          </view>
+        </block>
+      </view>
+    </block>
   </view>
 </template>
 
@@ -11,19 +27,95 @@
   import wepy from 'wepy'
   import contentsList from '../../components/contentsList'
   import tabSearch from '../../components/tabSearch'
-
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
   export default class monthly extends wepy.page {
+    mixins = [base, http, user]
     config = {
       navigationBarTitleText: '每月活动'
     }
     components = {
       contentsList, tabSearch
     }
-    data = {}
-    methods = {}
-
-    onLoad() {
+    data = {
+      loading: false,
+      noSearch: 'true',
+      noMore: false,
+      current: 0,
+      type: 'MONTHLY',
+      page: 1,
+      list: []
     }
+    onShow() {
+      this.getData()
+    }
+    onPullDownRefresh() {
+      this.page = 1
+      this.getData()
+    }
+
+    onReachBottom() {
+      this.getData()
+    }
+    getData() {
+      let _this = this
+      _this.loading = true
+      _this.noMore = true
+      let url = `${service.host}/jobs?type=${_this.type}`,
+        data = {
+          page: _this.page
+        }
+      _this.$get({
+        url: url, data
+      }, {
+        success: ({code, data}) => {
+          if (data == null) {
+            return
+          }
+          if (data.data.length == 0 && data.last_page == 1) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.noMore = true
+            _this.loading = false
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = data
+            _this.loading = false
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+              setTimeout(() => {
+                _this.loading = false
+              }, 500)
+            })
+          }
+          console.log(_this.list)
+          _this.noMore = true
+          _this.page += 1
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          _this.loading = false
+          _this.init = true
+          wx.hideLoading()
+        }
+      })
+    }
+    methods = {}
   }
 </script>
 

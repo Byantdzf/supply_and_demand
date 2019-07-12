@@ -59,12 +59,12 @@
             <image src="https://images.ufutx.com/201907/10/84c297d9226bcdb116b42d04d4c0bc7f.png" mode="widthFix"
                    style="width: 100%;" @tap="openLocation"></image>
           </view>
-          <view class="bc_title">
-            <view class="font_30 color-666 bold">已报名（12）</view>
-            <view class="main-member text-center flo_l" wx:for="{{4}}" wx:key="index">
-              <image src="https://images.ufutx.com/201907/10/84c297d9226bcdb116b42d04d4c0bc7f.png"
+          <view class="bc_title" wx:if="{{members.length>0}}">
+            <view class="font_30 color-666 bold">已报名（{{members.length}}）</view>
+            <view class="main-member text-center flo_l" wx:for="{{members}}" wx:key="index">
+              <image src="{{item.user.avatar}}"
                      mode="aspectFill"></image>
-              <view class="font_26 colorb0">张小刚</view>
+              <view class="font_26 colorb0">{{item.user.name}}</view>
             </view>
             <view class="inline-block flo_l" style="line-height: 100rpx;margin-left: 22rpx;">...</view>
             <view class="clearfloat"></view>
@@ -77,7 +77,7 @@
       <view class="bc_detail_btn fixed_bot text-center ff">
         <view class="shear flo_l font_24" @tap="collect">
           <view hover-class="btn_active">
-            <image src="http://images.ufutx.com/201906/25/c9db4580b201590933b0bba0036f0957.png" wx:if="{{collect}}"
+            <image src="http://images.ufutx.com/201906/25/c9db4580b201590933b0bba0036f0957.png" wx:if="{{information.is_collected == 1}}"
                    mode="widthFix" class="right_icon"></image>
             <image src="http://images.ufutx.com/201906/23/cd4de9597c203328c5e6abb737ccfc51.png" wx:else mode="widthFix"
                    class="right_icon"></image>
@@ -93,7 +93,19 @@
             <text class="font_24">分享</text>
           </button>
         </view>
-        <view class="apply  flo_l font_32" @tap="showRule">立即报名</view>
+        <block wx:if="{{information.status == 'UNDERWAY'}}">
+          <view class="apply  flo_l font_32 is_join" wx:if="{{information.is_joined == 0}}" @tap="showRule">立即报名</view>
+          <view class="apply  flo_l font_32 is_join" wx:else @tap="showJoin" style="background: #cdcdcd">已报名</view>
+        </block>
+        <block wx:elif="{{information.status == 'FINISHED'}}">
+          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">已结束</view>
+        </block>
+        <block  wx:elif="{{information.status == 'UNPLAYED'}}">
+          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">待开始</view>
+        </block>
+        <block wx:else>
+          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">已取消</view>
+        </block>
       </view>
     </view>
   </view>
@@ -108,7 +120,7 @@
       <view class="apply text-center white" @tap="showUserInfo">立即报名</view>
     </view>
   </modal>
-  <userInfo type="apply"></userInfo>
+  <userInfo type="apply" :id.sync="id"></userInfo>
 </template>
 <script>
   import wepy from 'wepy'
@@ -129,8 +141,7 @@
       id: '',
       count: 0,
       information: {},
-      members: [],
-      collect: false // 收藏
+      members: []
     }
     onLoad(e) {
       this.id = e.id
@@ -150,7 +161,6 @@
         success: ({code, data}) => {
           vm.information = data.job
           vm.members = data.members
-          vm.collect = data.is_collected == 1 ? false : true
           vm.count = vm.information.joined_num / vm.information.need_num * 100
           vm.$apply()
           let {intro} = data.job
@@ -182,13 +192,16 @@
       showRule() {
         this.$invoke('modal', 'showModal')
       },
+      showJoin() { // 显示已经报名
+        this.$showToast('你已经报名了！')
+      },
       collect() {  // 收藏
         let vm = this
         vm.$post({url: `${service.host}/collect/jobs/${vm.id}`}, {
           success: ({code, data}) => {
-            vm.collect = !vm.collect
+            vm.information.is_collected = !vm.information.is_collected
             vm.$apply()
-            if (vm.collect) {
+            if (vm.information.is_collected == 1) {
               vm.$Toast_success('收藏成功')
             } else {
               vm.$showToast('已取消')
@@ -369,6 +382,15 @@
           border-radius: 50%;
         }
       }
+    }
+    .is_join {
+      margin: 14rpx !important;
+      width: 48% !important;
+      height: 72rpx !important;
+      line-height: 72rpx !important;
+      border-radius: 8rpx;
+      float: right;
+      margin-right: 4rpx;
     }
   }
 

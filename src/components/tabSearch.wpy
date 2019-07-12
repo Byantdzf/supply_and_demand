@@ -23,15 +23,15 @@
       <view class="weui-search-bar__cancel-btn font_28" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
     </view>
     <view class="bc_searchIist font_26 text-center ff" wx:if="{{noSearch == 'false'}}">
-      <view class="bc_searchItem flo_l" @tap="showModal">
+      <view class="bc_searchItem flo_l" @tap="showModalFn">
         类型
         <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
       </view>
-      <view class="bc_searchItem flo_l" @tap="showModal">
+      <view class="bc_searchItem flo_l" @tap="showModalFn">
         区域
         <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
       </view>
-      <view class="bc_searchItem flo_l" @tap="showModal">
+      <view class="bc_searchItem flo_l" @tap="showModalFn">
         排序
         <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
       </view>
@@ -41,10 +41,20 @@
   </view>
   <view style="height: {{bc_height}}"></view>
   <modalUp>
-    <view slot="wrapper" class="color-666 font_28 text-center " style="margin-top: {{bc_height}};padding: 12%;">
-      <!--<image src="http://images.ufutx.com/201906/25/f6990555f2016f45f84836c931cdc69a.png" mode="widthFix" class="close" @tap="hideModal"></image>-->
-      <image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix" style="width: 50%;" class="close" @tap="hideModal"></image>
-      <view class="title color-666">暂无数据</view>
+    <view slot="wrapper" class="color-666 font_28 text-center " style="margin-top: {{bc_height}};padding: 4%;">
+      <!--<image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix" style="width: 50%;" class="close" @tap="hideModal"></image>-->
+      <!--<view class="title color-666">暂无数据</view>-->
+      <scroll-view scroll-y class="main-scroll flo_l" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll" scroll-into-view="{{toView}}" scroll-top="{{scrollTop}}">
+        <block wx:for="{{objectMultiArray[0]}}" wx:key="index">
+          <view class="scroll-view-item mian-item-scroll {{item.active?'mian-item-active':''}}" @tap="jobActive({{index}})">{{item.name}}</view>
+        </block>
+      </scroll-view>
+      <scroll-view scroll-y class="main-scroll main-scroll-sub flo_l" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll" scroll-into-view="{{toView}}" scroll-top="{{scrollTop}}">
+        <block wx:for="{{objectMultiArray[1]}}" wx:key="index">
+          <view class="scroll-view-item mian-item-scroll {{item.active?'mian-item-active':''}}" @tap="jobActive({{index}})">{{item.name}}</view>
+        </block>
+      </scroll-view>
+      <view class="clearfloat"></view>
     </view>
   </modalUp>
 </template>
@@ -54,6 +64,7 @@
   import http from '../mixins/http'
   import base from '../mixins/base'
   import modalUp from '../components/modal-up'
+  import {service} from '../config.js'
   import {getElement_WH} from '../utils/fn'
 
   export default class tabSearch extends wepy.component {
@@ -89,9 +100,24 @@
       inputShowed: false,
       inputVal: '',
       bc_height: '81px',
-      showModal: false
+      showModal: false,
+      multiIndex2: [0, 0],
+      objectMultiArray: [],
+      Business: [],
+      multiIndex: [0, 0],
+      addressArray: [],
+      address: [],
+      toView: 'red',
+      scrollTop: 100
     }
     onLoad() {
+      this.$invoke('modalUp', 'showModal')
+
+      this.objectMultiArray = []
+      this.addressArray = []
+      this.geJobType()
+      this.getAddress()
+      this.$apply()
       if (this.noSearch == 'true') {
         this.bc_height = '40px'
         this.$apply()
@@ -107,9 +133,70 @@
       //   console.log(error)
       // })
     }
+    geJobType() {
+      let that = this
+      this.$get({url: `${service.host}/job/categories`}, {
+        success: ({code, data}) => {
+          let result = data
+          that.Business = result
+          let IndustryArr = []
+          result.forEach(function (item, index, arr) {
+            IndustryArr.push(arr[index])
+          })
+          console.log(IndustryArr)
+          for (let item of IndustryArr) {
+            item.active = false
+          }
+          that.objectMultiArray.push(IndustryArr)
+          that.objectMultiArray.push(result[0].sub_categories)
+          that.$apply()
+          console.log(that.objectMultiArray)
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
+    getAddress() {
+      let that = this
+      this.$get({url: `${service.host}/addresses`}, {
+        success: ({code, data}) => {
+          let result = data
+          that.address = result
+          let IndustryArr = []
+          result.forEach(function (item, index, arr) {
+            IndustryArr.push(arr[index])
+          })
+          that.addressArray.push(IndustryArr)
+          that.addressArray.push(result[0].sub_addresses)
+          that.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
 
     methods = {
-      showModal() {
+      upper(e) {
+        console.log(e)
+      },
+      lower(e) {
+        console.log(e)
+      },
+      scroll(e) {
+        console.log(e)
+      },
+      jobActive(index) {
+        let vm = this
+        for (let item of vm.objectMultiArray[0]) {
+          item.active = false
+        }
+        vm.objectMultiArray[0][index].active = true
+      },
+      showModalFn() {
         this.showModal = !this.showModal
         this.$apply()
         if (this.showModal) {
@@ -203,5 +290,29 @@
         vertical-align: middle;
       }
     }
+  }
+
+  .main-scroll {
+    height: 240px;
+    width: 45%;
+    padding-right: 12rpx;
+    /*background: red;*/
+    /*border-right: 2rpx solid #d3d3d3 ;*/
+    .mian-item-scroll {
+      /*background: wheat;*/
+      margin: 12rpx;
+      padding: 8rpx 0;
+      border-bottom: 2rpx solid #d3d3d3 ;
+    }
+    .mian-item-active{
+      background: #ececec;
+    }
+  }
+  .main-scroll-sub{
+    height: 240px;
+    width: 45%;
+    padding-right: 12rpx;
+    /*background: red;*/
+    border-right: none;
   }
 </style>

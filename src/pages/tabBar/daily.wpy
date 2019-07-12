@@ -4,6 +4,22 @@
       <tabSearch></tabSearch>
     </view>
     <contentsList :list.sync="list"></contentsList>
+    <block wx:if="{{list.length>0}}">
+      <view class="_bc-list">
+        <block wx:if="{{loading}}">
+          <view class="weui-loadmore">
+            <view class="weui-loading"></view>
+            <view class="weui-loadmore__tips" style="background: white">正在加载</view>
+          </view>
+        </block>
+        <block wx:if="{{noMore}}">
+          <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+            <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"
+                  style="background: white"></view>
+          </view>
+        </block>
+      </view>
+    </block>
   </view>
 </template>
 
@@ -17,7 +33,7 @@
   import user from '../../mixins/user'
 
   export default class daily extends wepy.page {
-    mixins = [base, http, user,]
+    mixins = [base, http, user]
     config = {
       navigationBarTitleText: '每日活动'
     }
@@ -56,7 +72,6 @@
         url: url, data
       }, {
         success: ({code, data}) => {
-          _this.announcements = data.ads
           if (data == null) {
             return
           }

@@ -1,7 +1,23 @@
 <template>
   <view>
     <navBarTop :tabs.sync="tabs" @tapClick="tapClick"></navBarTop>
-    <contentsList></contentsList>
+    <contentsList :list.sync="list"></contentsList>
+    <block wx:if="{{list.length>0}}">
+      <view class="_bc-list">
+        <block wx:if="{{loading}}">
+          <view class="weui-loadmore">
+            <view class="weui-loading"></view>
+            <view class="weui-loadmore__tips" style="background: white">正在加载</view>
+          </view>
+        </block>
+        <block wx:if="{{noMore}}">
+          <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+            <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"
+                  style="background: white"></view>
+          </view>
+        </block>
+      </view>
+    </block>
   </view>
 </template>
 
@@ -10,8 +26,12 @@
   import contentsList from '../../components/contentsList'
   import tabSearch from '../../components/tabSearch'
   import navBarTop from '../../components/navBarTop'
-
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
   export default class apply extends wepy.page {
+    mixins = [base, http, user]
     config = {
       navigationBarTitleText: '我的报名'
     }
@@ -19,9 +39,85 @@
       contentsList, tabSearch, navBarTop
     }
     data = {
-      tabs: ['已完成', '已取消', '待开始', '进行中']
+      tabs: ['进行中', '待开始', '已完成', '已取消'],
+      loading: false,
+      noSearch: 'true',
+      noMore: false,
+      current: 0,
+      type: 'MONTHLY',
+      status: 'UNDERWAY', //tabClass
+      page: 1,
+      list: []
     }
-    onLoad() {
+    onShow() {
+      this.getData()
+    }
+    onPullDownRefresh() {
+      this.page = 1
+      this.getData()
+    }
+
+    onReachBottom() {
+      this.getData()
+    }
+    getData() {
+      let _this = this
+      _this.loading = true
+      _this.noMore = true
+      let url = `${service.host}/my/application/forms?status=${_this.status}`,
+        data = {
+          page: _this.page
+        }
+      _this.$get({
+        url: url, data
+      }, {
+        success: ({code, data}) => {
+          if (data == null) {
+            return
+          }
+          if (data.data.length == 0 && data.last_page == 1) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.noMore = true
+            _this.loading = false
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = []
+            for (let item of data) {
+              _this.list.push(item.job)
+            }
+            _this.loading = false
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item.job)
+              setTimeout(() => {
+                _this.loading = false
+              }, 500)
+            })
+          }
+          console.log(_this.list)
+          _this.noMore = true
+          _this.page += 1
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          _this.loading = false
+          _this.init = true
+          wx.hideLoading()
+        }
+      })
     }
     methods = {
 
@@ -29,6 +125,31 @@
     events = {
       'tabClick': (value) => { // NavTab返回值
         console.log(value)
+        this.page = 1
+        this.list = []
+        this.$apply()
+        switch (value) {
+          case '0':
+            this.status = 'UNDERWAY'
+            this.$apply()
+            this.getData()
+            break
+          case '1':
+            this.status = 'UNPLAYED'
+            this.$apply()
+            this.getData()
+            break
+          case '2':
+            this.status = 'FINISHED'
+            this.$apply()
+            this.getData()
+            break
+          case '3':
+            this.status = 'CANCELED'
+            this.$apply()
+            this.getData()
+            break
+        }
       }
     }
   }

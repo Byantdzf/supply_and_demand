@@ -13,7 +13,7 @@
         <view class="item_subhead font_28 ellipsis_1">{{item.intro}}</view>
         <view class="item_time font_26 ellipsis_1">{{item.job_time}}</view>
         <view class="item_price font_26 bold text-right">{{item.reward}}元</view>
-        <view class="item_state font_26">活动中</view>
+        <view class="item_state font_26">{{item.status_name}}</view>
       </view>
     </view>
   </block>
@@ -36,8 +36,28 @@
     components = {}
 
     onLoad() {
-    }
 
+    }
+    watch = {
+      list() {
+        for (let item of this.list) {
+          switch (item.status) {
+            case 'UNDERWAY':
+              item.status_name = '进行中'
+              break
+            case 'FINISHED':
+              item.status_name = '已结束'
+              break
+            case 'UNPLAYED':
+              item.status_name = '待开始'
+              break
+            case 'CANCELED':
+              item.status_name = '已取消'
+              break
+          }
+        }
+      }
+    }
     methods = {
       goto(url) {
         this.$goto(url)

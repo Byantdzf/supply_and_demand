@@ -110,8 +110,6 @@
     }
 
     onLoad(e) {
-      this.$invoke('userInfo', 'showModal')
-
       // setTimeout(() => {
       //   this.photo = 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=4259300811,497831842&fm=27&gp=0.jpg'
       //   this.$apply()

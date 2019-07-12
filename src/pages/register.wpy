@@ -8,8 +8,8 @@
     <view class="font_30 bc_text color-666">申请获取以下权限</view>
     <view class="font_28 bc_text text">获取您的手机号授权</view>
     <!--<block wx:if="{{mobile == ''}}">-->
-      <!--<button hover-class="btn_active" class="btn bc_code text-center white font_32" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录-->
-      <!--</button>-->
+      <button hover-class="btn_active" class="btn bc_code text-center white font_32" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录
+      </button>
     <!--</block>-->
     <!--<block wx:else>-->
       <view class="btn bc_code text-center white font_32" @tap="mobileRegister">

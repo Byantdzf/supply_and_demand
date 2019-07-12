@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require('path')
 var prod = process.env.NODE_ENV === 'production'
 
 module.exports = {
@@ -32,12 +32,36 @@ module.exports = {
     }
   },
   plugins: {
+    replace: {
+      filter: /\.wxml$/,
+      config: {
+        find: /<\!-- wepyhtml-repeat start -->([\W\w]+?)<\!-- wepyhtml-repeat end -->/,
+        replace(match, tpl) {
+          let result = ''
+          let prefix = ''
+
+          tpl = tpl.replace(/\{\{\s*(\$.*?\$)thisIsMe\s*\}\}/, (match, p) => {
+            prefix = p
+            return ''
+          })
+
+          for (let i = 0; i <= 20; i++) {
+            result += '\n' + tpl
+              .replace('wepyhtml-0', 'wepyhtml-' + i)
+              .replace(/<\!-- next template -->/g, () => {
+                return i === 20 ? '' : `<template is="wepyhtml-${i + 1}" wx:if="{{ item.children }}" data="{{ ${prefix}content: item.children, ${prefix}imgInsteadOfVideo: ${prefix}imgInsteadOfVideo }}"></template>`
+              })
+          }
+          return result
+        }
+      }
+    }
   }
 }
 
 if (prod) {
 
-  delete module.exports.compilers.babel.sourcesMap;
+  delete module.exports.compilers.babel.sourcesMap
   // 压缩sass
   // module.exports.compilers['sass'] = {outputStyle: 'compressed'}
 
@@ -48,8 +72,7 @@ if (prod) {
   module.exports.plugins = {
     uglifyjs: {
       filter: /\.js$/,
-      config: {
-      }
+      config: {}
     },
     imagemin: {
       filter: /\.(jpg|png|jpeg)$/,
@@ -59,6 +82,30 @@ if (prod) {
         },
         png: {
           quality: 80
+        }
+      }
+    },
+    replace: {
+      filter: /\.wxml$/,
+      config: {
+        find: /<\!-- wepyhtml-repeat start -->([\W\w]+?)<\!-- wepyhtml-repeat end -->/,
+        replace(match, tpl) {
+          let result = ''
+          let prefix = ''
+
+          tpl = tpl.replace(/\{\{\s*(\$.*?\$)thisIsMe\s*\}\}/, (match, p) => {
+            prefix = p
+            return ''
+          })
+
+          for (let i = 0; i <= 20; i++) {
+            result += '\n' + tpl
+              .replace('wepyhtml-0', 'wepyhtml-' + i)
+              .replace(/<\!-- next template -->/g, () => {
+                return i === 20 ? '' : `<template is="wepyhtml-${i + 1}" wx:if="{{ item.children }}" data="{{ ${prefix}content: item.children, ${prefix}imgInsteadOfVideo: ${prefix}imgInsteadOfVideo }}"></template>`
+              })
+          }
+          return result
         }
       }
     }

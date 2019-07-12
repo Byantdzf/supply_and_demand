@@ -126,7 +126,7 @@ export default class httpMixin extends wepy.mixin {
           this.init = true
           wx.hideLoading()
           wx.setStorageSync('message', data.message)
-        } else if (data.code == 2 && !wx.getStorageSync('skip')) {
+        } else if (data.code == 2) {
           var pages = getCurrentPages()    // 获取加载的页面
           var currentPage = pages[pages.length - 1]    // 获取当前页面的对象
           var options = currentPage.options
@@ -160,10 +160,6 @@ export default class httpMixin extends wepy.mixin {
                   var route = wx.getStorageSync('jump');
                   if (route == '/pages/register') {
                     return
-                  }
-                  if (route.includes('/pages/tabBar/home')) {
-                    this.getNewCount()
-                    this.upDate()
                   }
                   if (!data.token) {
                     wx.navigateTo({url: '/pages/register?from_openid=' + wx.getStorageSync('from_openid')})

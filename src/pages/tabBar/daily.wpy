@@ -3,7 +3,7 @@
     <view>
       <tabSearch></tabSearch>
     </view>
-    <contentsList></contentsList>
+    <contentsList :list.sync="list"></contentsList>
   </view>
 </template>
 
@@ -11,19 +11,97 @@
   import wepy from 'wepy'
   import contentsList from '../../components/contentsList'
   import tabSearch from '../../components/tabSearch'
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
 
   export default class daily extends wepy.page {
+    mixins = [base, http, user,]
     config = {
       navigationBarTitleText: '每日活动'
+    }
+    data = {
+      loading: false,
+      noSearch: 'true',
+      noMore: false,
+      current: 0,
+      type: 'DAILY',
+      page: 1,
+      list: []
     }
     components = {
       contentsList, tabSearch
     }
-    data = {}
-    methods = {}
-
-    onLoad() {
+    onShow() {
+      this.getData()
     }
+    onPullDownRefresh() {
+      this.page = 1
+      this.getData()
+    }
+
+    onReachBottom() {
+      this.getData()
+    }
+    getData() {
+      let _this = this
+      _this.loading = true
+      _this.noMore = true
+      let url = `${service.host}/jobs?type=${_this.type}`,
+        data = {
+          page: _this.page
+        }
+      _this.$get({
+        url: url, data
+      }, {
+        success: ({code, data}) => {
+          _this.announcements = data.ads
+          if (data == null) {
+            return
+          }
+          if (data.data.length == 0 && data.last_page == 1) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.noMore = true
+            _this.loading = false
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = data
+            _this.loading = false
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+              setTimeout(() => {
+                _this.loading = false
+              }, 500)
+            })
+          }
+          console.log(_this.list)
+          _this.noMore = true
+          _this.page += 1
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          _this.loading = false
+          _this.init = true
+          wx.hideLoading()
+        }
+      })
+    }
+    methods = {}
   }
 </script>
 

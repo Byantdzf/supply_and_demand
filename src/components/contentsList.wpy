@@ -1,18 +1,18 @@
 <template>
-  <block wx:for="{{15}}" wx:key="index">
-    <view class="contentsList ff" @tap="goto('/pages/job/detail')">
+  <block wx:for="{{list}}" wx:key="index">
+    <view class="contentsList ff" @tap="goto('/pages/job/detail?id={{item.id}}')">
       <view class="item_image flo_l">
-        <image src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=311097710,965735535&fm=27&gp=0.jpg"
-               mode="widthFix"></image>
+        <image src="{{item.pic}}"
+               mode="aspectFill"></image>
       </view>
       <view class="item_info flo_l">
-        <view class="font_30 bold title ellipsis_1">国美电器
+        <view class="font_30 bold title ellipsis_1">{{item.title}}
           <image src="http://images.ufutx.com/201905/28/e4c792af693e669c1a5ee1aae22797aa.png" mode="widthFix"
-                 wx:if="{{index < 3}}" class="topIcon"></image>
+                 wx:if="{{item.is_top > 0}}" class="topIcon"></image>
         </view>
-        <view class="item_subhead font_28 ellipsis_1">福田就近原则,实力碾压</view>
-        <view class="item_time font_26 ellipsis_1">2019-07-12</view>
-        <view class="item_price font_26 bold text-right">6000元</view>
+        <view class="item_subhead font_28 ellipsis_1">{{item.intro}}</view>
+        <view class="item_time font_26 ellipsis_1">{{item.job_time}}</view>
+        <view class="item_price font_26 bold text-right">{{item.reward}}元</view>
         <view class="item_state font_26">活动中</view>
       </view>
     </view>
@@ -56,8 +56,8 @@
       width: 132rpx;
       height: 132rpx;
       image{
-        width: 100%;
-        height: auto;
+        width: 132rpx;
+        height: 132rpx;
       }
     }
     .item_info{

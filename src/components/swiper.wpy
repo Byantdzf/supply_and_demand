@@ -16,7 +16,7 @@
   <!--</swiper>-->
   <swiper class="swiper" style="height:{{style_height}};" autoplay="{{autoplay}}"
           indicator-color="{{indicatorColor}}"
-          indicator-active-color="{{indicatorActiveColor}}" indicator-dots="true" indicator-color="#b0afb0" indicator-active-color="#0075c5">
+          indicator-active-color="{{indicatorActiveColor}}" indicator-dots="true" indicator-color="#b0afb0" circular="true" indicator-active-color="#0075c5">
     <block wx:for="{{list}}" wx:key="index">
       <swiper-item>
         <navigator wx:if="{{item.url}}" url="{{item.url}}">
@@ -74,16 +74,16 @@
     methods = {
       BtnFun(item) {
         console.log(item)
-        if (item.type == 'MP') {
-          if (item.path.includes('tabBar')) {
-            this.$gotoTab(item.path)
-          } else {
-            console.log(item.path)
-            this.$goto(item.path)
-          }
-        } else {
+        // if (item.type == 'MP') {
+        //   if (item.path.includes('tabBar')) {
+        //     this.$gotoTab(item.path)
+        //   } else {
+        //     console.log(item.path)
+        //     this.$goto(item.path)
+        //   }
+        // } else {
           this.gotoApp(item.path)
-        }
+        // }
       },
       gotofriends (item) {
         let url = ''

@@ -1,18 +1,23 @@
 <template>
   <view>
-    <image src="http://images.ufutx.com/201906/23/52400e66d22067711d0cb96378fc83a2.png" mode="widthFix"
-           style="width: 100%;"></image>
+    <!--<image src="http://images.ufutx.com/201906/23/52400e66d22067711d0cb96378fc83a2.png" mode="widthFix"-->
+           <!--style="width: 100%;"></image>-->
+    <htmlParser ></htmlParser>
   </view>
+
 </template>
 <script>
   import wepy from 'wepy'
+  import htmlParser from '../../components/htmlParser'
 
   export default class detail extends wepy.page {
     config = {
       navigationBarTitleText: '报名成员'
     }
-    components = {}
-    data = {}
+    components = {htmlParser}
+    data = {
+      intro: '<p><span style="font-weight: bold;">测试啥登记卡上的健<span style="color: rgb(249, 150, 59);">康奥斯卡</span>几点回家看闪电借款</span></p><p>阿萨德尽快哈是的哈撒即可电话见色卡号</p><h1><span style="font-weight: bold;">爱神的箭看上的空间</span></h1><p><span style="font-style: italic;">阿斯达四大</span></p><p><br></p><p><img src="https://ss1.bdstatic.com/70cFuXSh_Q1YnxGkpoWK1HF6hhy/it/u=2884107401,3797902000&amp;fm=27&amp;gp=0.jpg" style="max-width:100%;"><br></p>'
+    }
     methods = {}
 
     onLoad() {

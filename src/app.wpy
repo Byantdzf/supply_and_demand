@@ -381,4 +381,7 @@
   @import "./styles/weui/index.less";
   @import "./styles/custom/index.less";
   @import "./styles/custom/theme.less";
+  view{
+    font-weight: normal;
+  }
 </style>

@@ -1,0 +1,49 @@
+<template lang="wxml">
+	<wepyhtml />
+</template>
+
+<style>
+/* 可以覆盖默认样式 */
+.wepyhtml-tag-p {
+	margin: 1em 0;
+}
+</style>
+
+<script>
+  import wepy from 'wepy'
+  import wepyhtml from 'wepy-html'
+
+  export default class Page extends wepy.component {
+    components = {
+      wepyhtml
+    }
+    props = {
+      parserContent: {
+        type: String,
+        default: '<p style=\'font-size: 32rpx; padding: 30rpx 0; text-align: center;\'>没有任何内容</p>'
+      }
+    }
+
+    onLoad() {
+      let htmlCode = this.parserContent
+      console.log(htmlCode)
+      // 调用组件接口，传入HTML内容和相关参数
+      this.$invoke('wepyhtml', 'updateContent', htmlCode, {
+        // 是否使用图片代替视频（点击时全屏播放视频），
+        // 主要用于防止视频组件遮挡其他元素
+        imgInsteadOfVideo: true,
+
+        // 可以在此函数中处理链接点击
+        onHyperlinkTap(e) {
+          // e.href 为链接地址
+        },
+
+        // 可以在此函数中修改属性
+        onNodeCreate(nodeName, attrs) {
+          // nodeName 为标签名
+          // attrs 为属性集合
+        }
+      })
+    }
+}
+</script>

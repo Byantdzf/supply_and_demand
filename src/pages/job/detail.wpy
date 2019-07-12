@@ -2,49 +2,93 @@
   <view class="bc_detail">
     <view class="bc_conter">
       <view class="image_box">
-        <image src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3959347532,13644892&fm=26&gp=0.jpg"
-               mode="aspectFill" ></image>
+        <image src="{{information.pic}}" mode="aspectFill"></image>
       </view>
-      <view class="detail_box">
+      <view class="detail_box ff">
         <view class="message_box ff">
-          <view class="title font_30 bold ellipsis_1">国美电器活动需求</view>
+          <view class="title font_30 bold ellipsis_1">{{information.title}}</view>
           <view class="message font_24">
-            <span class="text">储备成员</span>
-            <span class="text">广东/深圳/南山区</span>
-            <span class="text">不限</span>
+            <span class="text">{{information.category_name}} / {{information.sub_category_name}}</span>
+            <!--<span class="text">不限</span>-->
           </view>
-          <view class="price font_28 bold">6000</view>
+          <view class="price font_28 bold">{{information.reward}}</view>
           <view class="_bc_progress color-666">
             <span class="font_26 flo_l">报名成员：</span>
-            <progress percent="{{count}}"  border-radius="24" class="flo_l font_26"  active="true" stroke-width="12" activeColor="#0075c5" backgroundColor="#f1f1f1"/>
-            <span class="font_26 flo_l" style="margin-left: 14rpx;">20/100</span>
+            <progress percent="{{count}}" border-radius="24" class="flo_l font_26" active="true" stroke-width="12"
+                      activeColor="#0075c5" backgroundColor="#f1f1f1"/>
+            <span class="font_26 flo_l"
+                  style="margin-left: 14rpx;">{{information.joined_num}}/{{information.need_num}}</span>
           </view>
           <!--<view class="model"></view>-->
         </view>
-        <view style="margin: 12rpx 22rpx;">
-          <!--<image src="http://images.ufutx.com/201906/23/6baaf70c7c39ed93b089af3e1ca4973d.png" mode="widthFix" style="width: 100%;"></image>-->
-          <image src="http://images.ufutx.com/201906/23/f470b1ff07a6d18d8952527c247a3b17.png" mode="widthFix" style="width: 100%;" @tap="makePhoneCall('0755-XXXX')"></image>
-          <!--<image src="http://images.ufutx.com/201906/23/8198e01da0ee35343001e8a80fcfa539.png" mode="widthFix" style="width: 100%;"></image>-->
-          <!--<image src="http://images.ufutx.com/201906/23/51a9f72d7f0ec4a38f3bc276c44998ad.png" mode="widthFix" style="width: 100%;"></image>-->
-          <!--<image src="http://images.ufutx.com/201906/23/9ced1b34f2ede9b986cf9c279ae98fc4.png" mode="widthFix" style="width: 100%;margin-top: -40rpx;" @tap="openLocation"></image>-->
-          <image src="http://images.ufutx.com/201906/23/1421f0068dfbfe1a63f9eff6de4dfe6e.png" mode="widthFix" style="width: 100%;"></image>
+        <view class="main_box">
+          <view class="bc_title">
+            <image src="https://images.ufutx.com/201907/10/ee1ba88327a47ae94c9d34f8755d0a63.png"
+                   mode="widthFix"></image>
+            <span class="font_30 color-666 bold">工作详情</span>
+            <wepyhtml></wepyhtml>
+          </view>
+        </view>
+        <view class="main_box">
+          <view class="bc_title">
+          <image src="https://images.ufutx.com/201907/10/5a34d772474f1b8afb10e1084aeff8c2.png"
+                   mode="widthFix"></image>
+            <span class="font_30 color-666 bold">联系方式</span>
+            <view class="font_26 colorb0">联系人：{{information.linkman}}</view>
+            <view class="font_26 colorb0" @tap="copyText({{information.wechat}})">微信：{{information.wechat}}
+              <image src="https://images.ufutx.com/201907/11/72c9b88c76039f4609bea4f1ff87410b.png" mode="widthFix"
+                     style="width: 24rpx;margin-left: 4rpx;"></image>
+            </view>
+            <view class="font_26 colorb0">Email：{{information.link_email}}</view>
+            <view class="font_26 colorb0" @tap="makePhoneCall({{information.link_mobile}})">
+              联系电话：{{information.link_mobile}}
+              <image src="https://images.ufutx.com/201907/11/c6898aee3d02420dfe71150ab047d44a.png" mode="widthFix"
+                     style="width: 24rpx;margin-left: 4rpx;"></image>
+            </view>
+          </view>
+          <view class="bc_title">
+            <image src="https://images.ufutx.com/201907/10/cf9895a360a744c10f789bb64be7ada8.png"
+                   mode="widthFix"></image>
+            <span class="font_30 color-666 "><span class="bold">招聘截止时间：</span><span class="colorb0 font_28">{{information.job_time}}</span></span>
+          </view>
+          <view class="bc_title">
+            <image src="https://images.ufutx.com/201907/10/5a34d772474f1b8afb10e1084aeff8c2.png"
+                   mode="widthFix"></image>
+            <span class="font_30 color-666 bold">工作地址</span>
+            <view class="font_26 colorb0">{{information.province+'/'+information.city+'/'+information.dist}}</view>
+            <image src="https://images.ufutx.com/201907/10/84c297d9226bcdb116b42d04d4c0bc7f.png" mode="widthFix"
+                   style="width: 100%;" @tap="openLocation"></image>
+          </view>
+          <view class="bc_title">
+            <view class="font_30 color-666 bold">已报名（12）</view>
+            <view class="main-member text-center flo_l" wx:for="{{4}}" wx:key="index">
+              <image src="https://images.ufutx.com/201907/10/84c297d9226bcdb116b42d04d4c0bc7f.png"
+                     mode="aspectFill"></image>
+              <view class="font_26 colorb0">张小刚</view>
+            </view>
+            <view class="inline-block flo_l" style="line-height: 100rpx;margin-left: 22rpx;">...</view>
+            <view class="clearfloat"></view>
+          </view>
         </view>
         <view>
         </view>
       </view>
       <view style="height: 100rpx;"></view>
       <view class="bc_detail_btn fixed_bot text-center ff">
-        <view class="shear flo_l font_24" @tap="collect" >
+        <view class="shear flo_l font_24" @tap="collect">
           <view hover-class="btn_active">
-            <image src="http://images.ufutx.com/201906/25/c9db4580b201590933b0bba0036f0957.png" wx:if="{{collect}}" mode="widthFix" class="right_icon"></image>
-            <image src="http://images.ufutx.com/201906/23/cd4de9597c203328c5e6abb737ccfc51.png" wx:else mode="widthFix" class="right_icon"></image>
+            <image src="http://images.ufutx.com/201906/25/c9db4580b201590933b0bba0036f0957.png" wx:if="{{collect}}"
+                   mode="widthFix" class="right_icon"></image>
+            <image src="http://images.ufutx.com/201906/23/cd4de9597c203328c5e6abb737ccfc51.png" wx:else mode="widthFix"
+                   class="right_icon"></image>
           </view>
           <text>收藏</text>
         </view>
         <view class="collect flo_l font_24">
           <button class="btn font_24 text-center" open-type="share" style=''>
             <view hover-class="btn_active">
-              <image src="http://images.ufutx.com/201906/23/6c8580be7e2173a9939752ac3e34c8f3.png" mode="widthFix" class="right_icon"></image>
+              <image src="http://images.ufutx.com/201906/23/6c8580be7e2173a9939752ac3e34c8f3.png" mode="widthFix"
+                     class="right_icon"></image>
             </view>
             <text class="font_24">分享</text>
           </button>
@@ -55,38 +99,80 @@
   </view>
   <modal>
     <view slot="wrapper" class="color-666 font_28 wrapperModal ">
-      <image src="http://images.ufutx.com/201906/25/f6990555f2016f45f84836c931cdc69a.png" mode="widthFix" class="close" @tap="hideModal"></image>
+      <image src="http://images.ufutx.com/201906/25/f6990555f2016f45f84836c931cdc69a.png" mode="widthFix" class="close"
+             @tap="hideModal"></image>
       <view class="title">报名须知：</view>
       <view class="rule">
-        <view>1、报名商铺要达到4星以上、支持在线交易</view>
-        <view>2、商铺需绑定QQ客服，可在线沟通</view>
-        <view>3、会员注册质量高，保证商铺信息完整</view>
-        <view>4、需有相关授权书、产品相关信息真实有效</view>
-        <view>5、报名商家在线商机产品数量要求达到20条以上</view>
-        <view>6、参与活动的价格有效期：活动结束后 15天内有效</view>
+        <view class="text-wrapper">{{information.explain}}</view>
       </view>
       <view class="apply text-center white" @tap="showUserInfo">立即报名</view>
     </view>
   </modal>
-  <userInfo></userInfo>
+  <userInfo type="apply"></userInfo>
 </template>
 <script>
   import wepy from 'wepy'
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
   import base from '../../mixins/base'
   import modal from '../../components/modal'
   import userInfo from '../../components/userInfo'
+  import wepyhtml from 'wepy-html'
 
   export default class detail extends wepy.page {
-    mixins = [base]
+    mixins = [base, http]
     config = {
       navigationBarTitleText: '活动详情'
     }
-    components = {modal, userInfo}
+    components = {modal, userInfo, wepyhtml}
     data = {
-      count: 20,
+      id: '',
+      count: 0,
+      information: {},
+      members: [],
       collect: false // 收藏
     }
+    onLoad(e) {
+      this.id = e.id
+      this.$apply()
+      this.$invoke('userInfo', 'showModal')
+    }
+
+    onShow() {
+      this.getData()
+    }
+
+    getData() {
+      let vm = this
+      let url = `${service.host}/jobs/${vm.id}`
+      vm.$get({url: url
+      }, {
+        success: ({code, data}) => {
+          vm.information = data.job
+          vm.members = data.members
+          vm.collect = data.is_collected == 1 ? false : true
+          vm.count = vm.information.joined_num / vm.information.need_num * 100
+          vm.$apply()
+          let {intro} = data.job
+          vm.$invoke('wepyhtml', 'updateContent', intro, {
+            imgInsteadOfVideo: true,
+            onHyperlinkTap(e) {
+            },
+            onNodeCreate(nodeName, attrs) {
+            }
+          })
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
     methods = {
+      copyText(text) {
+        console.log(text)
+        this.$copyText(text)
+      },
       hideModal() {
         this.$invoke('modal', 'hideModal')
       },
@@ -97,13 +183,22 @@
         this.$invoke('modal', 'showModal')
       },
       collect() {  // 收藏
-        this.collect = !this.collect
-        this.$apply()
-        if (this.collect) {
-          this.$Toast_success('收藏成功')
-        } else {
-          this.$showToast('已取消')
-        }
+        let vm = this
+        vm.$post({url: `${service.host}/collect/jobs/${vm.id}`}, {
+          success: ({code, data}) => {
+            vm.collect = !vm.collect
+            vm.$apply()
+            if (vm.collect) {
+              vm.$Toast_success('收藏成功')
+            } else {
+              vm.$showToast('已取消')
+            }
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+          }
+        })
       },
       makePhoneCall(iphone) { // 拨打电话
         this.$makePhoneCall(iphone)
@@ -115,11 +210,12 @@
         })
       },
       openLocation() {
+        let vm = this
         wx.getLocation({
           type: 'gcj02', // 返回可以用于wx.openLocation的经纬度
           success(res) {
-            const latitude = res.latitude
-            const longitude = res.longitude
+            const latitude = vm.information.lat
+            const longitude = vm.information.lng
             wx.openLocation({
               latitude,
               longitude,
@@ -129,14 +225,10 @@
         })
       }
     }
-
-    onLoad() {
-      // this.$invoke('modal', 'showModal')
-    }
   }
 </script>
 
-<style lang="less">
+<style lang="less" scoped="scoped">
   @import "../../styles/weui/base/fn.wxss";
   @import "../../styles/custom/fn.less";
 
@@ -247,5 +339,41 @@
 
       }
     }
+    .main_box{
+      padding: 22rpx 42rpx;
+      padding-top: 12rpx;
+      .bc_title{
+        padding-bottom: 16rpx;
+        margin-top: 12rpx;
+        border-bottom: 1rpx solid #e1e1e1;
+        image{
+          width: 32rpx;
+          height: auto;
+          vertical-align: middle;
+          margin-bottom: 4rpx;
+          margin-right: 8rpx;
+          margin-left: -12rpx;
+        }
+      }
+      text{
+        display: inline-block !important;
+      }
+      .main-member{
+        width: 20%;
+        margin-top: 12rpx;
+        margin-right: 12rpx;
+        image{
+          margin: 0;
+          width: 100rpx;
+          height: 100rpx;
+          border-radius: 50%;
+        }
+      }
+    }
+  }
+
+  /* 可以覆盖默认样式 */
+  .wepyhtml-tag-p {
+    margin: 1em 0;
   }
 </style>

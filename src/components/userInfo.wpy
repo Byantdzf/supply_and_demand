@@ -4,7 +4,7 @@
   <view animation="{{animationData}}" class="commodity_attr_box" wx:if="{{showModalStatus}}">
     <view class="model_page-user ff">
       <view class="user_box text-center">
-        <image src="http://images.ufutx.com/201906/21/65a1e16f455b3f05feb9fa1035bde05d.png" mode="widthFix" class="bc_image"></image>
+        <image src="https://images.ufutx.com/201907/12/f260a5ad7f97c949d955d9daeec0caac.png" mode="widthFix" class="bc_image"></image>
         <view class="user_photo ff">
           <image src="{{photo}}" mode="aspectFill"></image>
         </view>
@@ -29,7 +29,14 @@
                 <block wx:if="{{item.mode === 'job_type'}}">
                   <picker mode="multiSelector" @change="bindMultiPickerChange2" @columnchange="bindMultiPickerColumnChange2" value="{{multiIndex2}}" range="{{objectMultiArray}}" range-key="name">
                     <view class="picker">
-                      阿萨斯
+                      {{objectMultiArray[0][multiIndex2[0]].name}} - {{objectMultiArray[1][multiIndex2[1]].name}}
+                    </view>
+                  </picker>
+                </block>
+                <block wx:if="{{item.mode === 'address'}}">
+                  <picker mode="multiSelector" @change="bindMultiPickerChange" @columnchange="bindMultiPickerColumnChange" value="{{multiIndex}}" range="{{addressArray}}" range-key="name">
+                    <view class="picker">
+                      {{addressArray[0][multiIndex[0]].name}} - {{addressArray[1][multiIndex[1]].name}}
                     </view>
                   </picker>
                 </block>
@@ -53,9 +60,8 @@
   export default class modal extends wepy.component {
     mixins = [base, http]
     props = {
-      user: {
-        type: Object,
-        default: {}
+      type: {
+        type: ''
       }
     }
     components = {
@@ -94,7 +100,7 @@
         },
         {
           title: '学历',
-          name: 'belief',
+          name: 'ducation',
           value: '大专',
           mode: 'selector',
           type: 'picker',
@@ -110,11 +116,11 @@
         },
         {
           title: '地址',
-          name: 'belief',
+          name: 'address',
           value: '其他',
-          mode: 'selector',
+          mode: 'address',
           type: 'picker',
-          pickerList: ['基督教', '佛教', '伊斯兰教', '其他'],
+          pickerList: [],
           pickerIndex: 3
         },
         {
@@ -123,13 +129,13 @@
           value: '其他',
           mode: 'job_type',
           type: 'picker',
-          pickerList: ['基督教', '佛教', '伊斯兰教', '其他'],
+          pickerList: [],
           pickerIndex: 3
         },
         {
           title: '倾向的活动类型',
-          name: 'belief',
-          value: '每日',
+          name: 'payType',
+          value: 'DAILY',
           mode: 'selector',
           type: 'picker',
           pickerList: ['每日', '每月'],
@@ -140,18 +146,40 @@
       industry_sub: '',
       multiIndex2: [0, 0],
       objectMultiArray: [],
-      Business: []
+      Business: [],
+      multiIndex: [0, 0],
+      addressArray: [],
+      address: [],
+      userInfo: {}
     }
     watch = {
     }
 
     onLoad() {
-      setTimeout(() => {
-        this.photo = this.user.wechat.avatar
-        this.$apply()
-      }, 1200)
       this.objectMultiArray = []
+      this.addressArray = []
       this.geJobType()
+      this.initPageData()
+      this.getAddress()
+      this.$apply()
+    }
+    // 初始化页面数据
+    initPageData() {
+      this.$get({url: `${service.host}/user`}, {
+        success: ({code, data}) => {
+          this.photo = data.avatar
+          this.userInfo = data
+          this.information[0].value = data.name
+          this.information[1].value = data.sex ? data.sex : 1
+          this.information[2].value = data.birthday ? data.birthday : ''
+          this.information[3].value = data.ducation ? data.ducation : ''
+          this.information[4].value = data.school ? data.school : ''
+          // this.information[5].value = data.sex
+          // this.information[6].value = data.sex
+          this.information[7].pickerIndex = data.pay_type == 'MONTHLY'?1:0
+          this.$apply()
+        }
+      })
     }
 
     geJobType() {
@@ -168,17 +196,35 @@
           that.objectMultiArray.push(IndustryArr)
           that.objectMultiArray.push(result[0].sub_categories)
           that.$apply()
-          console.log(that.objectMultiArray)
         },
         fail: ({code, data}) => {
         },
         complete: () => {
-          this.loading = false
+        }
+      })
+    }
+    getAddress() {
+      let that = this
+      this.$get({url: `${service.host}/addresses`}, {
+        success: ({code, data}) => {
+          let result = data
+          that.address = result
+          let IndustryArr = []
+          result.forEach(function (item, index, arr) {
+            IndustryArr.push(arr[index])
+          })
+          that.addressArray.push(IndustryArr)
+          that.addressArray.push(result[0].sub_addresses)
+          that.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
         }
       })
     }
 
-    hideModal(){
+    hideModal() {
       var animation = wx.createAnimation({
         duration: 200,
         timingFunction: 'linear',
@@ -196,25 +242,34 @@
     }
     methods = {
       pickerChange(index, e) { // picker fn
+        console.log(e.detail.value)
         switch (this.information[index].name) {
-          case 'name':case 'birthday':
+          case 'name':
+          case 'birthday':
+          case 'school':
             this.information[index].value = e.detail.value
             break
           case 'sex':
             this.information[index].pickerIndex = e.detail.value
             this.information[index].value = e.detail.value === '0' ? '1' : '2'
             break
-          case 'belief':
+          case 'ducation':
+            this.information[index].pickerIndex = e.detail.value
             this.information[index].value = this.information[index].pickerList[e.detail.value]
+            break
+          case 'payType':
+            this.information[index].pickerIndex = e.detail.value
+            this.information[index].value = e.detail.value == 0 ? 'DAILY' : 'MONTHLY'
             break
         }
         console.log(this.information)
         this.$apply()
       },
-      bindMultiPickerChange2(e) {
+      bindMultiPickerChange2(e) {  // type
         console.log(e)
         console.log('picker发送选择改变，携带值为', e.detail.value)
         this.multiIndex2 = e.detail.value
+        this.information[6].value = e.detail.value
         this.$apply()
       },
       bindMultiPickerColumnChange2(e) {
@@ -228,6 +283,28 @@
               }
             }
             that.multiIndex2[1] = 0
+            break
+        }
+        that.$apply()
+      },
+      bindMultiPickerChange(e) { // address
+        console.log(e)
+        console.log('picker发送选择改变，携带值为', e.detail.value)
+        this.multiIndex = e.detail.value
+        this.information[5].value = e.detail.value
+        this.$apply()
+      },
+      bindMultiPickerColumnChange(e) {
+        let that = this
+        that.multiIndex[e.detail.column] = e.detail.value
+        switch (e.detail.column) {
+          case 0:
+            for (let i = 0; i < that.address.length; i++) {
+              if (that.multiIndex[0] === i) {
+                that.addressArray[1] = that.address[i].sub_addresses
+              }
+            }
+            that.multiIndex[1] = 0
             break
         }
         that.$apply()
@@ -304,6 +381,11 @@
       },
       save() {
         this.hideModal()
+        if (this.type === 'apply') {
+          console.log('报名')
+        }else{
+          console.log('编辑')
+        }
         this.$Toast_success('提交成功')
       }
     }
@@ -368,27 +450,26 @@
     border-radius: 50%;
     margin: auto;
     position: relative;
+    animation:rotate 1500ms 1;
     image{
       width: 182rpx;
       height: 182rpx;
       border-radius: 50%;
       z-index: 99;
-      animation:rotate 1500ms 1;
     }
-    @keyframes rotate {
-      0%{
-        transform:rotate(0deg);
-      }
-      100%{
-        transform:rotate(360deg);
-      }
+  }
+  @keyframes rotate {
+    0%{
+      transform: scale(0.5) rotate(0deg);
+    }
+    100% {
+      transform: scale(1) rotate(360deg);
     }
   }
   .list_item{
     height: 124rpx;
     margin: 0 42rpx;
     border-bottom: 1px solid @f6;
-    /*background: pink;*/
     .item_icon{
       width: 52rpx;
       vertical-align: middle;
@@ -398,7 +479,6 @@
     }
     .item_title{
       line-height: 124rpx;
-      /*background: red;*/
       width: 84%;
     }
     .right_icon{

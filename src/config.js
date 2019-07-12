@@ -3,10 +3,7 @@
 ======================================================== */
 // 域名
 // var host = 'https://love.ufutx.com/api',
-var host = 'http://job.hankin.ufutx.cn/api',
-  book = 'https://christ.data.ufutx.com/api',
-  party = 'https://party.ufutx.com/api'
-// party= 'http://party.hankin.ufutx.cn/api'
+var host = 'http://job.hankin.ufutx.cn/api'
 export const service = {
   // 登录接口
   login: `${host}/wechat/login`,

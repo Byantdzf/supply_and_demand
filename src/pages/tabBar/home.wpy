@@ -11,11 +11,16 @@
         </block>
         <!--<notification></notification>-->
         <view class="bc_swiper_box">
-          <view class="font_30 bold bc_title">推荐文章</view>
+          <view class="bc_title">
+            <span class="font_30 bold color-666">推荐文章</span>
+            <span class="font_22 colorb0 flo_r" style="margin-top: 12rpx;" @tap="goto('/pages/article/list')">更多
+            <image src="http://images.ufutx.com/201906/20/02b0c5873eb2f556ab43d655965644ed.png" mode="widthFix" class="right_icon"></image>
+            </span>
+          </view>
           <view class="bc_swiper">
             <swiper @change="getcurrent" autoplay="{{autoplay}}">
               <swiper-item wx:for="{{articles}}" wx:key="index" style="width: 96%;" wx:for-item="otherUser">
-                <view class="_bc-list_swiper flo_l" wx:for="{{otherUser}}" wx:key="index">
+                <view class="_bc-list_swiper flo_l" wx:for="{{otherUser}}" wx:key="index" @tap="goto('/pages/article/detail?id={{item.id}}')">
                   <image src="{{item.pic}}" mode="aspectFill" class="image"></image>
                   <view class="font_26 ellipsis_1 text-left color-666" style="margin-left: 6rpx;">{{item.title}}</view>
                   <view class="font_24 ellipsis_1 text-left colorb0" style="margin-left: 6rpx;">{{item.sub_title}}</view>
@@ -35,7 +40,9 @@
             每月
           </view>
           <view class="clearfloat"></view>
-          <view class="font_30 bold _bc_title">推荐活动</view>
+          <view class=" _bc_title ">
+            <span class="font_30 bold color-666">推荐活动</span>
+          </view>
         </view>
         <navBarTop :tabs.sync="tabs" @tabClick="tabClick"></navBarTop>
         <view class="bc_center">
@@ -133,6 +140,7 @@
           path: 'https://www.baidu.com/'
         }
       ],
+      inputVal: '',
       images: [
         'http://images.ufutx.com/201812/05/1649aa2e886b21329627029b1aeb9359.png',
         'http://images.ufutx.com/201812/05/c46f2491f8afc9726b4267d7ead8bed1.png',
@@ -177,7 +185,8 @@
       _this.noMore = true
       let url = `${service.host}/home?type=${_this.type}`,
         data = {
-          page: _this.page
+          page: _this.page,
+          keyword: _this.inputVal
         }
       _this.$get({
         url: url, data
@@ -264,6 +273,12 @@
       }
     }
     events = {
+      'search': (value) => { // 搜索返回值
+        this.page = 1
+        this.inputVal = value.inputVal
+        this.$apply()
+        this.getData()
+      },
       'tabClick': (value) => { // NavTab返回值
         console.log(value)
         this.page = 1
@@ -319,13 +334,14 @@
           background: @theme;
           position: absolute;
           left: 0;
-          top: 14rpx;
+          top: 20rpx;
         }
       }
     }
     .bc_title{
       /*margin-top: 42rpx;*/
       margin-left: 30rpx;
+      margin-right: 30rpx;
       padding-left: 16rpx;
       position: relative;
       &:after{
@@ -335,7 +351,12 @@
         background: @theme;
         position: absolute;
         left: 0;
-        top: 14rpx;
+        top: 20rpx;
+      }
+      .right_icon{
+        width: 22rpx;
+        vertical-align: middle;
+        margin-bottom: 4rpx;
       }
     }
     .heart {

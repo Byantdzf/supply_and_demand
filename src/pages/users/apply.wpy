@@ -1,7 +1,15 @@
 <template>
   <view>
     <navBarTop :tabs.sync="tabs" @tapClick="tapClick"></navBarTop>
-    <contentsList :list.sync="list"></contentsList>
+    <block wx:if="{{list.length>0}}">
+      <applyList :list.sync="list"></applyList>
+    </block>
+    <block wx:else>
+      <view class="text-center">
+        <image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix"
+               style="width: 50%;"></image>
+      </view>
+    </block>
     <block wx:if="{{list.length>0}}">
       <view class="_bc-list">
         <block wx:if="{{loading}}">
@@ -23,7 +31,7 @@
 
 <script>
   import wepy from 'wepy'
-  import contentsList from '../../components/contentsList'
+  import applyList from '../../components/applyList'
   import tabSearch from '../../components/tabSearch'
   import navBarTop from '../../components/navBarTop'
   import {service} from '../../config.js'
@@ -36,7 +44,7 @@
       navigationBarTitleText: '我的报名'
     }
     components = {
-      contentsList, tabSearch, navBarTop
+      applyList, tabSearch, navBarTop
     }
     data = {
       tabs: ['进行中', '待开始', '已完成', '已取消'],

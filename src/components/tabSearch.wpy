@@ -9,7 +9,7 @@
         <view class="weui-search-bar__box">
           <!--<image src="http://images.ufutx.com/201905/28/828547386e36c11a03b10e41fae92374.png" class="weui-icon-search_in-box" mode="widthFix" style="width: 28rpx;"></image>-->
           <icon class="weui-icon-search_in-box" type="search" size="14"></icon>
-          <input type="text" class="weui-search-bar__input" placeholder="{{title}}" confirm-type="search" value="{{inputVal}}" focus="{{inputShowed}}" @confirm="inputTyping" />
+          <input type="text" class="weui-search-bar__input" placeholder="{{title}}" confirm-type="search" value="{{inputVal}}" focus="{{inputShowed}}" @confirm="inputTyping" @change="inputTypingfn"/>
           <view class="weui-icon-clear" wx:if="{{inputVal.length > 0}}" bindtap="clearInput">
             <icon type="clear" size="14"></icon>
           </view>
@@ -23,37 +23,68 @@
       <view class="weui-search-bar__cancel-btn font_28" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
     </view>
     <view class="bc_searchIist font_26 text-center ff" wx:if="{{noSearch == 'false'}}">
-      <view class="bc_searchItem flo_l" @tap="showModalFn">
-        类型
-        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
+      <view class="bc_searchItem flo_l {{searchType == 'type'?'activeColor':''}}" @tap="showModalFn('type')">
+        <span wx:if="{{typeText}}">{{typeText}} </span>
+        <span wx:else>类型 </span>
+        <image src="https://images.ufutx.com/201907/15/fbe45a51c00fa19a932c91a4b4558c6d.png" wx:if="{{searchType == 'type'}}" mode="widthFix" class="up_icon"></image>
+        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" wx:else mode="widthFix" class="down_icon"></image>
       </view>
-      <view class="bc_searchItem flo_l" @tap="showModalFn">
-        区域
-        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
+      <view class="bc_searchItem flo_l {{searchType == 'area'?'activeColor':''}}" @tap="showModalFn('area')">
+        <span wx:if="{{addressText}}">{{addressText}} </span>
+        <span wx:else>区域 </span>
+        <image src="https://images.ufutx.com/201907/15/fbe45a51c00fa19a932c91a4b4558c6d.png" wx:if="{{searchType == 'area'}}" mode="widthFix" class="up_icon"></image>
+        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" wx:else mode="widthFix" class="down_icon"></image>
       </view>
-      <view class="bc_searchItem flo_l" @tap="showModalFn">
-        排序
-        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
+      <view class="bc_searchItem flo_l {{searchType == 'sort'?'activeColor':''}}" @tap="showModalFn('sort')">
+        <span wx:if="{{sortText}}">{{sortText}} </span>
+        <span wx:else>排序 </span>
+        <image src="https://images.ufutx.com/201907/15/fbe45a51c00fa19a932c91a4b4558c6d.png"
+               wx:if="{{searchType == 'sort'}}" mode="widthFix" class="up_icon"></image>
+        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" wx:else mode="widthFix" class="down_icon"></image>
       </view>
       <view class="clearfloat"></view>
     </view>
     <slot></slot>
   </view>
-  <view style="height: {{bc_height}}"></view>
+  <view style="height:{{bc_height}}"></view>
+  <!--<image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix" style="width: 50%;" class="close" @tap="hideModal"></image>-->
   <modalUp>
-    <view slot="wrapper" class="color-666 font_28 text-center " style="margin-top: {{bc_height}};padding: 4%;">
-      <!--<image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix" style="width: 50%;" class="close" @tap="hideModal"></image>-->
-      <!--<view class="title color-666">暂无数据</view>-->
-      <scroll-view scroll-y class="main-scroll flo_l" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll" scroll-into-view="{{toView}}" scroll-top="{{scrollTop}}">
-        <block wx:for="{{objectMultiArray[0]}}" wx:key="index">
-          <view class="scroll-view-item mian-item-scroll {{item.active?'mian-item-active':''}}" @tap="jobActive({{index}})">{{item.name}}</view>
-        </block>
-      </scroll-view>
-      <scroll-view scroll-y class="main-scroll main-scroll-sub flo_l" bindscrolltoupper="upper" bindscrolltolower="lower" bindscroll="scroll" scroll-into-view="{{toView}}" scroll-top="{{scrollTop}}">
-        <block wx:for="{{objectMultiArray[1]}}" wx:key="index">
-          <view class="scroll-view-item mian-item-scroll {{item.active?'mian-item-active':''}}" @tap="jobActive({{index}})">{{item.name}}</view>
-        </block>
-      </scroll-view>
+    <view slot="wrapper" class="color-666 font_28 text-center " style="margin-top: {{bc_height}};">
+      <block wx:if="{{searchType === 'type'}}">
+        <view class="main-scroll flo_l">
+          <block wx:for="{{objectMultiArray}}" wx:key="index">
+            <view class="mian-item-scroll font_26 {{item.active?'mian-item-active':''}}" @tap="jobActive({{index}})">{{item.name}}</view>
+          </block>
+        </view>
+        <view class="main-scroll-sub flo_l">
+          <block wx:for="{{sub_objectMultiArray}}" wx:key="index">
+            <view class="mian-item-scroll font_26" @tap="sub_jobActive({{index}})">{{item.name}}</view>
+          </block>
+        </view>
+      </block>
+      <block wx:elif="{{searchType === 'area'}}">
+        <view class="main-scroll flo_l">
+          <block wx:for="{{addressArray}}" wx:key="index">
+            <scroll-view scroll-y>
+              <view class="mian-item-scroll font_26 {{item.active?'mian-item-active':''}}" @tap="jobActive({{index}})">
+                {{item.name}}
+              </view>
+            </scroll-view>
+          </block>
+        </view>
+        <view class="main-scroll-sub flo_l">
+          <block wx:for="{{sub_addressArray}}" wx:key="index">
+            <scroll-view scroll-y>
+              <view class="mian-item-scroll font_26" @tap="sub_jobActive({{index}})">{{item.name}}</view>
+            </scroll-view>
+          </block>
+        </view>
+      </block>
+      <block wx:else>
+        <view class="main-sort-title text-left">选择排序</view>
+        <view class="main-sort-item {{sortType == '0'?'main-sort-item-active':''}}" @tap="sortActive('0')">综合排序</view>
+        <view class="main-sort-item {{sortType == '1'?'main-sort-item-active':''}}" @tap="sortActive('1')">最新发布</view>
+      </block>
       <view class="clearfloat"></view>
     </view>
   </modalUp>
@@ -97,22 +128,34 @@
       }
     }
     data = {
+      typeText: '',
+      addressText: '',
+      sortText: '综合',
       inputShowed: false,
       inputVal: '',
       bc_height: '81px',
+      sortType: 0,
       showModal: false,
       multiIndex2: [0, 0],
       objectMultiArray: [],
+      sub_objectMultiArray: [],
       Business: [],
       multiIndex: [0, 0],
       addressArray: [],
+      sub_addressArray: [],
       address: [],
       toView: 'red',
+      searchType: '',
+      searchArray: {
+        inputVal: '',
+        category_id : '',
+        dist: '',
+        order: 'other'
+      },
       scrollTop: 100
     }
     onLoad() {
-      this.$invoke('modalUp', 'showModal')
-
+      // this.$invoke('modalUp', 'showModal')
       this.objectMultiArray = []
       this.addressArray = []
       this.geJobType()
@@ -124,6 +167,7 @@
       } else {
         this.bc_height = '81px'
         this.$apply()
+
       }
 
       // getElement_WH('.bc_BoxTab_123').then((value) => {
@@ -138,19 +182,19 @@
       this.$get({url: `${service.host}/job/categories`}, {
         success: ({code, data}) => {
           let result = data
-          that.Business = result
-          let IndustryArr = []
-          result.forEach(function (item, index, arr) {
-            IndustryArr.push(arr[index])
-          })
-          console.log(IndustryArr)
-          for (let item of IndustryArr) {
+          for (let item of result) {
             item.active = false
           }
-          that.objectMultiArray.push(IndustryArr)
-          that.objectMultiArray.push(result[0].sub_categories)
+          result.unshift({
+            name: '全部',
+            active: true,
+            sub_categories: [
+              {name: '全部类型'}
+            ]
+          })
+          that.objectMultiArray = result
+          that.sub_objectMultiArray = result[0].sub_categories
           that.$apply()
-          console.log(that.objectMultiArray)
         },
         fail: ({code, data}) => {
         },
@@ -163,13 +207,18 @@
       this.$get({url: `${service.host}/addresses`}, {
         success: ({code, data}) => {
           let result = data
-          that.address = result
-          let IndustryArr = []
-          result.forEach(function (item, index, arr) {
-            IndustryArr.push(arr[index])
+          for (let item of result) {
+            item.active = false
+          }
+          result.unshift({
+            name: '全部',
+            active: true,
+            sub_addresses: [
+              {name: '全部区域'}
+            ]
           })
-          that.addressArray.push(IndustryArr)
-          that.addressArray.push(result[0].sub_addresses)
+          that.addressArray = result
+          that.sub_addressArray = result[0].sub_addresses
           that.$apply()
         },
         fail: ({code, data}) => {
@@ -180,48 +229,89 @@
     }
 
     methods = {
-      upper(e) {
-        console.log(e)
-      },
-      lower(e) {
-        console.log(e)
-      },
-      scroll(e) {
-        console.log(e)
+      sortActive(index) {
+        this.sortType = index
+        this.$apply()
+        if (this.sortType === '0') {
+          this.sortText = '综合'
+          this.searchArray.order = 'other'
+          this.$apply()
+        } else {
+          this.sortText = '最新'
+          this.searchArray.order = 'new'
+          this.$apply()
+        }
+        this.$invoke('modalUp', 'hideModal')
+        this.$emit('search', this.searchArray)
+        console.log(this.searchArray)
       },
       jobActive(index) {
         let vm = this
-        for (let item of vm.objectMultiArray[0]) {
-          item.active = false
+        if (vm.searchType === 'type') {
+          for (let item of vm.objectMultiArray) {
+            item.active = false
+          }
+          vm.objectMultiArray[index].active = true
+          vm.sub_objectMultiArray = vm.objectMultiArray[index].sub_categories
+          vm.$apply()
+        } else if (vm.searchType === 'area') {
+          for (let item of vm.addressArray) {
+            item.active = false
+          }
+          vm.addressArray[index].active = true
+          vm.sub_addressArray = vm.addressArray[index].sub_addresses
+          vm.$apply()
         }
-        vm.objectMultiArray[0][index].active = true
       },
-      showModalFn() {
-        this.showModal = !this.showModal
-        this.$apply()
-        if (this.showModal) {
-          this.$invoke('modalUp', 'showModal')
-        } else {
-          this.$invoke('modalUp', 'hideModal')
+      sub_jobActive(index) {
+        let vm = this
+        if (vm.searchType === 'type') {
+          console.log(vm.sub_objectMultiArray[index].name,index)
+          vm.typeText = vm.sub_objectMultiArray[index].name
+          vm.searchArray.category_id = vm.sub_objectMultiArray[index].name !== '全部类型' ? vm.sub_objectMultiArray[index].id : ''
+          vm.searchType = ''
+          vm.$apply()
+        } else if (vm.searchType === 'area') {
+          console.log(vm.sub_addressArray[index].name)
+          vm.addressText = vm.sub_addressArray[index].name
+          vm.searchArray.dist = vm.sub_addressArray[index].name !== '全部区域' ? vm.sub_addressArray[index].name : ''
+          vm.searchType = ''
+          vm.$apply()
         }
+        vm.$invoke('modalUp', 'hideModal')
+        vm.$emit('search', vm.searchArray)
+      },
+      showModalFn(type) {
+        this.showModal = true
+        this.searchType = type
+        this.$apply()
+        console.log(this.searchType)
+        // if (this.showModal) {
+        this.$invoke('modalUp', 'showModal')
+        // } else {
+        //   this.$invoke('modalUp', 'hideModal')
+        // }
       },
       showInput() {
         if (this.disabled) return
         this.inputShowed = true
       },
       hideInput() {
-        this.inputVal = ''
+        this.searchArray.inputVal = ''
         this.inputShowed = false
-        this.$emit('search', this.inputVal)
+        this.$emit('search', this.searchArray)
       },
       clearInput() {
-        this.inputVal = ''
-        this.$emit('search', this.inputVal)
+        this.searchArray.inputVal = ''
+        this.$emit('search', this.searchArray)
       },
       inputTyping(e) {
         this.$showLoading('搜索中...')
-        this.inputVal = e.detail.value
-        this.$emit('search', this.inputVal)
+        this.searchArray.inputVal = e.detail.value
+        this.$emit('search', this.searchArray)
+      },
+      inputTypingfn(e) {
+        this.searchArray.inputVal = e.detail.value
       },
       goto(url) {
         wx.navigateTo({url: url})
@@ -243,8 +333,10 @@
     position: absolute;
     left: 0;
     top: 0;
-    width: 14%;
-    padding: 22rpx 22rpx;
+    width: 20%;
+    text-align: center;
+    line-height: 98rpx;
+    /*padding: 22rpx 22rpx;*/
     .right_icon{
       width: 36rpx;
       vertical-align: middle;
@@ -280,39 +372,59 @@
   .bc_searchIist{
     width: 100%;
     overflow: hidden;
-    box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
+    border-bottom: 1rpx solid #f1f1f1;
+    /*box-shadow: 1rpx 1rpx 12rpx #d3d3d3;*/
     .bc_searchItem{
       width: 33.3%;
       padding: 16rpx 0;
-      .down_icon{
+      .down_icon,.up_icon{
         width: 22rpx;
         height: auto;
         vertical-align: middle;
       }
+      .up_icon{
+        transform:rotate(180deg);
+      }
+    }
+    .activeColor{
+      color: #0075c5;
     }
   }
 
   .main-scroll {
-    height: 240px;
-    width: 45%;
-    padding-right: 12rpx;
-    /*background: red;*/
-    /*border-right: 2rpx solid #d3d3d3 ;*/
+    height: 72vh;
+    width: 42%;
+    overflow-y: auto;
+    background: #F6F6F6;
     .mian-item-scroll {
-      /*background: wheat;*/
-      margin: 12rpx;
-      padding: 8rpx 0;
-      border-bottom: 2rpx solid #d3d3d3 ;
+      padding: 20rpx 0;
     }
     .mian-item-active{
-      background: #ececec;
+      background: #ffffff;
     }
   }
   .main-scroll-sub{
-    height: 240px;
-    width: 45%;
-    padding-right: 12rpx;
-    /*background: red;*/
-    border-right: none;
+    height: 72vh;
+    width: 58%;
+    overflow-y: auto;
+    .mian-item-scroll {
+      padding: 20rpx 0;
+    }
+  }
+  .main-sort-title{
+    background: #f6f6f6;
+    padding: 6rpx 22rpx;
+  }
+  .main-sort-item{
+    width: 36%;
+    padding: 12rpx 0;
+    margin: 22rpx auto;
+    border-radius: 8rpx;
+    border: 1rpx solid #dadada;
+  }
+  .main-sort-item-active{
+    background: #a6c5f6;
+    color: white;
+    /*border: 1rpx solid #0075c5;*/
   }
 </style>

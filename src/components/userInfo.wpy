@@ -178,7 +178,7 @@
     initPageData() {
       this.$get({url: `${service.host}/user`}, {
         success: ({code, data}) => {
-          this.photo = data.avatar
+          this.photo = data.wechat ? data.wechat.avatar : ''
           this.userInfo = data
           this.information[0].value = data.name
           this.information[1].value = data.sex ? data.sex : 1
@@ -225,7 +225,6 @@
             }
           })
           console.log(data.dist, data.address)
-
           this.$apply()
         }
       })

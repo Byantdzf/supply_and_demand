@@ -146,7 +146,7 @@
     onLoad(e) {
       this.id = e.id
       this.$apply()
-      this.$invoke('userInfo', 'showModal')
+      // this.$invoke('userInfo', 'showModal')
     }
 
     onShow() {
@@ -171,6 +171,7 @@
             onNodeCreate(nodeName, attrs) {
             }
           })
+          vm.openLocation()
         },
         fail: ({code, data}) => {
         },
@@ -224,11 +225,15 @@
       },
       openLocation() {
         let vm = this
-        wx.getLocation({
-          type: 'gcj02', // 返回可以用于wx.openLocation的经纬度
+        console.log(vm.information.lat)
+        console.log(vm.information.lng)
+        debugger
+        wx.getLocation({ // 返回可以用于wx.openLocation的经纬度
+          type: 'gcj02',
           success(res) {
             const latitude = vm.information.lat
             const longitude = vm.information.lng
+            debugger
             wx.openLocation({
               latitude,
               longitude,

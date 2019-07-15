@@ -1,0 +1,141 @@
+<template>
+  <view class="bc_detail font_28 color-666 text-wrapper">
+    <wepyhtml></wepyhtml>
+  </view>
+  <modal>
+    <view slot="wrapper" class="color-666 font_28 wrapperModal ">
+    </view>
+  </modal>
+</template>
+<script>
+  import wepy from 'wepy'
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import modal from '../../components/modal'
+  import wepyhtml from 'wepy-html'
+
+  export default class articleDetail extends wepy.page {
+    mixins = [base, http]
+    config = {
+      navigationBarTitleText: '文章详情'
+    }
+    components = {modal, wepyhtml}
+    data = {
+      id: '',
+      count: 0,
+      information: {},
+      members: []
+    }
+    onLoad(e) {
+      this.id = e.id
+      this.$apply()
+    }
+
+    onShow() {
+      this.getData()
+    }
+
+    getData() {
+      let vm = this
+      let url = `${service.host}/articles/${vm.id}`
+      vm.$get({url: url
+      }, {
+        success: ({code, data}) => {
+          vm.information = data
+          let {content} = data
+          vm.$invoke('wepyhtml', 'updateContent', content, {
+            imgInsteadOfVideo: true,
+            onHyperlinkTap(e) {
+            },
+            onNodeCreate(nodeName, attrs) {
+            }
+          })
+          vm.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
+    methods = {
+      copyText(text) {
+        console.log(text)
+        this.$copyText(text)
+      },
+      hideModal() {
+        this.$invoke('modal', 'hideModal')
+      },
+      goto(url) {
+        this.$goto(url)
+      },
+      showRule() {
+        this.$invoke('modal', 'showModal')
+      },
+      showJoin() { // 显示已经报名
+        this.$showToast('你已经报名了！')
+      },
+      collect() {  // 收藏
+        let vm = this
+        vm.$post({url: `${service.host}/collect/jobs/${vm.id}`}, {
+          success: ({code, data}) => {
+            vm.information.is_collected = !vm.information.is_collected
+            vm.$apply()
+            if (vm.information.is_collected == 1) {
+              vm.$Toast_success('收藏成功')
+            } else {
+              vm.$showToast('已取消')
+            }
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+          }
+        })
+      },
+      makePhoneCall(iphone) { // 拨打电话
+        this.$makePhoneCall(iphone)
+      },
+      showUserInfo() {
+        this.$invoke('modal', 'hideModal')
+        setTimeout(() => {
+          this.$invoke('userInfo', 'showModal')
+        })
+      },
+      openLocation() {
+        let vm = this
+        wx.getLocation({
+          type: 'gcj02', // 返回可以用于wx.openLocation的经纬度
+          success(res) {
+            const latitude = vm.information.lat
+            const longitude = vm.information.lng
+            wx.openLocation({
+              latitude,
+              longitude,
+              scale: 18
+            })
+          }
+        })
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+
+  page {
+    background: white !important;
+    .bc_detail{
+      background: white;
+      padding: 22rpx;
+    }
+  }
+
+  /* 可以覆盖默认样式 */
+  .wepyhtml-tag-p {
+    /*margin: 1em 0;*/
+  }
+</style>

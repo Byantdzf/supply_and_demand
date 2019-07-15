@@ -45,6 +45,7 @@
       noMore: false,
       current: 0,
       type: 'MONTHLY',
+      searchObj: {},
       page: 1,
       list: []
     }
@@ -65,7 +66,11 @@
       _this.noMore = true
       let url = `${service.host}/jobs?type=${_this.type}`,
         data = {
-          page: _this.page
+          page: _this.page,
+          keyword: _this.searchObj.inputVal ? _this.searchObj.inputVal : '',
+          category_id: _this.searchObj.category_id ? _this.searchObj.category_id : '',
+          dist: _this.searchObj.dist ? _this.searchObj.dist : '',
+          order: _this.searchObj.order ? _this.searchObj.order : ''
         }
       _this.$get({
         url: url, data
@@ -116,6 +121,15 @@
       })
     }
     methods = {}
+    events = {
+      'search': (value) => { // 搜索返回值
+        this.page = 1
+        this.searchObj = value
+        this.$apply()
+        console.log(this.searchObj)
+        this.getData()
+      }
+    }
   }
 </script>
 

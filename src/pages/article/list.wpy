@@ -1,9 +1,18 @@
 <template>
   <view>
-    <view>
-      <tabSearch></tabSearch>
+    <Search></Search>
+    <view style="height: 100rpx;"></view>
+    <view class="main-list" wx:for="{{list}}" wx:key="index" @tap="goto('/pages/article/detail?id={{item.id}}')">
+      <view class="main-item">
+        <view class="main-pic text-center flo_l">
+          <image src="{{item.pic}}" mode="aspectFill"></image>
+        </view>
+        <view class="main-box flo_l ">
+          <view class="main-title font_28 color-666 bold ellipsis_1">{{item.title}}</view>
+          <view class="main-info font_26 colorb0 ellipsis_2">{{item.sub_title}}</view>
+        </view>
+      </view>
     </view>
-    <contentsList :list.sync="list"></contentsList>
     <block wx:if="{{list.length>0}}">
       <view class="_bc-list">
         <block wx:if="{{loading}}">
@@ -25,30 +34,27 @@
 
 <script>
   import wepy from 'wepy'
-  import contentsList from '../../components/contentsList'
-  import tabSearch from '../../components/tabSearch'
   import {service} from '../../config.js'
   import http from '../../mixins/http'
   import base from '../../mixins/base'
   import user from '../../mixins/user'
+  import Search from '../../components/SearchV2'
 
-  export default class daily extends wepy.page {
+  export default class articleList extends wepy.page {
     mixins = [base, http, user]
     config = {
-      navigationBarTitleText: '每日活动'
+      navigationBarTitleText: '文章列表'
     }
+    components = {Search}
     data = {
       loading: false,
       noSearch: 'true',
       noMore: false,
       current: 0,
-      type: 'DAILY',
+      inputVal: '',
+      type: 'MONTHLY',
       page: 1,
-      searchObj: {},
       list: []
-    }
-    components = {
-      contentsList, tabSearch
     }
     onShow() {
       this.getData()
@@ -65,13 +71,9 @@
       let _this = this
       _this.loading = true
       _this.noMore = true
-      let url = `${service.host}/jobs?type=${_this.type}`,
+      let url = `${service.host}/articles?keyword=${_this.inputVal}`,
         data = {
-          page: _this.page,
-          keyword: _this.searchObj.inputVal ? _this.searchObj.inputVal : '',
-          category_id: _this.searchObj.category_id ? _this.searchObj.category_id : '',
-          dist: _this.searchObj.dist ? _this.searchObj.dist : '',
-          order: _this.searchObj.order ? _this.searchObj.order : ''
+          page: _this.page
         }
       _this.$get({
         url: url, data
@@ -121,14 +123,17 @@
         }
       })
     }
-    methods = {}
+    methods = {
+      goto(url) {
+        this.$goto(url)
+      }
+    }
     events = {
-      'search': (value) => { // 搜索返回值
+      'search': (value) => {
+        // 搜索返回值
         this.page = 1
-        this.list = []
-        this.searchObj = value
+        this.inputVal = value
         this.$apply()
-        console.log(this.searchObj)
         this.getData()
       }
     }
@@ -136,7 +141,38 @@
 </script>
 
 <style lang="less">
-  page{
+  @import "../../styles/weui/base/fn.wxss";
+  @import "../../styles/custom/fn.less";
+  page {
     background: white !important;
+
+    .main-list {
+      overflow: hidden;
+      margin: 0 22rpx;
+      padding: 22rpx 0;
+      border-bottom: 1rpx solid #d3d3d3;
+      .main-item {
+        .main-pic {
+          width: 120rpx;
+          height: 120rpx;
+          image {
+            width: 100%;
+            height: 100%;
+          }
+        }
+
+        .main-box {
+          width: 78%;
+          margin-left: 18rpx;
+          .main-title {
+
+          }
+
+          .main-info {
+
+          }
+        }
+      }
+    }
   }
 </style>

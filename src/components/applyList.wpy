@@ -13,7 +13,8 @@
         <view class="item_subhead font_28 ellipsis_1">{{item.intro}}</view>
         <view class="item_time font_26 ellipsis_1">{{item.job_time}}</view>
         <view class="item_price font_26 bold text-right">{{item.reward}}元</view>
-        <view class="item_state font_26">{{item.status_name}}</view>
+        <view class="item_state font_26 flo_l">{{item.status_name}}</view>
+        <view class="font_26 flo_r cancle" @tap="cancle({{item.id}})">取消报名</view>
       </view>
     </view>
   </block>
@@ -23,7 +24,7 @@
   import wepy from 'wepy'
   import base from '../mixins/base'
 
-  export default class contentsList extends wepy.component {
+  export default class applyList extends wepy.component {
     mixins = [base]
     props = {
       list: {
@@ -59,6 +60,9 @@
       }
     }
     methods = {
+      cancle() {
+
+      },
       goto(url) {
         this.$goto(url)
       }
@@ -109,6 +113,12 @@
         right: 0rpx;
         top: 32rpx;
         color: @theme;
+      }
+      .cancle{
+        margin-top: 16rpx;
+        padding: 2rpx 12rpx;
+        border: 1rpx solid #d3d3d3;
+        border-radius: 6rpx;
       }
       .item_state{
         margin-top: 16rpx;

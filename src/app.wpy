@@ -45,6 +45,13 @@
             'detail',
             'member'
           ]
+        },
+        {
+          'root': 'pages/article',
+          'pages': [
+            'detail',
+            'list'
+          ]
         }
       ],
       window: {

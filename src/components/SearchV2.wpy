@@ -49,7 +49,7 @@
       },
       BColor: {
         type: String,
-        default: false
+        default: '#ffffff'
       }
     }
     data = {
@@ -84,6 +84,110 @@
 
 <style type="less">
 @import "../styles/custom/fn.less";
-.weui-tab{
+page{
+  background: white;
+}
+.weui-search-bar {
+  border: none;
+  position: relative;
+  border-bottom: 1rpx solid #f1f1f1;
+}
+.search_address{
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 20%;
+  text-align: center;
+  line-height: 98rpx;
+  /*padding: 22rpx 22rpx;*/
+  .right_icon{
+    width: 36rpx;
+    vertical-align: middle;
+    margin-bottom: 2rpx;
+    height: auto;
+    margin-left: -4rpx;
+  }
+}
+.weui-search-bar__box{
+}
+.weui-search-bar__form, .weui-search-bar__label{
+  background: #f3f3f3 !important;
+  color: @darkgray;
+  border-radius: 36rpx;
+  border: none;
+}
+.weui-search-bar__text{
+  color: @gray;
+}
+.weui-search-bar__cancel-btn{
+  color: @darkgray;
+}
+.weui-search-bar__label{
+  text-align: left;
+  padding-left: 20rpx;
+}
+.weui-tab__content{
+  width: 100%;
+  position: fixed;
+  top: 0;
+  z-index: 10010;
+}
+.bc_searchIist{
+  width: 100%;
+  overflow: hidden;
+  border-bottom: 1rpx solid #f1f1f1;
+  /*box-shadow: 1rpx 1rpx 12rpx #d3d3d3;*/
+  .bc_searchItem{
+    width: 33.3%;
+    padding: 16rpx 0;
+    .down_icon,.up_icon{
+      width: 22rpx;
+      height: auto;
+      vertical-align: middle;
+    }
+    .up_icon{
+      transform:rotate(180deg);
+    }
+  }
+  .activeColor{
+    color: #0075c5;
+  }
+}
+
+.main-scroll {
+  height: 72vh;
+  width: 42%;
+  overflow-y: auto;
+  background: #F6F6F6;
+  .mian-item-scroll {
+    padding: 20rpx 0;
+  }
+  .mian-item-active{
+    background: #ffffff;
+  }
+}
+.main-scroll-sub{
+  height: 72vh;
+  width: 58%;
+  overflow-y: auto;
+  .mian-item-scroll {
+    padding: 20rpx 0;
+  }
+}
+.main-sort-title{
+  background: #f6f6f6;
+  padding: 6rpx 22rpx;
+}
+.main-sort-item{
+  width: 36%;
+  padding: 12rpx 0;
+  margin: 22rpx auto;
+  border-radius: 8rpx;
+  border: 1rpx solid #dadada;
+}
+.main-sort-item-active{
+  background: #a6c5f6;
+  color: white;
+  /*border: 1rpx solid #0075c5;*/
 }
 </style>

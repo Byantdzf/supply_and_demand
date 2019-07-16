@@ -4,8 +4,8 @@
     <view class="user_box text-center">
       <image src="https://images.ufutx.com/201907/12/1bf6336eb94725606f979d0bd0c31d0e.png" mode="widthFix" class="bc_image"></image>
       <view class="user_photo ff" @tap="detection">
-        <block wx:if="{{Image}}" >
-          <image src="{{Image}}" mode="aspectFill"></image>
+        <block wx:if="{{photo}}" >
+          <image src="{{photo}}" mode="aspectFill"></image>
         </block>
         <block wx:else>
           <open-data type="userAvatarUrl"></open-data>
@@ -50,14 +50,14 @@
   import Loading from '../../components/loading'
   import userInfo from '../../components/userInfo'
   import {service} from '../../config.js'
-
+  import uploadImage from '../../components/uploadImage'
   export default class User extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
       navigationBarTitleText: '我的',
       enablePullDownRefresh: true
     }
-    components = {userTitle, Loading, userInfo}
+    components = {userTitle, Loading, userInfo, uploadImage}
     data = {
       libraries: {},
       user: {},
@@ -102,7 +102,7 @@
     computed = {}
 
     onShow() {
-      this.initPageData()
+
       this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
     }
     onShareAppMessage(res) {
@@ -110,6 +110,7 @@
     }
 
     onLoad(e) {
+      this.initPageData()
       // setTimeout(() => {
       //   this.photo = 'https://ss3.bdstatic.com/70cFv8Sh_Q1YnxGkpoWK1HF6hhy/it/u=4259300811,497831842&fm=27&gp=0.jpg'
       //   this.$apply()
@@ -126,7 +127,7 @@
         success: ({code, data}) => {
           this.init = true
           this.user = data
-          this.Image = data.wechat.avatar
+          this.photo = data.wechat.avatar
           this.$apply()
           wx.setStorageSync('type', data.type)
         }
@@ -151,37 +152,18 @@
         this.$invoke('userInfo', 'showModal')
       },
       detection() {
-        let vm = this
-        wx.chooseImage({
-          count: 9,
-          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-          success: (res) => {
-            console.log(res)
-            console.log(res.tempFilePaths[0])
-            // wx.getFileSystemManager().readFile({
-            //   filePath: res.tempFilePaths[0], // 选择图片返回的相对路径
-            //   encoding: 'base64', // 编码格式
-            //   success: rest => { // 成功的回调
-            //     console.log('data:image/png;base64,' + rest.data)
-                // let base64 = wx.getFileSystemManager().readFileSync(res.tempFilePaths[0], 'base64')
-            vm.$post({
-              url: `${service.host}/upload`,
-              data: {
-                file: res.tempFilePaths[0]
-              }
-            }, {
-              success: ({code, data}) => {
-                console.log(data)
-              }
-            })
-            //   }
-            // })
-          }
-        })
+        this.$invoke('uploadImage', 'chooseimage')
       },
       goto(url) {
         this.$goto(url)
+      }
+    }
+    events = {
+      'UpLoadImage': (value) => {
+        let vm = this
+        vm.photo = value
+        vm.$apply()
+        console.log(vm.photo)
       }
     }
   }

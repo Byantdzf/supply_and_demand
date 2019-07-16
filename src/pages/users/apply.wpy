@@ -2,12 +2,12 @@
   <view>
     <navBarTop :tabs.sync="tabs" @tapClick="tapClick"></navBarTop>
     <block wx:if="{{list.length>0}}">
-      <applyList :list.sync="list"></applyList>
+      <applyList :list.sync="list"  :status.sync="status"></applyList>
     </block>
     <block wx:else>
       <view class="text-center">
         <image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix"
-               style="width: 50%;"></image>
+               style="width: 50%;margin-top: 12%;"></image>
       </view>
     </block>
     <block wx:if="{{list.length>0}}">
@@ -52,8 +52,8 @@
       noSearch: 'true',
       noMore: false,
       current: 0,
-      type: 'MONTHLY',
-      status: 'UNDERWAY', //tabClass
+      type: '',
+      status: 'UNDERWAY', // tabClass
       page: 1,
       list: []
     }

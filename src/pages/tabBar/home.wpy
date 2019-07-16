@@ -46,7 +46,15 @@
         </view>
         <navBarTop :tabs.sync="tabs" @tabClick="tabClick"></navBarTop>
         <view class="bc_center">
-          <contentsList :list.sync="list"></contentsList>
+          <block wx:if="{{list.length>0}}">
+            <contentsList :list.sync="list"></contentsList>
+          </block>
+          <block wx:else>
+            <view class="text-center">
+              <image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix"
+                     style="width: 50%;margin-top: 12%;"></image>
+            </view>
+          </block>
         </view>
         <block wx:if="{{list.length>0}}">
           <view class="_bc-list">
@@ -282,6 +290,7 @@
       'tabClick': (value) => { // NavTab返回值
         console.log(value)
         this.page = 1
+        this.list = []
         if (value == 0) {
           this.type = 'MONTHLY'
           this.$apply()

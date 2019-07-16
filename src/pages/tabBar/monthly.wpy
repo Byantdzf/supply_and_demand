@@ -3,23 +3,29 @@
     <view>
       <tabSearch></tabSearch>
     </view>
-    <contentsList :list.sync="list"></contentsList>
     <block wx:if="{{list.length>0}}">
-      <view class="_bc-list">
-        <block wx:if="{{loading}}">
-          <view class="weui-loadmore">
-            <view class="weui-loading"></view>
-            <view class="weui-loadmore__tips" style="background: white">正在加载</view>
-          </view>
-        </block>
-        <block wx:if="{{noMore}}">
-          <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
-            <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"
-                  style="background: white"></view>
-          </view>
-        </block>
+      <contentsList :list.sync="list"></contentsList>
+    </block>
+    <block wx:else>
+      <view class="text-center">
+        <image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix"
+               style="width: 50%;margin-top: 12%;"></image>
       </view>
     </block>
+    <view class="_bc-list">
+      <block wx:if="{{loading}}">
+        <view class="weui-loadmore">
+          <view class="weui-loading"></view>
+          <view class="weui-loadmore__tips" style="background: white">正在加载</view>
+        </view>
+      </block>
+      <block wx:if="{{noMore}}">
+        <view class="weui-loadmore weui-loadmore_line weui-loadmore_dot">
+          <view class="weui-loadmore__tips weui-loadmore__tips_in-line weui-loadmore__tips_in-dot"
+                style="background: white"></view>
+        </view>
+      </block>
+    </view>
   </view>
 </template>
 
@@ -124,6 +130,7 @@
     events = {
       'search': (value) => { // 搜索返回值
         this.page = 1
+        this.list = []
         this.searchObj = value
         this.$apply()
         console.log(this.searchObj)

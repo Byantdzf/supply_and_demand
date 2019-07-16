@@ -10,11 +10,11 @@
           <image src="http://images.ufutx.com/201905/28/e4c792af693e669c1a5ee1aae22797aa.png" mode="widthFix"
                  wx:if="{{item.is_top > 0}}" class="topIcon"></image>
         </view>
-        <view class="item_subhead font_28 ellipsis_1">{{item.intro}}</view>
+        <view class="item_subhead font_28 ellipsis_1">{{item.sub_title}}</view>
         <view class="item_time font_26 ellipsis_1">{{item.job_time}}</view>
         <view class="item_price font_26 bold text-right">{{item.reward}}元</view>
         <view class="item_state font_26 flo_l">{{item.status_name}}</view>
-        <view class="font_26 flo_r cancle" @tap="cancle({{item.id}})">取消报名</view>
+        <view class="font_26 flo_r cancle" wx:if="{{status == 'UNDERWAY'}}" @tap.stop="cancle({{index}}, {{item.id}})">取消报名</view>
       </view>
     </view>
   </block>
@@ -22,14 +22,20 @@
 
 <script>
   import wepy from 'wepy'
+  import {service} from '../config.js'
+  import http from '../mixins/http'
   import base from '../mixins/base'
 
   export default class applyList extends wepy.component {
-    mixins = [base]
+    mixins = [base, http]
     props = {
       list: {
         type: Array,
         default: []
+      },
+      status: {
+        type: Object,
+        default: 'UNDERWAY'
       }
     }
     data = {
@@ -37,7 +43,7 @@
     components = {}
 
     onLoad() {
-
+      console.log(this.status)
     }
     watch = {
       list() {
@@ -60,8 +66,21 @@
       }
     }
     methods = {
-      cancle() {
-        debugger
+      cancle(index, id) {
+        this.$showLoading('取消报名中...')
+        this.$post({
+          url: `${service.host}/cancel/join/jobs/${id}`
+        }, {
+          success: ({code, data}) => {
+            this.$showToast('已取消')
+            this.list.splice(index, 1)
+          },
+          fail: ({code, data}) => {
+          },
+          complete: () => {
+            wx.hideLoading()
+          }
+        })
       },
       goto(url) {
         this.$goto(url)

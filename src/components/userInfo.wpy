@@ -6,7 +6,12 @@
       <view class="user_box text-center">
         <image src="https://images.ufutx.com/201907/12/f260a5ad7f97c949d955d9daeec0caac.png" mode="widthFix" class="bc_image"></image>
         <view class="user_photo ff" @tap="detection">
-          <image src="{{photo}}" mode="aspectFill"></image>
+          <block wx:if="{{photo}}" >
+            <image src="{{photo}}" mode="aspectFill"></image>
+          </block>
+          <block wx:else>
+            <open-data type="userAvatarUrl"></open-data>
+          </block>
         </view>
         <view class="userInfoBox" wx:for="{{information}}" wx:key="index">
           <view class="item_title flo_l font_30">{{item.title}}:</view>

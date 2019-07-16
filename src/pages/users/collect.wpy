@@ -90,12 +90,16 @@
           if (_this.list.length === 0 || _this.page === 1) {
             _this.list = []
             for (let item of data) {
-              _this.list.push(item.job)
+              if (item.job) {
+                _this.list.push(item.job)
+              }
             }
             _this.loading = false
           } else {
             data.map(function (item, index) {
-              _this.list.push(item.job)
+              if (item.job) {
+                _this.list.push(item.job)
+              }
               setTimeout(() => {
                 _this.loading = false
               }, 500)

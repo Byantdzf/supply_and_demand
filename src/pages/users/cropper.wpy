@@ -1,0 +1,61 @@
+<template>
+  <wepy-image-cropper id="image-cropper" :limit_move="limit_move" :disable_rotate="disable_rotate" :borderColor="borderColor" :width="width" :height="height" :imgSrc.sync="src" @load.user="cropperload" @imageload.user="loadimage" @tapcut.user="clickcut"></wepy-image-cropper>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import WepyImageCropper from 'wepy-image-cropper'
+
+  export default class Test extends wepy.page {
+    config = {
+      navigationBarTitleText: '',
+    }
+    components = {
+      'wepy-image-cropper': WepyImageCropper
+    }
+
+    mixins = []
+
+    data = {
+      src: '',
+      width: 350,//宽度
+      height: 350,//高度
+      limit_move: true,
+      disable_rotate: true,
+      borderColor: 'skyblue',
+    }
+    onLoad(options) {
+    }
+    onReady() {
+      //开始裁剪
+      this.src = 'https://raw.githubusercontent.com/1977474741/image-cropper/dev/image/code.jpg'
+      wx.showLoading({
+        title: '加载中'
+      })
+    }
+
+    computed = {
+    }
+
+    methods = {
+      cropperload(e) {
+        console.log("cropper初始化完成:" + e);
+      },
+      loadimage(e){
+        console.log("图片加载完成",e);
+
+      },
+      clickcut(e) {
+        console.log(e);
+        //点击裁剪框阅览图片
+        wx.previewImage({
+          current: e.url, // 当前显示图片的http链接
+          urls: [e.url] // 需要预览的图片http链接列表
+        })
+      }
+    }
+
+    events = {
+    }
+  }
+</script>

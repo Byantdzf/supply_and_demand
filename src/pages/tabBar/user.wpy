@@ -3,9 +3,9 @@
   <view class="page-user ff">
     <view class="user_box text-center">
       <image src="https://images.ufutx.com/201907/12/1bf6336eb94725606f979d0bd0c31d0e.png" mode="widthFix" class="bc_image"></image>
-      <view class="user_photo ff" @tap="detection">
+      <view class="user_photo ff">
         <block wx:if="{{photo}}" >
-          <image src="{{photo}}" mode="aspectFill"></image>
+          <image src="{{photo}}" mode="aspectFill"  @tap="previewImage({{photo}})"></image>
         </block>
         <block wx:else>
           <open-data type="userAvatarUrl"></open-data>
@@ -127,7 +127,7 @@
         success: ({code, data}) => {
           this.init = true
           this.user = data
-          this.photo = data.wechat.avatar
+          this.photo = data.avatar ? data.avatar : data.wechat.avatar
           this.$apply()
           wx.setStorageSync('type', data.type)
         }
@@ -148,6 +148,9 @@
     }
 
     methods = {
+      previewImage(image) {
+        this.$previewImage(image)
+      },
       showModel() {
         this.$invoke('userInfo', 'showModal')
       },
@@ -158,11 +161,25 @@
         this.$goto(url)
       }
     }
+    saveAvatar() {
+      console.log(this.photo)
+      this.$put({
+        url: `${service.host}/user/avatar`,
+        data: {
+          avatar: this.photo
+        }
+      }, {
+        success: ({code, data}) => {
+          console.log(data)
+        }
+      })
+    }
     events = {
       'UpLoadImage': (value) => {
         let vm = this
         vm.photo = value
         vm.$apply()
+        vm.saveAvatar()
         console.log(vm.photo)
       }
     }

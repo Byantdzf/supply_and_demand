@@ -12,11 +12,11 @@
   "license": "GPL-3.0",
   "dependencies": {
     "promise-polyfill": "^8.1.0",
-    "we-cropper": "^1.3.7",
     "wepy": "^1.7.1",
     "wepy-async-function": "^1.4.4",
     "wepy-com-toast": "^1.0.2",
     "wepy-html": "^0.1.4",
+    "wepy-image-cropper": "^1.0.1",
     "yeast": "^0.1.2"
   },
   "devDependencies": {

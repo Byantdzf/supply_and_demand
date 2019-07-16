@@ -61,6 +61,7 @@
   import base from '../mixins/base'
   import {service} from '../config.js'
   import http from '../mixins/http'
+  import uploadImage from '../components/uploadImage'
 
   export default class modal extends wepy.component {
     mixins = [base, http]
@@ -73,6 +74,7 @@
       }
     }
     components = {
+      uploadImage
     }
     data = {
       showModalStatus: false,
@@ -163,7 +165,19 @@
     }
     watch = {
     }
-
+    saveAvatar() {
+      console.log(this.photo)
+      this.$put({
+        url: `${service.host}/user/avatar`,
+        data: {
+          avatar: this.photo
+        }
+      }, {
+        success: ({code, data}) => {
+          console.log(data)
+        }
+      })
+    }
     onLoad() {
       this.objectMultiArray = []
       this.addressArray = []
@@ -183,7 +197,7 @@
     initPageData() {
       this.$get({url: `${service.host}/user`}, {
         success: ({code, data}) => {
-          this.photo = data.wechat ? data.wechat.avatar : ''
+          this.photo = data.avatar ? data.avatar : data.wechat.avatar
           this.userInfo = data
           this.information[0].value = data.name
           this.information[1].value = data.sex ? data.sex : 1
@@ -342,33 +356,7 @@
 
     methods = {
       detection() {
-        let vm = this
-        wx.chooseImage({
-          count: 9,
-          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
-          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
-          success: (res) => {
-            console.log(res)
-            wx.getFileSystemManager().readFile({
-              filePath: res.tempFilePaths[0], // 选择图片返回的相对路径
-              encoding: 'base64', // 编码格式
-              success: rest => { // 成功的回调
-                console.log('data:image/png;base64,' + rest.data)
-                // let base64 = wx.getFileSystemManager().readFileSync(res.tempFilePaths[0], 'base64')
-                vm.$post({
-                  url: `${service.host}/upload`,
-                  data: {
-                    file: rest.data
-                  }
-                }, {
-                  success: ({code, data}) => {
-                    console.log(data)
-                  }
-                })
-              }
-            })
-          }
-        })
+        this.$invoke('uploadImage', 'chooseimage')
       },
       pickerChange(index, e) { // picker fn
         console.log(e.detail.value)
@@ -515,6 +503,15 @@
         } else {
           this.saveUserInfo()
         }
+      }
+    }
+    events = {
+      'UpLoadImage': (value) => {
+        let vm = this
+        vm.photo = value
+        vm.$apply()
+        vm.saveAvatar()
+        console.log(vm.photo)
       }
     }
   }

@@ -50,6 +50,7 @@
           'root': 'pages/article',
           'pages': [
             'detail',
+            'detail',
             'list'
           ]
         }

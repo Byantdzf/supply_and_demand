@@ -61,7 +61,7 @@
     }
     methods = {
       cancle() {
-
+        debugger
       },
       goto(url) {
         this.$goto(url)

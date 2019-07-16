@@ -3,7 +3,7 @@ import { service } from '../config.js'
 
 export default class upload_image extends wepy.mixin {
   data = {
-    Image: '',
+    Image: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
     files: '',
     ShowUpload: false,
     BookImage: ''

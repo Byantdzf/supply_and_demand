@@ -4,8 +4,8 @@
     <view class="user_box text-center">
       <image src="https://images.ufutx.com/201907/12/1bf6336eb94725606f979d0bd0c31d0e.png" mode="widthFix" class="bc_image"></image>
       <view class="user_photo ff" @tap="detection">
-        <block wx:if="{{photo}}" >
-          <image src="{{photo}}" mode="aspectFill"></image>
+        <block wx:if="{{Image}}" >
+          <image src="{{Image}}" mode="aspectFill"></image>
         </block>
         <block wx:else>
           <open-data type="userAvatarUrl"></open-data>
@@ -126,7 +126,7 @@
         success: ({code, data}) => {
           this.init = true
           this.user = data
-          this.photo = data.wechat.avatar
+          this.Image = data.wechat.avatar
           this.$apply()
           wx.setStorageSync('type', data.type)
         }
@@ -165,7 +165,7 @@
                 console.log('data:image/png;base64,' + rest.data)
                 // let base64 = wx.getFileSystemManager().readFileSync(res.tempFilePaths[0], 'base64')
                 vm.$post({
-                  url: `${service.host}/vivo/detection`,
+                  url: `${service.host}/upload`,
                   data: {
                     file: rest.data
                   }

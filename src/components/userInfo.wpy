@@ -5,8 +5,8 @@
     <view class="model_page-user ff">
       <view class="user_box text-center">
         <image src="https://images.ufutx.com/201907/12/f260a5ad7f97c949d955d9daeec0caac.png" mode="widthFix" class="bc_image"></image>
-        <view class="user_photo ff" @tap="chooseimage">
-          <image src="{{Image}}" mode="aspectFill"></image>
+        <view class="user_photo ff" @tap="detection">
+          <image src="{{photo}}" mode="aspectFill"></image>
         </view>
         <view class="userInfoBox" wx:for="{{information}}" wx:key="index">
           <view class="item_title flo_l font_30">{{item.title}}:</view>
@@ -56,10 +56,9 @@
   import base from '../mixins/base'
   import {service} from '../config.js'
   import http from '../mixins/http'
-  import upload_images from '../mixins/upload_images'
 
   export default class modal extends wepy.component {
-    mixins = [base, http, upload_images]
+    mixins = [base, http]
     props = {
       type: {
         type: ''
@@ -76,7 +75,6 @@
       animationData: {},
       photo: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
       StateText: '',
-      Image: '',
       text: '提交',
       information: [
         {
@@ -180,7 +178,7 @@
     initPageData() {
       this.$get({url: `${service.host}/user`}, {
         success: ({code, data}) => {
-          this.Image = data.wechat ? data.wechat.avatar : ''
+          this.photo = data.wechat ? data.wechat.avatar : ''
           this.userInfo = data
           this.information[0].value = data.name
           this.information[1].value = data.sex ? data.sex : 1
@@ -338,6 +336,35 @@
     }
 
     methods = {
+      detection() {
+        let vm = this
+        wx.chooseImage({
+          count: 9,
+          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+          success: (res) => {
+            console.log(res)
+            wx.getFileSystemManager().readFile({
+              filePath: res.tempFilePaths[0], // 选择图片返回的相对路径
+              encoding: 'base64', // 编码格式
+              success: rest => { // 成功的回调
+                console.log('data:image/png;base64,' + rest.data)
+                // let base64 = wx.getFileSystemManager().readFileSync(res.tempFilePaths[0], 'base64')
+                vm.$post({
+                  url: `${service.host}/upload`,
+                  data: {
+                    file: rest.data
+                  }
+                }, {
+                  success: ({code, data}) => {
+                    console.log(data)
+                  }
+                })
+              }
+            })
+          }
+        })
+      },
       pickerChange(index, e) { // picker fn
         console.log(e.detail.value)
         switch (this.information[index].name) {

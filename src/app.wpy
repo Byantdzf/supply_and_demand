@@ -35,6 +35,7 @@
             'apply',
             'setting',
             'about',
+            'cropper',
             'cooperation',
             'question'
           ]
@@ -49,7 +50,6 @@
         {
           'root': 'pages/article',
           'pages': [
-            'detail',
             'detail',
             'list'
           ]

@@ -1,61 +1,136 @@
 <template>
-  <wepy-image-cropper id="image-cropper" :limit_move="limit_move" :disable_rotate="disable_rotate" :borderColor="borderColor" :width="width" :height="height" :imgSrc.sync="src" @load.user="cropperload" @imageload.user="loadimage" @tapcut.user="clickcut"></wepy-image-cropper>
+  <view>
+    <cropper :option.once="cropperOpt"
+             @ready="cropperReady"
+             @beforeDraw="cropperBeforeDraw"
+             @beforeImageLoad="cropperBeforeImageLoad"
+             @beforeLoad="cropperLoad"></cropper>
+    <view class="cropper-buttons">
+      <view
+        class="upload"
+        @tap="uploadTap">
+        上传图片
+      </view>
+      <view
+        class="getCropperImage"
+        @tap="getCropperImage">
+        生成图片
+      </view>
+    </view>
+  </view>
 </template>
 
 <script>
   import wepy from 'wepy'
-  import WepyImageCropper from 'wepy-image-cropper'
+  import Cropper from '/wepy-com-cropper'
+  const device = wx.getSystemInfoSync()
+  const width = device.windowWidth
+  const height = device.windowHeight - 50
 
-  export default class Test extends wepy.page {
-    config = {
-      navigationBarTitleText: '',
-    }
-    components = {
-      'wepy-image-cropper': WepyImageCropper
-    }
-
-    mixins = []
-
+  export default class Index extends wepy.page {
     data = {
-      src: '',
-      width: 350,//宽度
-      height: 350,//高度
-      limit_move: true,
-      disable_rotate: true,
-      borderColor: 'skyblue',
-    }
-    onLoad(options) {
-    }
-    onReady() {
-      //开始裁剪
-      this.src = 'https://raw.githubusercontent.com/1977474741/image-cropper/dev/image/code.jpg'
-      wx.showLoading({
-        title: '加载中'
-      })
-    }
-
-    computed = {
-    }
-
-    methods = {
-      cropperload(e) {
-        console.log("cropper初始化完成:" + e);
-      },
-      loadimage(e){
-        console.log("图片加载完成",e);
-
-      },
-      clickcut(e) {
-        console.log(e);
-        //点击裁剪框阅览图片
-        wx.previewImage({
-          current: e.url, // 当前显示图片的http链接
-          urls: [e.url] // 需要预览的图片http链接列表
-        })
+      cropperOpt: {
+        width,
+        height,
+        scale: 2.5,
+        zoom: 8,
+        cut: {
+          x: (width - 300) / 2,
+          y: (height - 300) / 2,
+          width: 300,
+          height: 300
+        }
       }
     }
 
+    components = {
+      cropper: Cropper
+    }
+
     events = {
+      cropperReady (...args) {
+        console.log('cropper ready!')
+      },
+      cropperBeforeImageLoad (...args) {
+        console.log('before image load')
+      },
+      cropperLoad (...args) {
+        console.log('image loaded')
+      },
+      cropperBeforeDraw (...args) {
+        // Todo: 绘制水印等等
+      }
+    }
+
+    methods = {
+      uploadTap () {
+        wx.chooseImage({
+          count: 1, // 默认9
+          sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有
+          sourceType: ['album', 'camera'], // 可以指定来源是相册还是相机，默认二者都有
+          success: (res) => {
+            const src = res.tempFilePaths[0]
+            //  获取裁剪图片资源后，给data添加src属性及其值
+
+            this.$invoke('cropper', 'pushOrigin', src)
+          }
+        })
+      },
+      getCropperImage () {
+        this.$invoke('cropper', 'getCropperImage').then((src) => {
+          if (src) {
+            wepy.previewImage({
+              current: '', // 当前显示图片的http链接
+              urls: [src] // 需要预览的图片http链接列表
+            })
+          } else {
+            console.log('获取图片地址失败，请稍后重试')
+          }
+        })
+      }
     }
   }
 </script>
+
+<style>
+  .cropper-wrapper{
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background-color: #e5e5e5;
+  }
+
+  .cropper-buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    line-height: 50px;
+  }
+
+  .cropper-buttons .upload, .cropper-buttons .getCropperImage{
+    width: 50%;
+    text-align: center;
+  }
+
+  .cropper{
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .cropper-buttons{
+    background-color: rgba(0, 0, 0, 0.95);
+    color: #04b00f;
+  }
+</style>

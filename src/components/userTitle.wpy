@@ -129,7 +129,7 @@
     <view slot="wrapper" class="wrapper-up white">
       <view class="header">
         <image src="http://images.ufutx.com/201903/05/cbc22feb2fcbd4b43173f763c6a46107.png" mode="aspectFit" class="image"></image>
-        <span class="font_28 bold">福恋： <span class="font_24">头像审核标准</span></span>
+        <span class="font_28 bold">兼职： <span class="font_24">头像审核标准</span></span>
       </view>
       <view class="imagebox">
         <image src="http://images.ufutx.com/201903/13/6b705dc8ce0087eae7301080e5e2fc90.png" mode="aspectFit"></image>
@@ -485,7 +485,7 @@
       longPress() {
         wx.showModal({ // 使用模态框提示用户进行操作
           title: '警告',
-          content: '你将清空福恋小程序本地所有缓存！',
+          content: '你将清空兼职小程序本地所有缓存！',
           success: function (res) {
             if (res.confirm) { // 判断用户是否点击了确定
               wx.clearStorageSync()

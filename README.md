@@ -2,13 +2,13 @@
 
 ## Features
 
-* 友福福恋
+* 友福兼职
 ....
 
 
 扫码访问小程序:
 
-![福恋](https://images.ufutx.com/201903/14/1552529823home_qrcode.png)
+![兼职](https://images.ufutx.com/201903/14/1552529823home_qrcode.png)
 
 
 ## Usage

@@ -158,8 +158,6 @@
       // this.$invoke('modalUp', 'showModal')
       this.objectMultiArray = []
       this.addressArray = []
-      this.geJobType()
-      this.getAddress()
       this.$apply()
       if (this.noSearch == 'true') {
         this.bc_height = '40px'
@@ -167,8 +165,10 @@
       } else {
         this.bc_height = '81px'
         this.$apply()
-
       }
+      if(this.noSearch == 'true') return
+      this.geJobType()
+      this.getAddress()
 
       // getElement_WH('.bc_BoxTab_123').then((value) => {
       //   this.bc_height = value.height + 'px'

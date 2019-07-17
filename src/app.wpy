@@ -15,11 +15,11 @@
   export default class extends wepy.app {
     config = {
       pages: [
-        'pages/register',
         'pages/tabBar/home',
         'pages/tabBar/daily',
         'pages/tabBar/monthly',
-        'pages/tabBar/user'
+        'pages/tabBar/user',
+        'pages/register'
       ],
       'permission': {
         'scope.userLocation': {
@@ -56,7 +56,7 @@
         }
       ],
       window: {
-        navigationBarTitleText: '福恋',
+        navigationBarTitleText: '兼职',
         navigationBarTextStyle: 'white',
         navigationBarBackgroundColor: '#0075c5',
         backgroundColor: '#eaeaea',
@@ -344,7 +344,7 @@
     //   if (!this.globalData.tracker) {
     //     // 初始化GoogleAnalytics Tracker
     //     this.globalData.tracker = GoogleAnalytics.getInstance(this)
-    //       .setAppName('福恋')
+    //       .setAppName('兼职')
     //       .setAppVersion('v0.1')
     //       .newTracker('UA-98664364-7')
     //   }

@@ -1,10 +1,10 @@
 <template>
   <view>
-    <cropper :option.once="cropperOpt"
-             @ready="cropperReady"
-             @beforeDraw="cropperBeforeDraw"
-             @beforeImageLoad="cropperBeforeImageLoad"
-             @beforeLoad="cropperLoad"></cropper>
+    <!--<cropper :option.sync="cropperOpt"-->
+             <!--@ready="cropperReady"-->
+             <!--@beforeDraw="cropperBeforeDraw"-->
+             <!--@beforeImageLoad="cropperBeforeImageLoad"-->
+             <!--@beforeLoad="cropperLoad"></cropper>-->
     <view class="cropper-buttons">
       <view
         class="upload"

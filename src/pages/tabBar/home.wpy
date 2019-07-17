@@ -20,7 +20,7 @@
           <view class="bc_swiper">
             <swiper @change="getcurrent" autoplay="{{autoplay}}">
               <swiper-item wx:for="{{articles}}" wx:key="index" style="width: 96%;" wx:for-item="otherUser">
-                <view class="_bc-list_swiper flo_l" wx:for="{{otherUser}}" wx:key="index" @tap="goto('/pages/article/detail?id={{item.id}}')">
+                <view class="_bc-list_swiper flo_l" wx:for="{{otherUser}}" wx:key="index" @tap="gotoArticle({{item}})">
                   <image src="{{item.pic}}" mode="aspectFill" class="image"></image>
                   <view class="font_26 ellipsis_1 text-left color-666" style="margin-left: 6rpx;">{{item.title}}</view>
                   <view class="font_24 ellipsis_1 text-left colorb0" style="margin-left: 6rpx;">{{item.sub_title}}</view>
@@ -80,7 +80,7 @@
   <!--<view animation="{{animationData}}" class="commodity_attr_box" wx:if="{{!hide}}">-->
     <!--<view class=" font_26 state info" style="margin-bottom: 32rpx;margin-top: 12rpx;">-->
       <!--<view style="margin: 0rpx 22rpx;">-->
-        <!--<view>福恋部分功能需要获取您的位置,不授权将无法获取相关数据！</view>-->
+        <!--<view>兼职部分功能需要获取您的位置,不授权将无法获取相关数据！</view>-->
       <!--</view>-->
     <!--</view>-->
     <!--<view style="width: 100%;" class="text-center">-->
@@ -108,6 +108,7 @@
   import tabSearch from '../../components/tabSearch'
   import notification from '../../components/notification'
   import contentsList from '../../components/contentsList'
+
   export default class home extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
@@ -260,7 +261,7 @@
 
     gotoApp(item) {
       console.log(encodeURIComponent(item))
-      wx.navigateTo({url: '/pages/books/bookDetail?url=' + encodeURIComponent(item)})
+      wx.navigateTo({url: '/pages/users/bookDetail?url=' + encodeURIComponent(item)})
     }
 
     methods = {
@@ -275,6 +276,14 @@
       },
       goto(url) {
         this.$goto(url)
+      },
+      gotoArticle(item) {
+        console.log(item)
+        if (item.type == 'H5') {
+          this.$goto(`/pages/article/detail?id=${item.id}`)
+        } else {
+          this.gotoApp(item.path)
+        }
       },
       gotoTab(url) {
         this.$gotoTab(url)

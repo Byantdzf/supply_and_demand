@@ -2,7 +2,7 @@
   <view>
     <Search></Search>
     <view style="height: 100rpx;"></view>
-    <view class="main-list" wx:for="{{list}}" wx:key="index" @tap="goto('/pages/article/detail?id={{item.id}}')">
+    <view class="main-list" wx:for="{{list}}" wx:key="index" @tap="gotoArticle({{item}})')">
       <view class="main-item">
         <view class="main-pic text-center flo_l">
           <image src="{{item.pic}}" mode="aspectFill"></image>
@@ -67,6 +67,10 @@
     onReachBottom() {
       this.getData()
     }
+    gotoApp(item) {
+      console.log(encodeURIComponent(item))
+      wx.navigateTo({url: '/pages/users/bookDetail?url=' + encodeURIComponent(item)})
+    }
     getData() {
       let _this = this
       _this.loading = true
@@ -124,6 +128,14 @@
       })
     }
     methods = {
+      gotoArticle(item) {
+        console.log(item)
+        if (item.type == 'H5') {
+          this.$goto(`/pages/article/detail?id=${item.id}`)
+        } else {
+          this.gotoApp(item.path)
+        }
+      },
       goto(url) {
         this.$goto(url)
       }

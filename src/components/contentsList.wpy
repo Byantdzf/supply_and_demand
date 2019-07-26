@@ -12,7 +12,7 @@
         </view>
         <view class="item_subhead font_28 ellipsis_1">{{item.sub_title}}</view>
         <view class="item_time font_26 ellipsis_1">{{item.job_time}}</view>
-        <view class="item_price font_26 bold text-right">{{item.reward}}元</view>
+        <view class="item_price font_26 bold text-right">{{item.reward}}</view>
         <view class="item_state font_26">{{item.status_name}}</view>
       </view>
     </view>

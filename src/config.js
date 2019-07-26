@@ -3,8 +3,8 @@
 ======================================================== */
 // 域名
 // var host = 'https://love.ufutx.com/api',
-var host = 'http://job.hankin.ufutx.cn/api'
-// var host = 'https://jy.xofo9600.com/api'
+// var host = 'http://job.hankin.ufutx.cn/api'
+var host = 'https://jy.xofo9600.com/api'
 export const service = {
   // 登录接口
   login: `${host}/wechat/login`,

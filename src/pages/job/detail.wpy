@@ -57,7 +57,7 @@
             <span class="font_30 color-666 bold">工作地址</span>
             <view class="font_26 colorb0">{{information.province+'/'+information.city+'/'+information.dist}}</view>
             <image src="https://images.ufutx.com/201907/10/84c297d9226bcdb116b42d04d4c0bc7f.png" mode="widthFix"
-                   style="width: 100%;" @tap="openLocation"></image>
+                   style="width: 100%;" @tap="openLocation({{information.lat}},{{information.lng}})"></image>
           </view>
           <view class="bc_title" wx:if="{{members.length>0}}">
             <view class="font_30 color-666 bold">已报名（{{members.length}}）</view>
@@ -148,6 +148,10 @@
       this.$apply()
       // this.$invoke('userInfo', 'showModal')
     }
+    onPullDownRefresh() {
+      this.page = 1
+      this.getData()
+    }
 
     onShow() {
       this.getData()
@@ -171,7 +175,6 @@
             onNodeCreate(nodeName, attrs) {
             }
           })
-          vm.openLocation()
         },
         fail: ({code, data}) => {
         },
@@ -223,23 +226,13 @@
           this.$invoke('userInfo', 'showModal')
         })
       },
-      openLocation() {
-        let vm = this
-        console.log(vm.information.lat)
-        console.log(vm.information.lng)
-        debugger
-        wx.getLocation({ // 返回可以用于wx.openLocation的经纬度
-          type: 'gcj02',
-          success(res) {
-            const latitude = vm.information.lat
-            const longitude = vm.information.lng
-            debugger
-            wx.openLocation({
-              latitude,
-              longitude,
-              scale: 18
-            })
-          }
+      openLocation(latitude, longitude) {
+        wx.openLocation({        // 这里要直接输入该地方的经纬度，由于每个地图得到的经纬度不一样，所以精确度会有差别，我亲测了百度地图和腾讯地图的经纬度，发现使用腾讯地图的经纬度的精确度很高，至于为什么，毕竟都是腾讯应用嘛，大家懂的！后面给大家写了一个获取腾讯地图经纬度的文章：http://www.cnblogs.com/silent007/p/9023799.html
+          latitude: Number(latitude),
+          longitude: Number(longitude),
+//          name: "南宁市西乡塘区秀厢大道东祥云商务酒店",
+//          address:"南宁市西乡塘区秀厢大道东祥云商务酒店",
+          scale: 18
         })
       }
     }

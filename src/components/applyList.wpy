@@ -12,7 +12,7 @@
         </view>
         <view class="item_subhead font_28 ellipsis_1">{{item.sub_title}}</view>
         <view class="item_time font_26 ellipsis_1">{{item.job_time}}</view>
-        <view class="item_price font_26 bold text-right">{{item.reward}}元</view>
+        <view class="item_price font_26 bold text-right">{{item.reward}}</view>
         <view class="item_state font_26 flo_l">{{item.status_name}}</view>
         <view class="font_26 flo_r cancle" wx:if="{{status == 'UNDERWAY'}}" @tap.stop="cancle({{index}}, {{item.id}})">取消报名</view>
       </view>

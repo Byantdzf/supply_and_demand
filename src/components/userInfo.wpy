@@ -191,7 +191,9 @@
         this.text = '提交'
         this.$apply()
       }
-      this.initPageData()
+      setTimeout(() => {
+        this.initPageData()
+      })
     }
     // 初始化页面数据
     initPageData() {
@@ -208,11 +210,14 @@
           this.information[7].value = data.pay_type
           console.log(data.ducation)
           this.information[3].pickerList.map((item, index) => {
-            if (item == data.ducation) {
+            if (data.ducation == item) {
               this.information[3].pickerIndex = index
+              this.information[3].value = data.ducation
               this.$apply()
             }
           })
+          console.log(this.addressArray)
+          console.log('this.initPageData()')
           this.addressArray[0].map((item, index) => { // 地址回填
             if (data.dist == item.name) {
               console.log(index)
@@ -248,7 +253,26 @@
         }
       })
     }
-
+    getAddress() {
+      let that = this
+      this.$get({url: `${service.host}/addresses`}, {
+        success: ({code, data}) => {
+          let result = data
+          that.address = result
+          let IndustryArr = []
+          result.forEach(function (item, index, arr) {
+            IndustryArr.push(arr[index])
+          })
+          that.addressArray.push(IndustryArr)
+          that.addressArray.push(result[0].sub_addresses)
+          that.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
     geJobType() {
       let that = this
       this.$get({url: `${service.host}/job/categories`}, {
@@ -262,26 +286,6 @@
           console.log(IndustryArr)
           that.objectMultiArray.push(IndustryArr)
           that.objectMultiArray.push(result[0].sub_categories)
-          that.$apply()
-        },
-        fail: ({code, data}) => {
-        },
-        complete: () => {
-        }
-      })
-    }
-    getAddress() {
-      let that = this
-      this.$get({url: `${service.host}/addresses`}, {
-        success: ({code, data}) => {
-          let result = data
-          that.address = result
-          let IndustryArr = []
-          result.forEach(function (item, index, arr) {
-            IndustryArr.push(arr[index])
-          })
-          that.addressArray.push(IndustryArr)
-          that.addressArray.push(result[0].sub_addresses)
           that.$apply()
         },
         fail: ({code, data}) => {
@@ -576,6 +580,7 @@
     margin: auto;
     position: relative;
     animation:rotate 1500ms 1;
+    overflow: hidden;
     image{
       width: 182rpx;
       height: 182rpx;

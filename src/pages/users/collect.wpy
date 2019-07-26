@@ -1,6 +1,14 @@
 <template>
   <view>
-    <contentsList :list.sync="list"></contentsList>
+    <block wx:if="{{list.length>0}}">
+      <contentsList :list.sync="list"></contentsList>
+    </block>
+    <block wx:else>
+      <view class="text-center">
+        <image src="http://images.ufutx.com/201906/25/d0e1ab71f329930046239df63898395f.jpeg" mode="widthFix"
+               style="width: 50%;margin-top: 12%;"></image>
+      </view>
+    </block>
     <block wx:if="{{list.length>0}}">
       <view class="_bc-list">
         <block wx:if="{{loading}}">

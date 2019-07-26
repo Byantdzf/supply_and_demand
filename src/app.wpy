@@ -35,7 +35,7 @@
             'apply',
             'setting',
             'about',
-            'cropper',
+            // 'cropper',
             'cooperation',
             'question'
           ]

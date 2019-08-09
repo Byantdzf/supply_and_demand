@@ -16,8 +16,8 @@
     config = {
       pages: [
         'pages/tabBar/home',
-        'pages/tabBar/daily',
-        'pages/tabBar/monthly',
+        'pages/tabBar/contact',
+        'pages/tabBar/issue',
         'pages/tabBar/user',
         'pages/register'
       ],
@@ -70,23 +70,23 @@
         borderStyle: 'black',
         list: [{
           pagePath: 'pages/tabBar/home',
-          selectedIconPath: './images/tabBarIcon/homeA.png',
-          iconPath: './images/tabBarIcon/home.png',
+          selectedIconPath: './images/tabbar/homeA.png',
+          iconPath: './images/tabbar/home.png',
           text: '首页'
         }, {
-          pagePath: 'pages/tabBar/monthly',
-          selectedIconPath: './images/tabBarIcon/munA.png',
-          iconPath: './images/tabBarIcon/mun.png',
-          text: '每月活动'
+          pagePath: 'pages/tabBar/issue',
+          selectedIconPath: './images/tabbar/issueA.png',
+          iconPath: './images/tabbar/issue.png',
+          text: '发布'
         }, {
-          pagePath: 'pages/tabBar/daily',
-          selectedIconPath: './images/tabBarIcon/dayA.png',
-          iconPath: './images/tabBarIcon/day.png',
-          text: '每日活动'
+          pagePath: 'pages/tabBar/contact',
+          selectedIconPath: './images/tabbar/iPhoneA.png',
+          iconPath: './images/tabbar/iPhone.png',
+          text: '联系方式'
         }, {
           pagePath: 'pages/tabBar/user',
-          selectedIconPath: './images/tabBarIcon/userA.png',
-          iconPath: './images/tabBarIcon/user.png',
+          selectedIconPath: './images/tabbar/myA.png',
+          iconPath: './images/tabbar/my.png',
           text: '我的'
         }]
       },

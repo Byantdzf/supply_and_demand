@@ -1,0 +1,369 @@
+<template>
+  <view>
+    <view class="main">
+      <view class="main-step text-center">
+        <view class="main-circle inline-block text-center {{activeIndex>0? 'active': ''}}">1</view>
+        <view class="transit inline-block {{activeIndex>1? 'transitA': ''}}"></view>
+        <view class="main-circle inline-block text-center {{activeIndex>1? 'active': ''}}">2</view>
+        <view class="transit inline-block {{activeIndex>2? 'transitA': ''}}"></view>
+        <view class="main-circle inline-block text-center {{activeIndex>2? 'active': ''}}">3</view>
+      </view>
+      <view class="main-text font_28 inline-block">基本信息填写</view>
+      <view class="main-text font_28 inline-block">项目信息填写</view>
+      <view class="main-text font_28 inline-block">发布成功</view>
+      <view class="main-item"  wx:if="{{activeIndex == 1}}">
+        <view class="bc_edit font_26">
+          <view class="editTitle bold color-666">项目标题 <span class="red">*</span></view>
+          <view class="editContent">
+            <input type="text" placeholder="请点击输入项目名称"/>
+          </view>
+        </view>
+        <view class="bc_edit font_26">
+          <view class="editTitle bold color-666">选择行业 <span class="red">*</span></view>
+          <view class="editContent">
+            <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}" >
+              <input type="text" placeholder="请选择行业" disabled value="{{showIndustry? array[index]: ''}}"/>
+            </picker>
+          </view>
+        </view>
+        <view class="bc_edit font_26">
+          <view class="editTitle bold color-666">合作地区 <span class="red">*</span></view>
+          <view class="editContent">
+            <picker mode="region" bindchange="bindRegionChange" value="{{region}}" >
+              <input type="text" placeholder="请选择合作地区" disabled value="{{region.length > 1 ?region[1]+' - '+region[2]: ''}}"/>
+            </picker>
+          </view>
+        </view>
+        <view class="bc_edit font_26">
+          <view class="editTitle bold color-666">有效时间 <span class="red">*</span></view>
+          <view class="editContent">
+            <picker mode="date"value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChange" >
+              <input type="text" placeholder="请选择开始时间" disabled value="{{date !== '' ?date: ''}}" class="inline-block"/>
+            </picker>
+            <picker mode="date"value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChange" >
+              <input type="text" placeholder="请选择开始时间" disabled value="{{date !== '' ?date: ''}}" class="inline-block"/>
+            </picker>
+          </view>
+        </view>
+      </view>
+      <view class="main-item"  wx:if="{{activeIndex == 2}}">
+        <view class="bc_edit font_26">
+          <view class="editTitle bold color-666">项目信息 <span class="red">*</span></view>
+          <view class="editContent-textarea">
+            <textarea name="" id="" cols="30" rows="7" placeholder="点击输入项目信息详情"></textarea>
+          </view>
+        </view>
+        <view class="bc_edit font_26">
+          <view class="editTitle bold color-666">项目图片上传 <span class="red">*</span></view>
+          <view class="editContent-image">
+            <image src="https://images.ufutx.com/201908/09/939a6ee3b6757dd9d1bd3fac296b8d2b.png" mode="widthFix"></image>
+          </view>
+        </view>
+        <view class="bc_edit font_26">
+          <view class="editTitle bold color-666">联系人信息 <span class="red">*</span></view>
+          <view class="editContent-linkman">
+            <view style="overflow: hidden">
+              <view class="flo_l title">联系人名称：</view>
+              <input type="text" class="flo_l" placeholder="请填写联系人名称">
+            </view>
+            <view style="overflow: hidden">
+              <view class="flo_l title">联系方式：</view>
+              <input type="text" class="flo_l" placeholder="请填写联系人名称">
+            </view>
+            <view class="clearfloat"></view>
+          </view>
+        </view>
+      </view>
+      <view class="main-item"  wx:if="{{activeIndex == 3}}">
+        <view class="bc_edit font_26 text-center">
+          <view style="width: 80vw">
+            恭喜你发布成功！
+          </view>
+        </view>
+      </view>
+      <view class="text-center">
+        <view class="main-btn inline-block white font_30" @tap="next">下一步</view>
+      </view>
+    </view>
+    <modal>
+      <view slot="wrapper" class="wrapper-up text-center">
+        <view class="wrapper-item text-center inline-block" @tap="selectType('supply')">
+          <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
+          <view class="font_28">发布供应</view>
+        </view>
+        <view class="wrapper-item text-center inline-block" @tap="selectType('demand')">
+          <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
+          <view class="font_28">发布需求</view>
+        </view>
+      </view>
+    </modal>
+  </view>
+</template>
+
+<script>
+  import wepy from 'wepy'
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
+  import base from '../../mixins/base'
+  import user from '../../mixins/user'
+  import modal from '../../components/modal'
+  export default class issue extends wepy.page {
+    mixins = [base, http, user]
+    config = {
+      navigationBarTitleText: '发布'
+    }
+    components = {
+      modal
+    }
+    data = {
+      loading: false,
+      noSearch: 'true',
+      noMore: false,
+      current: 0,
+      type: '',
+      searchObj: {},
+      hideModalText: 'false',
+      page: 1,
+      list: [],
+      region: [],
+      array: ['美国', '中国', '巴西', '日本'],
+      index: 0,
+      date: '',
+      showIndustry: false,
+      activeIndex: 1
+    }
+    onShow() {
+      // this.getData()
+      // this.$invoke('modal', 'showModal')
+      this.type = ''
+      this.$apply()
+      wx.setNavigationBarTitle({
+        title: '发布'
+      })
+    }
+    onPullDownRefresh() {
+      this.page = 1
+      // this.getData()
+    }
+
+    onReachBottom() {
+      // this.getData()
+    }
+    getData() {
+      let _this = this
+      _this.loading = true
+      _this.noMore = true
+      let url = `${service.host}/jobs?type=${_this.type}`,
+        data = {
+          page: _this.page,
+          keyword: _this.searchObj.inputVal ? _this.searchObj.inputVal : '',
+          category_id: _this.searchObj.category_id ? _this.searchObj.category_id : '',
+          dist: _this.searchObj.dist ? _this.searchObj.dist : '',
+          order: _this.searchObj.order ? _this.searchObj.order : ''
+        }
+      _this.$get({
+        url: url, data
+      }, {
+        success: ({code, data}) => {
+          if (data == null) {
+            return
+          }
+          if (data.data.length == 0 && data.last_page == 1) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          if (data.current_page > data.last_page) {
+            _this.noMore = true
+            _this.loading = false
+            return
+          }
+          data = data.data
+          if (this.isArray(data) && data.length === 0) {
+            _this.noMore = true
+            _this.loading = false
+            _this.list = []
+            return
+          }
+          if (_this.list.length === 0 || _this.page === 1) {
+            _this.list = data
+            _this.loading = false
+          } else {
+            data.map(function (item, index) {
+              _this.list.push(item)
+              setTimeout(() => {
+                _this.loading = false
+              }, 500)
+            })
+          }
+          console.log(_this.list)
+          _this.noMore = true
+          _this.page += 1
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+          _this.loading = false
+          _this.init = true
+          wx.hideLoading()
+        }
+      })
+    }
+
+    methods = {
+      bindDateChange(e) {
+        this.date = e.detail.value
+        this.$apply()
+      },
+      bindPickerChange(e) {
+        this.showIndustry = true
+        this.index = e.detail.value
+        this.$apply()
+      },
+      bindRegionChange(e) {
+        this.region = e.detail.value
+        this.$apply()
+      },
+      selectType(type) {
+        this.type = type
+        this.$apply()
+        this.$invoke('modal', 'hideModal')
+        let title = type == 'supply' ? '发布供应' : '发布需求'
+        wx.setNavigationBarTitle({
+          title: title
+        })
+      },
+      next() {
+        if(this.activeIndex == 3) return
+        this.activeIndex++
+        this.$apply()
+        console.log(this.activeIndex)
+      }
+    }
+    events = {
+      'search': (value) => { // 搜索返回值
+        this.page = 1
+        this.list = []
+        this.searchObj = value
+        this.$apply()
+        console.log(this.searchObj)
+        this.getData()
+      }
+    }
+  }
+</script>
+
+<style lang="less">
+  @import "../../styles/custom/fn.less";
+
+  page {
+    background: white !important;
+    .wrapper-up{
+      margin: 22rpx 80rpx;
+      padding: 32rpx 0;
+      margin-bottom: 30vh;
+      background: white;
+      border-radius: 12rpx;
+    }
+    .wrapper-item{
+      width: 220rpx;
+      .image{
+        width: 80rpx;
+        height: auto;
+      }
+    }
+    .main{
+      .main-step{
+        margin-top: 32px;
+        overflow: hidden;
+        .main-circle{
+          width: 60rpx;
+          height: 60rpx;
+          border-radius: 50%;
+          line-height: 60rpx;
+          background: #ececec;
+          color: #666666;
+          z-index: 999;
+        }
+      }
+      .red{
+        color: red;
+      }
+      .main-text{
+        width: 33%;
+        margin-top: 18rpx;
+        text-align: center;
+      }
+      .main-btn{
+        padding: 6rpx 22rpx;
+        background: @theme;
+        border-radius: 6rpx;
+        margin: 32rpx auto;
+        margin-top: 48rpx;
+        /*background-image: linear-gradient(-45deg, #75a2c5 0%, #0075c5 100%) !important;*/
+      }
+      .transit{
+        width: 200rpx;
+        height: 12rpx;
+        line-height: 60rpx;
+        background: #ececec;
+        vertical-align: middle;
+        margin: -1px;
+        z-index: 99;
+      }
+      .transitA{
+        background-image: linear-gradient(45deg, #0075c5 0%, #75a2c5 100%) !important;
+      }
+      .active{
+        background-image: linear-gradient(45deg, #75a2c5 0%, #0075c5 100%) !important;
+        color: white !important;
+      }
+    }
+    .main-item{
+      border-top: 14rpx solid #f6f6f6;
+      padding: 22rpx 42rpx;
+      .bc_edit{
+        margin-top: 22rpx;
+        .editTitle{}
+        .editContent{
+          margin-top: 6rpx;
+          border-bottom: 1rpx solid #e2e2e2;
+        }
+        .editContent-textarea{
+          padding: 12rpx;
+          border: 1rpx solid #f0f0f0;
+          margin-top: 6rpx;
+          width: 100%;
+          margin-left: -14rpx;
+          border-radius: 8rpx;
+          textarea{
+            width: 100%;
+          }
+        }
+        .editContent-image{
+          margin-top: 12rpx;
+          image{
+            width: 120rpx;
+            height: 120rpx;
+          }
+        }
+        .editContent-linkman{
+          margin-top: 12rpx;
+          .title{
+            margin-top: 14rpx;
+            width: 160rpx;
+            display: inline-block;
+            text-align: justify;
+            text-align-last: justify;
+          }
+          input{
+            margin-top: 6rpx;
+            width: 50vw;
+            padding: 2rpx;
+            border-bottom: 1rpx solid #d3d3d3;
+          }
+        }
+      }
+    }
+  }
+</style>

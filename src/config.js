@@ -4,9 +4,9 @@
 // 域名
 // var host = 'https://love.ufutx.com/api',
 // var host = 'http://job.hankin.ufutx.cn/api'
-var host = 'http://demand.hankin.ufutx.cn/api'
+var host = 'https://demand.hankin.top/api'
 export const service = {
-  // 登录接口
+  // 登录接口s
   login: `${host}/wechat/login`,
   // 手机号
   mobile: `${host}/wechat/mobile`,

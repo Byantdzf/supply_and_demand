@@ -3,9 +3,9 @@
   <view class="page-user ff">
     <view class="user_box text-center">
       <image src="https://images.ufutx.com/201907/12/1bf6336eb94725606f979d0bd0c31d0e.png" mode="widthFix" class="bc_image"></image>
-      <view class="user_photo ff">
+      <view class="user_photo ff" @tap="detection">
         <block wx:if="{{photo}}" >
-          <image src="{{photo}}" mode="aspectFill"  @tap="previewImage({{photo}})"></image>
+          <image src="{{photo}}" mode="aspectFill" ></image>
         </block>
         <block wx:else>
           <open-data type="userAvatarUrl"></open-data>
@@ -37,7 +37,7 @@
       <text class="font_32 color-666 item_title">{{item.title}}</text>
       <image src="http://images.ufutx.com/201906/20/02b0c5873eb2f556ab43d655965644ed.png" mode="widthFix" class="right_icon"></image>
     </view>
-    <userInfo type="userInfo"></userInfo>
+<!--    <userInfo type="userInfo"></userInfo>-->
   </view>
 </template>
 <script>
@@ -48,7 +48,7 @@
   import ShareMessage from '../../mixins/ShareMessage'
   import userTitle from '../../components/userTitle'
   import Loading from '../../components/loading'
-  import userInfo from '../../components/userInfo'
+  // import userInfo from '../../components/userInfo'
   import {service} from '../../config.js'
   import uploadImage from '../../components/uploadImage'
   export default class User extends wepy.page {
@@ -57,7 +57,7 @@
       navigationBarTitleText: '我的',
       enablePullDownRefresh: true
     }
-    components = {userTitle, Loading, userInfo, uploadImage}
+    components = {userTitle, Loading, uploadImage}
     data = {
       libraries: {},
       user: {},
@@ -65,21 +65,27 @@
       init: false,
       nickName: '加载中...',
       showName: false,
-      photo: 'http://images.ufutx.com/201902/25/542cc218e40cbc8a8e3a9ce23d7f4789.gif',
+      photo: 'http://images.ufutx.com/201908/12/e94d1cbfb48e22962c4550ef9d974df9.jpeg',
       extraData: {},
       filePath: '',
       list: [
+        // {
+        //   icon: 'http://images.ufutx.com/201906/20/f46799d6d9236723cee53c08215499e1.png',
+        //   title: '我的信息',
+        //   type: 'showModel',
+        //   path: '/pages/users/setting'
+        // },
         {
-          icon: 'http://images.ufutx.com/201906/20/f46799d6d9236723cee53c08215499e1.png',
-          title: '我的信息',
-          type: 'showModel',
-          path: '/pages/users/setting'
+          icon: 'http://images.ufutx.com/201906/20/0f5153e8421d2d4f114116c61863964d.png',
+          title: '我的发布(供应)',
+          type: 'navigateTo',
+          path: '/pages/users/apply?type=SUPPLY'
         },
         {
           icon: 'http://images.ufutx.com/201906/20/0f5153e8421d2d4f114116c61863964d.png',
-          title: '我的报名',
+          title: '我的发布(需求)',
           type: 'navigateTo',
-          path: '/pages/users/apply'
+          path: '/pages/users/apply?type=DEMAND'
         },
         {
           icon: 'http://images.ufutx.com/201906/20/cf5c7ccaadbdd84b3fd887b7b5cfb359.png',
@@ -102,7 +108,6 @@
     computed = {}
 
     onShow() {
-
       this.$parent.getTracker(this.$root.$name, this.config.navigationBarTitleText)
     }
     onShareAppMessage(res) {
@@ -148,14 +153,14 @@
     }
 
     methods = {
+      detection() {
+        this.$invoke('uploadImage', 'chooseimage')
+      },
       previewImage(image) {
         this.$previewImage(image)
       },
       showModel() {
         this.$invoke('userInfo', 'showModal')
-      },
-      detection() {
-        this.$invoke('uploadImage', 'chooseimage')
       },
       goto(url) {
         this.$goto(url)
@@ -293,6 +298,7 @@
         position: relative;
         z-index: 990;
         overflow: hidden;
+        box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
         image{
           width: 182rpx;
           height: 182rpx;

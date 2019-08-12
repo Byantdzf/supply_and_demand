@@ -1,32 +1,46 @@
 <template>
-  <view class="bc_detail">
+  <view class="bc_detail ff">
     <view class="bc_conter">
       <view class="image_box">
-        <image src="{{information.pic}}" mode="aspectFill"></image>
+        <swiper style="height: 100%;">
+          <block wx:for="{{information.pics}}" wx:key="index">
+            <swiper-item >
+              <image src="{{item}}" class="slide-image" width="100" mode="aspectFill"/>
+            </swiper-item>
+          </block>
+        </swiper>
+<!--        <swiper :list.sync="information"></swiper>-->
+<!--        <image src="{{information.pics[0]}}" mode="aspectFill"></image>-->
       </view>
       <view class="detail_box ff">
         <view class="message_box ff">
+          <view class="isTop" wx:if="{{information.is_top==1}}">
+            <image src="http://images.ufutx.com/201908/12/f91002fb0d287c2c00f43a8796975c3c.png" mode="aspectFit"></image>
+          </view>
           <view class="title font_30 bold ellipsis_1">{{information.title}}</view>
           <view class="message font_24">
-            <span class="text">{{information.category_name}} / {{information.sub_category_name}}</span>
-            <!--<span class="text">不限</span>-->
+            <span class="text">所属行业：{{information.industry.name}}</span>
           </view>
-          <view class="price font_28 bold">{{information.reward}}</view>
-          <view class="_bc_progress color-666">
-            <span class="font_26 flo_l">报名成员：</span>
-            <progress percent="{{count}}" border-radius="24" class="flo_l font_26" active="true" stroke-width="12"
-                      activeColor="#0075c5" backgroundColor="#f1f1f1"/>
-            <span class="font_26 flo_l"
-                  style="margin-left: 14rpx;">{{information.joined_num}}/{{information.need_num}}</span>
+          <view class="message font_24">
+            <span class="text">合作地区：{{information.city}}</span>
           </view>
+<!--          <view class="price font_28 bold">{{information.reward}}</view>-->
+<!--          <view class="_bc_progress color-666">-->
+<!--            <span class="font_26 flo_l">报名成员：</span>-->
+<!--            <progress percent="{{count}}" border-radius="24" class="flo_l font_26" active="true" stroke-width="12"-->
+<!--                      activeColor="#0075c5" backgroundColor="#f1f1f1"/>-->
+<!--            <span class="font_26 flo_l"-->
+<!--                  style="margin-left: 14rpx;">{{information.joined_num}}/{{information.need_num}}</span>-->
+<!--          </view>-->
           <!--<view class="model"></view>-->
         </view>
         <view class="main_box">
           <view class="bc_title">
             <image src="https://images.ufutx.com/201907/10/ee1ba88327a47ae94c9d34f8755d0a63.png"
                    mode="widthFix"></image>
-            <span class="font_30 color-666 bold">工作详情</span>
-            <wepyhtml></wepyhtml>
+            <span class="font_30 color-666 bold">项目信息</span>
+<!--            <wepyhtml></wepyhtml>-->
+            <view class="font_26 colorb0">{{information.content}}</view>
           </view>
         </view>
         <view class="main_box">
@@ -35,11 +49,11 @@
                    mode="widthFix"></image>
             <span class="font_30 color-666 bold">联系方式</span>
             <view class="font_26 colorb0">联系人：{{information.linkman}}</view>
-            <view class="font_26 colorb0" @tap="copyText({{information.wechat}})">微信：{{information.wechat}}
-              <image src="https://images.ufutx.com/201907/11/72c9b88c76039f4609bea4f1ff87410b.png" mode="widthFix"
-                     style="width: 24rpx;margin-left: 4rpx;"></image>
-            </view>
-            <view class="font_26 colorb0">Email：{{information.link_email}}</view>
+<!--            <view class="font_26 colorb0" @tap="copyText({{information.wechat}})">微信：{{information.wechat}}-->
+<!--              <image src="https://images.ufutx.com/201907/11/72c9b88c76039f4609bea4f1ff87410b.png" mode="widthFix"-->
+<!--                     style="width: 24rpx;margin-left: 4rpx;"></image>-->
+<!--            </view>-->
+<!--            <view class="font_26 colorb0">Email：{{information.link_email}}</view>-->
             <view class="font_26 colorb0" @tap="makePhoneCall({{information.link_mobile}})">
               联系电话：{{information.link_mobile}}
               <image src="https://images.ufutx.com/201907/11/c6898aee3d02420dfe71150ab047d44a.png" mode="widthFix"
@@ -49,16 +63,16 @@
           <view class="bc_title">
             <image src="https://images.ufutx.com/201907/10/cf9895a360a744c10f789bb64be7ada8.png"
                    mode="widthFix"></image>
-            <span class="font_30 color-666 "><span class="bold">招聘截止时间：</span><span class="colorb0 font_28">{{information.job_time}}</span></span>
+            <span class="font_30 color-666 "><span class="bold">有效时间：</span><span class="colorb0 font_28">{{information.start_time}}~{{information.end_time}}</span></span>
           </view>
-          <view class="bc_title">
-            <image src="https://images.ufutx.com/201907/10/5a34d772474f1b8afb10e1084aeff8c2.png"
-                   mode="widthFix"></image>
-            <span class="font_30 color-666 bold">工作地址</span>
-            <view class="font_26 colorb0">{{information.province+'/'+information.city+'/'+information.dist}}</view>
-            <image src="https://images.ufutx.com/201907/10/84c297d9226bcdb116b42d04d4c0bc7f.png" mode="widthFix"
-                   style="width: 100%;" @tap="openLocation({{information.lat}},{{information.lng}})"></image>
-          </view>
+<!--          <view class="bc_title">-->
+<!--            <image src="https://images.ufutx.com/201907/10/5a34d772474f1b8afb10e1084aeff8c2.png"-->
+<!--                   mode="widthFix"></image>-->
+<!--            <span class="font_30 color-666 bold">工作地址</span>-->
+<!--            <view class="font_26 colorb0">{{information.province+'/'+information.city+'/'+information.dist}}</view>-->
+<!--            <image src="https://images.ufutx.com/201907/10/84c297d9226bcdb116b42d04d4c0bc7f.png" mode="widthFix"-->
+<!--                   style="width: 100%;" @tap="openLocation({{information.lat}},{{information.lng}})"></image>-->
+<!--          </view>-->
           <view class="bc_title" wx:if="{{members.length>0}}">
             <view class="font_30 color-666 bold">已报名（{{members.length}}）</view>
             <view class="main-member text-center flo_l" wx:for="{{members}}" wx:key="index">
@@ -93,34 +107,37 @@
             <text class="font_24">分享</text>
           </button>
         </view>
-        <block wx:if="{{information.status == 'UNDERWAY'}}">
-          <view class="apply  flo_l font_32 is_join" wx:if="{{information.is_joined == 0}}" @tap="showRule">立即报名</view>
-          <view class="apply  flo_l font_32 is_join" wx:else @tap="showJoin" style="background: #cdcdcd">已报名</view>
-        </block>
-        <block wx:elif="{{information.status == 'FINISHED'}}">
-          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">已结束</view>
-        </block>
-        <block  wx:elif="{{information.status == 'UNPLAYED'}}">
-          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">待开始</view>
-        </block>
-        <block wx:else>
-          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">已取消</view>
-        </block>
+<!--        <block wx:if="{{information.status == 'UNDERWAY'}}">-->
+          <view class="apply  flo_l font_32 is_join"  @tap="showRule">立即联系</view>
+<!--          <view class="apply  flo_l font_32 is_join" wx:else @tap="showJoin" style="background: #cdcdcd">已报名</view>-->
+<!--        </block>-->
+<!--        <block wx:elif="{{information.status == 'FINISHED'}}">-->
+<!--          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">已结束</view>-->
+<!--        </block>-->
+<!--        <block  wx:elif="{{information.status == 'UNPLAYED'}}">-->
+<!--          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">待开始</view>-->
+<!--        </block>-->
+<!--        <block wx:else>-->
+<!--          <view class="apply  flo_l font_32 is_join" style="background: #cdcdcd">已取消</view>-->
+<!--        </block>-->
       </view>
     </view>
   </view>
   <modal>
-    <view slot="wrapper" class="color-666 font_28 wrapperModal ">
-      <image src="http://images.ufutx.com/201906/25/f6990555f2016f45f84836c931cdc69a.png" mode="widthFix" class="close"
+    <view slot="wrapper" class="color-666 ff font_28 wrapperModal ">
+      <image src="http://images.ufutx.com/201906/25/f6990555f2016f45f84836c931cdc69a.png" mode="widthFix" class="close ff"
              @tap="hideModal"></image>
-      <view class="title">报名须知：</view>
       <view class="rule">
-        <view class="text-wrapper">{{information.explain}}</view>
+        <span>客服微信：</span>
+        <view class="text-center">
+          <image src="{{linkInfo.qrcode}}" mode="widthFix" class="qrcode"></image>
+        </view>
+        <view class="text-wrapper">客服电话：{{linkInfo.mobile}}</view>
       </view>
-      <view class="apply text-center white" @tap="showUserInfo">立即报名</view>
+      <view class="apply text-center white" @tap="PhoneCall({{linkInfo.mobile}})">立即拨打</view>
     </view>
   </modal>
-  <userInfo type="apply" :id.sync="id"></userInfo>
+<!--  <userInfo type="apply" :id.sync="id"></userInfo>-->
 </template>
 <script>
   import wepy from 'wepy'
@@ -128,20 +145,20 @@
   import http from '../../mixins/http'
   import base from '../../mixins/base'
   import modal from '../../components/modal'
-  import userInfo from '../../components/userInfo'
   import wepyhtml from 'wepy-html'
 
   export default class detail extends wepy.page {
     mixins = [base, http]
     config = {
-      navigationBarTitleText: '活动详情'
+      navigationBarTitleText: '信息详情'
     }
-    components = {modal, userInfo, wepyhtml}
+    components = {modal, wepyhtml}
     data = {
       id: '',
       count: 0,
       information: {},
-      members: []
+      members: [],
+      linkInfo: {}
     }
     onLoad(e) {
       this.id = e.id
@@ -155,20 +172,36 @@
 
     onShow() {
       this.getData()
+      this.getLinkInfo()
+    }
+    getLinkInfo() {
+      let vm = this
+      vm.$get({
+        url: `${service.host}/link/info`
+      }, {
+        success: ({code, data}) => {
+          this.linkInfo = data
+          this.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
     }
 
     getData() {
       let vm = this
-      let url = `${service.host}/jobs/${vm.id}`
+      let url = `${service.host}/supply/and/demands/${vm.id}`
       vm.$get({url: url
       }, {
         success: ({code, data}) => {
-          vm.information = data.job
-          vm.members = data.members
-          vm.count = vm.information.joined_num / vm.information.need_num * 100
+          vm.information = data
+          // vm.members = data.members
+          // vm.count = vm.information.joined_num / vm.information.need_num * 100
           vm.$apply()
-          let {intro} = data.job
-          vm.$invoke('wepyhtml', 'updateContent', intro, {
+          let {content} = data
+          vm.$invoke('wepyhtml', 'updateContent', content, {
             imgInsteadOfVideo: true,
             onHyperlinkTap(e) {
             },
@@ -183,6 +216,10 @@
       })
     }
     methods = {
+      PhoneCall(text) {
+        this.$invoke('modal', 'hideModal')
+        this.$makePhoneCall(text)
+      },
       copyText(text) {
         console.log(text)
         this.$copyText(text)
@@ -201,7 +238,7 @@
       },
       collect() {  // 收藏
         let vm = this
-        vm.$post({url: `${service.host}/collect/jobs/${vm.id}`}, {
+        vm.$post({url: `${service.host}/collect/supply/and/demands/${vm.id}`}, {
           success: ({code, data}) => {
             vm.information.is_collected = !vm.information.is_collected
             vm.$apply()
@@ -245,7 +282,9 @@
 
   page {
     background: white !important;
+    min-height: 100vh;
     .bc_detail{
+      min-height: 100vh;
       .bc_conter{
         .image_box{
           width: 100vw;
@@ -277,6 +316,16 @@
             box-shadow: 1rpx 1rpx 12rpx #d3d3d3;
             margin-top: -32rpx;
             position: relative;
+            .isTop{
+              position: absolute;left: 0;
+              top: 0;
+              width: 60rpx;
+              height: 60rpx;
+              image{
+                width: 100%;
+                height: 100%;
+              }
+            }
             .message{
               .text{
                 margin-right: 12rpx;
@@ -324,6 +373,11 @@
     }
     .wrapperModal{
       position: relative;
+      width: 90vw;
+      padding: 22rpx;
+      margin: auto;
+      border-radius: 12rpx;
+      margin-bottom: 22vh;
       .title{
         margin: 0 32rpx;
         margin-top: 36rpx;
@@ -333,6 +387,10 @@
         white-space: pre-wrap;
         line-height: 2;
         margin-bottom: 32rpx;
+        .qrcode{
+          width: 68vw;
+          margin: auto;
+        }
       }
       .apply{
         margin: 22rpx 32rpx;
@@ -346,8 +404,7 @@
         height: auto;
         position: absolute;
         right: 22rpx;
-        top: -12rpx;
-
+        top: 16rpx;
       }
     }
     .main_box{

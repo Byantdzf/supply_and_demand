@@ -31,9 +31,11 @@
           'X-Requested-With': 'XMLHttpRequest'
         },
         success: (res) => {
+          wx.hideLoading()
           this.$emit('UpLoadImage', JSON.parse(res.data).data)
         },
         fail: (res) => {
+          wx.hideLoading()
         },
         complete: () => {
         }
@@ -43,6 +45,7 @@
     methods = {
       chooseimage() {
         let vm = this
+        vm.$showLoading('上传中...')
         wx.chooseImage({
           count: 1,
           // sizeType: ['original', 'compressed'], // 可以指定是原图还是压缩图，默认二者都有

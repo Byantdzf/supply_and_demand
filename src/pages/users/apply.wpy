@@ -41,7 +41,7 @@
   export default class apply extends wepy.page {
     mixins = [base, http, user]
     config = {
-      navigationBarTitleText: '我的报名'
+      navigationBarTitleText: '我的发布'
     }
     components = {
       applyList, tabSearch, navBarTop
@@ -56,6 +56,16 @@
       status: 'UNDERWAY', // tabClass
       page: 1,
       list: []
+    }
+
+    onLoad(e) {
+      console.log(e.type, 'type')
+      this.type = e.type
+      let title = e.type == 'SUPPLY' ? '发布的供应' : '发布的需求'
+      wx.setNavigationBarTitle({
+        title: title
+      })
+      this.$apply()
     }
     onShow() {
       this.getData()
@@ -72,8 +82,9 @@
       let _this = this
       _this.loading = true
       _this.noMore = true
-      let url = `${service.host}/my/application/forms?status=${_this.status}`,
+      let url = `${service.host}/user/supply/and/demands?status=${_this.status}`,
         data = {
+          type: _this.type,
           page: _this.page
         }
       _this.$get({
@@ -103,12 +114,12 @@
           if (_this.list.length === 0 || _this.page === 1) {
             _this.list = []
             for (let item of data) {
-              _this.list.push(item.job)
+              _this.list.push(item)
             }
             _this.loading = false
           } else {
             data.map(function (item, index) {
-              _this.list.push(item.job)
+              _this.list.push(item)
               setTimeout(() => {
                 _this.loading = false
               }, 500)

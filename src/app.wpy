@@ -19,6 +19,8 @@
         'pages/tabBar/contact',
         'pages/tabBar/issue',
         'pages/tabBar/user',
+        'pages/tabBar/demand',
+        'pages/tabBar/supply',
         'pages/register'
       ],
       'permission': {

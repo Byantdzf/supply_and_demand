@@ -37,26 +37,28 @@
   import http from '../../mixins/http'
   import base from '../../mixins/base'
   import user from '../../mixins/user'
-  export default class monthly extends wepy.page {
+
+  export default class supply extends wepy.page {
     mixins = [base, http, user]
     config = {
-      navigationBarTitleText: '每月活动'
-    }
-    components = {
-      contentsList, tabSearch
+      navigationBarTitleText: '需求'
     }
     data = {
       loading: false,
       noSearch: 'true',
       noMore: false,
       current: 0,
-      type: 'MONTHLY',
-      searchObj: {},
+      type: 'DEMAND',
       page: 1,
+      searchObj: {},
       list: []
+    }
+    components = {
+      contentsList, tabSearch
     }
     onShow() {
       this.getData()
+      // this.getIndustries()
     }
     onPullDownRefresh() {
       this.page = 1
@@ -66,15 +68,29 @@
     onReachBottom() {
       this.getData()
     }
+
+    getIndustries() {
+      let vm = this
+      vm.$get({
+        url: `${service.host}/industries`
+      }, {
+        success: ({code, data}) => {
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
     getData() {
       let _this = this
       _this.loading = true
       _this.noMore = true
-      let url = `${service.host}/jobs?type=${_this.type}`,
+      let url = `${service.host}/supply/and/demands?type=${_this.type}`,
         data = {
           page: _this.page,
           keyword: _this.searchObj.inputVal ? _this.searchObj.inputVal : '',
-          category_id: _this.searchObj.category_id ? _this.searchObj.category_id : '',
+          industry_id: _this.searchObj.industry_id ? _this.searchObj.industry_id : '',
           dist: _this.searchObj.dist ? _this.searchObj.dist : '',
           order: _this.searchObj.order ? _this.searchObj.order : ''
         }
@@ -141,7 +157,7 @@
 </script>
 
 <style lang="less">
-  page {
+  page{
     background: white !important;
   }
 </style>

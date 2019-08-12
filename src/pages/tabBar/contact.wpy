@@ -3,15 +3,15 @@
     <view class="card_box">
       <view class="bc_top"></view>
       <view class="font_32 bc_title bold">//////////   合作方式   //////////</view>
-      <image src="http://images.ufutx.com/201906/25/cfbebe80d83faca341bcad7a2267d983.jpeg" mode="widthFix" class="qr" @tap="previewImage"></image>
+      <image src="{{linkInfo.qrcode}}" mode="widthFix" class="qr" @tap="previewImage"></image>
       <view style="height: 100rpx;"></view>
       <view class="text-center white font_30 main-box">
-        <view @tap="PhoneCall('XXXXXXX12345')" class="main-item">
-          联系电话： 15707534403
+        <view @tap="PhoneCall({{linkInfo.mobile}})" class="main-item">
+          联系电话： {{linkInfo.mobile}}
           <image src="https://images.ufutx.com/201908/07/2b6c3e989ecd6bf831db253b0a81d5f0.png" mode="widthFix" class="iphone_icon"></image>
         </view>
-        <view @tap="copyText('XXXXXXX12345')" class="main-item">
-          业务微信： 12345
+        <view @tap="copyText({{linkInfo.wechat}})" class="main-item">
+          业务微信： {{linkInfo.wechat}}
           <image src="http://images.ufutx.com/201906/20/7b09aae087268629cf0605fe38ab84e8.png" mode="widthFix" class="copy_icon"></image>
         </view>
       </view>
@@ -30,17 +30,40 @@
 </template>
 <script>
   import wepy from 'wepy'
+  import {service} from '../../config.js'
+  import http from '../../mixins/http'
   import base from '../../mixins/base'
 
   export default class contact extends wepy.page {
-    mixins = [base]
+    mixins = [base, http]
 
     config = {
       navigationBarTitleText: '联系方式'
     }
     components = {
     }
-    data = {}
+    onShow() {
+      this.getIndustries()
+    }
+
+    getIndustries() {
+      let vm = this
+      vm.$get({
+        url: `${service.host}/link/info`
+      }, {
+        success: ({code, data}) => {
+          this.linkInfo = data
+          this.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
+      })
+    }
+    data = {
+      linkInfo: {}
+    }
     methods = {
       copyText(text) {
         this.$copyText(text)
@@ -51,9 +74,6 @@
       previewImage(url) {
         this.$previewImage('http://images.ufutx.com/201906/25/cfbebe80d83faca341bcad7a2267d983.jpeg')
       }
-    }
-
-    onLoad() {
     }
   }
 </script>
@@ -68,7 +88,7 @@
       .main-item{
         min-width: 220rpx;
         text-align: left;
-        margin-left: 22vw;
+        margin-left: 19vw;
       }
       .iphone_icon{
         width: 36rpx;

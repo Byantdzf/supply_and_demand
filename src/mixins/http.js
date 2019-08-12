@@ -149,12 +149,12 @@ export default class httpMixin extends wepy.mixin {
                   if (data.token) {
                     wx.setStorageSync('token', data.token)
                     wx.setStorageSync('openid', data.openid)
-                    let userInfo = {
-                      nickName: data.user.name,
-                      avatarUrl: data.user.avatar,
-                      type: data.user.type
-                    }
-                    wx.setStorageSync('userInfo', userInfo)
+                    // let userInfo = {
+                    //   nickName: data.user.name,
+                    //   avatarUrl: data.user.avatar,
+                    //   type: data.user.type
+                    // }
+                    // wx.setStorageSync('userInfo', userInfo)
                     wx.setStorageSync('user_id', data.user.id)
                   }
                   var route = wx.getStorageSync('jump');

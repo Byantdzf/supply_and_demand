@@ -200,7 +200,7 @@
       this.$get({url: `${service.host}/user`}, {
         success: ({code, data}) => {
           this.photo = data.avatar ? data.avatar : data.wechat.avatar
-          this.userInfo = data
+          // this.userInfo = data
           this.information[0].value = data.name
           this.information[1].value = data.sex ? data.sex : 1
           this.information[1].pickerIndex = data.sex ? data.sex - 1 : 0

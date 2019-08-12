@@ -2,7 +2,7 @@
   <block wx:for="{{list}}" wx:key="index">
     <view class="contentsList ff" @tap="goto('/pages/job/detail?id={{item.id}}')">
       <view class="item_image flo_l">
-        <image src="{{item.pic}}"
+        <image src="{{item.pics[0]}}"
                mode="aspectFill"></image>
       </view>
       <view class="item_info flo_l">

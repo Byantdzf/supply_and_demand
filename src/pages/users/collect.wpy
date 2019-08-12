@@ -1,5 +1,6 @@
 <template>
   <view>
+    <navBarTop :tabs.sync="tabs" @tapClick="tapClick"></navBarTop>
     <block wx:if="{{list.length>0}}">
       <contentsList :list.sync="list"></contentsList>
     </block>
@@ -35,20 +36,24 @@
   import http from '../../mixins/http'
   import base from '../../mixins/base'
   import user from '../../mixins/user'
+  import navBarTop from '../../components/navBarTop'
+
   export default class collect extends wepy.page {
     mixins = [base, http, user]
     config = {
       navigationBarTitleText: '我的收藏'
     }
     components = {
-      contentsList
+      contentsList,
+      navBarTop
     }
     data = {
+      tabs: ['供应', '需求'],
       loading: false,
       noSearch: 'true',
       noMore: false,
       current: 0,
-      type: 'MONTHLY',
+      type: 'SUPPLY',
       page: 1,
       list: []
     }
@@ -67,9 +72,10 @@
       let _this = this
       _this.loading = true
       _this.noMore = true
-      let url = `${service.host}/my/collect/jobs`,
+      let url = `${service.host}/my/collects`,
         data = {
-          page: _this.page
+          page: _this.page,
+          type: _this.type
         }
       _this.$get({
         url: url, data
@@ -98,15 +104,15 @@
           if (_this.list.length === 0 || _this.page === 1) {
             _this.list = []
             for (let item of data) {
-              if (item.job) {
-                _this.list.push(item.job)
+              if (item.supply_and_demand) {
+                _this.list.push(item.supply_and_demand)
               }
             }
             _this.loading = false
           } else {
             data.map(function (item, index) {
-              if (item.job) {
-                _this.list.push(item.job)
+              if (item.supply_and_demand) {
+                _this.list.push(item.supply_and_demand)
               }
               setTimeout(() => {
                 _this.loading = false
@@ -127,6 +133,26 @@
       })
     }
     methods = {}
+    events = {
+      'tabClick': (value) => { // NavTab返回值
+        console.log(value)
+        this.page = 1
+        this.list = []
+        this.$apply()
+        switch (value) {
+          case '0':
+            this.type = 'SUPPLY'
+            this.$apply()
+            this.getData()
+            break
+          case '1':
+            this.type = 'DEMAND'
+            this.$apply()
+            this.getData()
+            break
+        }
+      }
+    }
   }
 </script>
 

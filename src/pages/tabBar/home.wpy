@@ -31,12 +31,12 @@
           <view class="clearfloat"></view>
         </view>
         <view class="bc_center">
-          <view class="mon flo_r font_30 text-center" @tap="gotoTab('/pages/tabBar/daily')">
-            <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
+          <view class="mon flo_l font_30 text-center" @tap="goto('/pages/tabBar/supply')">
+            <image src="http://images.ufutx.com/201908/13/9674e6b5f03efb2d121eebe768935b18.png" class="image" mode="widthFix"></image>
             供应
           </view>
-          <view class="day flo_l font_30 text-center" @tap="gotoTab('/pages/tabBar/monthly')">
-            <image src="http://images.ufutx.com/201906/20/b31621d7348e6f5ed56d33f4434a38d1.png" class="image" mode="widthFix"></image>
+          <view class="day flo_r font_30 text-center" @tap="goto('/pages/tabBar/demand')">
+            <image src="http://images.ufutx.com/201908/13/5b0334dace582a4f78a7c9bfbfe93cc6.png" class="image" mode="widthFix"></image>
             需求
           </view>
           <view class="clearfloat"></view>
@@ -112,7 +112,7 @@
   export default class home extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
-      navigationBarTitleText: '活动网',
+      navigationBarTitleText: '首页',
       onReachBottomDistance: 10
     }
     components = {
@@ -129,7 +129,7 @@
       noSearch: 'true',
       noMore: false,
       current: 0,
-      type: 'MONTHLY',
+      type: 'SUPPLY',
       page: 1,
       articles: [], // 文章系统
       announcements: [
@@ -211,17 +211,17 @@
           if (data == null) {
             return
           }
-          if (data.jobs.data.length == 0 && data.jobs.last_page == 1) {
+          if (data.supply_and_demands.data.length == 0 && data.supply_and_demands.last_page == 1) {
             _this.noMore = true
             _this.loading = false
             return
           }
-          if (data.jobs.current_page > data.jobs.last_page) {
+          if (data.supply_and_demands.current_page > data.supply_and_demands.last_page) {
             _this.noMore = true
             _this.loading = false
             return
           }
-          data = data.jobs.data
+          data = data.supply_and_demands.data
           if (this.isArray(data) && data.length === 0) {
             _this.noMore = true
             _this.loading = false
@@ -301,11 +301,11 @@
         this.page = 1
         this.list = []
         if (value == 0) {
-          this.type = 'MONTHLY'
+          this.type = 'SUPPLY'
           this.$apply()
           this.getData()
         } else {
-          this.type = 'DAILY'
+          this.type = 'DEMAND'
           this.$apply()
           this.getData()
         }
@@ -331,7 +331,7 @@
         border-radius: 8rpx;
         color: @theme;
         .image{
-          width: 48rpx;
+          width: 54rpx;
           vertical-align: middle;
           margin-bottom: 6rpx;
           margin-right: 12rpx;

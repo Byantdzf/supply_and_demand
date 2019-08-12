@@ -31,7 +31,7 @@
   export default class Register extends wepy.page {
     mixins = [base, http, user, ShareMessage]
     config = {
-      navigationBarTitleText: '猴赛雷',
+      navigationBarTitleText: '恒河供需',
       enablePullDownRefresh: false
     }
     data = {
@@ -41,7 +41,7 @@
     }
 
     onLoad(e) {
-      this.login()
+      // this.login()
     }
 
     onShow() {

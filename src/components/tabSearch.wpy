@@ -23,24 +23,26 @@
       <view class="weui-search-bar__cancel-btn font_28" hidden="{{!inputShowed}}" bindtap="hideInput">取消</view>
     </view>
     <view class="bc_searchIist font_26 text-center ff" wx:if="{{noSearch == 'false'}}">
-      <view class="bc_searchItem flo_l {{searchType == 'type'?'activeColor':''}}" @tap="showModalFn('type')">
-        <span wx:if="{{typeText}}">{{typeText}} </span>
-        <span wx:else>类型 </span>
-        <image src="https://images.ufutx.com/201907/15/fbe45a51c00fa19a932c91a4b4558c6d.png" wx:if="{{searchType == 'type'}}" mode="widthFix" class="up_icon"></image>
-        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" wx:else mode="widthFix" class="down_icon"></image>
-      </view>
-      <view class="bc_searchItem flo_l {{searchType == 'area'?'activeColor':''}}" @tap="showModalFn('area')">
-        <span wx:if="{{addressText}}">{{addressText}} </span>
-        <span wx:else>区域 </span>
-        <image src="https://images.ufutx.com/201907/15/fbe45a51c00fa19a932c91a4b4558c6d.png" wx:if="{{searchType == 'area'}}" mode="widthFix" class="up_icon"></image>
-        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" wx:else mode="widthFix" class="down_icon"></image>
-      </view>
-      <view class="bc_searchItem flo_l {{searchType == 'sort'?'activeColor':''}}" @tap="showModalFn('sort')">
+      <picker bindchange="bindPickerChange" value="{{index}}" range="{{industries}}" range-key="name">
+        <view class="bc_searchItem flo_l {{searchType == 'type'?'activeColor':''}}">
+          <span wx:if="{{typeText}}">{{typeText}} </span>
+          <span wx:else>行业 </span>
+          <image src="https://images.ufutx.com/201907/15/fbe45a51c00fa19a932c91a4b4558c6d.png" wx:if="{{searchType == 'type'}}" mode="widthFix" class="up_icon"></image>
+          <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" wx:else mode="widthFix" class="down_icon"></image>
+        </view>
+      </picker>
+      <picker mode="region" bindchange="bindRegionChange" value="{{region}}" >
+        <view class="bc_searchItem flo_l {{searchType == 'area'?'activeColor':''}}">
+          <span wx:if="{{addressText}}">{{addressText}} </span>
+          <span wx:else>区域 </span>
+          <image src="https://images.ufutx.com/201907/15/fbe45a51c00fa19a932c91a4b4558c6d.png" wx:if="{{searchType == 'area'}}" mode="widthFix" class="up_icon"></image>
+          <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" wx:else mode="widthFix" class="down_icon"></image>
+        </view>
+      </picker>
+      <view class="bc_searchItem flo_l" @tap="showModalFn('sort')">
         <span wx:if="{{sortText}}">{{sortText}} </span>
         <span wx:else>排序 </span>
-        <image src="https://images.ufutx.com/201907/15/fbe45a51c00fa19a932c91a4b4558c6d.png"
-               wx:if="{{searchType == 'sort'}}" mode="widthFix" class="up_icon"></image>
-        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" wx:else mode="widthFix" class="down_icon"></image>
+        <image src="http://images.ufutx.com/201906/23/a0d45254280ea98370ea18db942c20ac.png" mode="widthFix" class="down_icon"></image>
       </view>
       <view class="clearfloat"></view>
     </view>
@@ -96,7 +98,7 @@
   import base from '../mixins/base'
   import modalUp from '../components/modal-up'
   import {service} from '../config.js'
-  import {getElement_WH} from '../utils/fn'
+  // import {getElement_WH} from '../utils/fn'
 
   export default class tabSearch extends wepy.component {
     mixins = [base, http]
@@ -128,6 +130,11 @@
       }
     }
     data = {
+      industries: [],
+      index: 0,
+      industriesId: '',
+      region: [],
+
       typeText: '',
       addressText: '',
       sortText: '综合',
@@ -166,9 +173,9 @@
         this.bc_height = '81px'
         this.$apply()
       }
-      if(this.noSearch == 'true') return
-      this.geJobType()
-      this.getAddress()
+      if (this.noSearch == 'true') return
+      this.getIndustries()
+      // this.getAddress()
 
       // getElement_WH('.bc_BoxTab_123').then((value) => {
       //   this.bc_height = value.height + 'px'
@@ -177,23 +184,14 @@
       //   console.log(error)
       // })
     }
-    geJobType() {
+    getIndustries() {
       let that = this
-      this.$get({url: `${service.host}/job/categories`}, {
+      this.$get({url: `${service.host}/industries`}, {
         success: ({code, data}) => {
           let result = data
-          for (let item of result) {
-            item.active = false
+          for (let item of data) {
+            that.industries.push(item)
           }
-          result.unshift({
-            name: '全部',
-            active: true,
-            sub_categories: [
-              {name: '全部类型'}
-            ]
-          })
-          that.objectMultiArray = result
-          that.sub_objectMultiArray = result[0].sub_categories
           that.$apply()
         },
         fail: ({code, data}) => {
@@ -202,33 +200,22 @@
         }
       })
     }
-    getAddress() {
-      let that = this
-      this.$get({url: `${service.host}/addresses`}, {
-        success: ({code, data}) => {
-          let result = data
-          for (let item of result) {
-            item.active = false
-          }
-          result.unshift({
-            name: '全部',
-            active: true,
-            sub_addresses: [
-              {name: '全部区域'}
-            ]
-          })
-          that.addressArray = result
-          that.sub_addressArray = result[0].sub_addresses
-          that.$apply()
-        },
-        fail: ({code, data}) => {
-        },
-        complete: () => {
-        }
-      })
-    }
-
     methods = {
+      bindRegionChange(e) { // 地址
+        this.region = e.detail.value
+        this.addressText = e.detail.value[2]
+        this.searchArray.dist = e.detail.value[2]
+        this.$apply()
+        this.$emit('search', this.searchArray)
+      },
+      bindPickerChange(e) {  // 行业
+        this.typeText = this.industries[e.detail.value].name
+        this.industriesId = this.industries[e.detail.value].id
+        this.searchArray.industry_id = this.industriesId
+        console.log(this.searchArray.industry_id)
+        this.$apply()
+        this.$emit('search', this.searchArray)
+      },
       sortActive(index) {
         this.sortType = index
         this.$apply()
@@ -266,7 +253,7 @@
       sub_jobActive(index) {
         let vm = this
         if (vm.searchType === 'type') {
-          console.log(vm.sub_objectMultiArray[index].name,index)
+          console.log(vm.sub_objectMultiArray[index].name, index)
           vm.typeText = vm.sub_objectMultiArray[index].name
           vm.searchArray.category_id = vm.sub_objectMultiArray[index].name !== '全部类型' ? vm.sub_objectMultiArray[index].id : ''
           vm.searchType = ''

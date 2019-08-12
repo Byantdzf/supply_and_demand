@@ -15,14 +15,14 @@
         <view class="bc_edit font_26">
           <view class="editTitle bold color-666">项目标题 <span class="red">*</span></view>
           <view class="editContent">
-            <input type="text" placeholder="请点击输入项目名称"/>
+            <input type="text" placeholder="请点击输入项目名称" value="{{title}}" bindinput="editInput('title')"/>
           </view>
         </view>
         <view class="bc_edit font_26">
           <view class="editTitle bold color-666">选择行业 <span class="red">*</span></view>
           <view class="editContent">
-            <picker bindchange="bindPickerChange" value="{{index}}" range="{{array}}" >
-              <input type="text" placeholder="请选择行业" disabled value="{{showIndustry? array[index]: ''}}"/>
+            <picker bindchange="bindPickerChange" value="{{index}}" range="{{industries}}" range-key="name" >
+              <input type="text" placeholder="请选择行业" disabled value="{{showIndustry? industries[index].name: ''}}"/>
             </picker>
           </view>
         </view>
@@ -37,11 +37,11 @@
         <view class="bc_edit font_26">
           <view class="editTitle bold color-666">有效时间 <span class="red">*</span></view>
           <view class="editContent">
-            <picker mode="date"value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChange" >
-              <input type="text" placeholder="请选择开始时间" disabled value="{{date !== '' ?date: ''}}" class="inline-block"/>
+            <picker mode="date"value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChangeStart" >
+              <input type="text" placeholder="请选择开始时间" disabled value="{{startTime !== '' ?'开始时间：'+startTime: ''}}" class="inline-block"/>
             </picker>
-            <picker mode="date"value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChange" >
-              <input type="text" placeholder="请选择开始时间" disabled value="{{date !== '' ?date: ''}}" class="inline-block"/>
+            <picker mode="date"value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChangeEnd" >
+              <input type="text" placeholder="请选择开始时间" disabled value="{{endTime !== '' ?'结束时间：'+endTime: ''}}" class="inline-block"/>
             </picker>
           </view>
         </view>
@@ -50,13 +50,16 @@
         <view class="bc_edit font_26">
           <view class="editTitle bold color-666">项目信息 <span class="red">*</span></view>
           <view class="editContent-textarea">
-            <textarea name="" id="" cols="30" rows="7" placeholder="点击输入项目信息详情"></textarea>
+            <textarea name="" id="" cols="30" rows="7" placeholder="点击输入项目信息详情" bindinput="editInput('content')"></textarea>
           </view>
         </view>
         <view class="bc_edit font_26">
           <view class="editTitle bold color-666">项目图片上传 <span class="red">*</span></view>
           <view class="editContent-image">
-            <image src="https://images.ufutx.com/201908/09/939a6ee3b6757dd9d1bd3fac296b8d2b.png" mode="widthFix"></image>
+            <image src="https://images.ufutx.com/201908/09/939a6ee3b6757dd9d1bd3fac296b8d2b.png"  @tap="detection" mode="widthFix"></image>
+            <block wx:for="{{pics}}" wx:key="index">
+              <image src="{{item}}"  mode="aspectFill"></image>
+            </block>
           </view>
         </view>
         <view class="bc_edit font_26">
@@ -64,11 +67,11 @@
           <view class="editContent-linkman">
             <view style="overflow: hidden">
               <view class="flo_l title">联系人名称：</view>
-              <input type="text" class="flo_l" placeholder="请填写联系人名称">
+              <input type="text" class="flo_l" placeholder="请填写联系人名称" bindinput="editInput('linkman')" />
             </view>
             <view style="overflow: hidden">
               <view class="flo_l title">联系方式：</view>
-              <input type="text" class="flo_l" placeholder="请填写联系人名称">
+              <input type="number" class="flo_l" placeholder="请填写联系人名称" bindinput="editInput('link_mobile')" />
             </view>
             <view class="clearfloat"></view>
           </view>
@@ -76,23 +79,24 @@
       </view>
       <view class="main-item"  wx:if="{{activeIndex == 3}}">
         <view class="bc_edit font_26 text-center">
-          <view style="width: 80vw">
-            恭喜你发布成功！
+          <view style="width: 60vw;margin: auto" >
+            恭喜你发布成功！后台会在1~3个工作日进行审核，谢谢！如需加急，请联系客服
           </view>
         </view>
       </view>
+      <view class="font_28 text-right" style="color: #0a9ec7;padding: 0 32px;" @tap="reset">重新发布</view>
       <view class="text-center">
-        <view class="main-btn inline-block white font_30" @tap="next">下一步</view>
+        <view class="main-btn inline-block white font_30" @tap="next">{{activeIndex == 3?'完成': '下一步'}}</view>
       </view>
     </view>
     <modal>
       <view slot="wrapper" class="wrapper-up text-center">
         <view class="wrapper-item text-center inline-block" @tap="selectType('supply')">
-          <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
+          <image src="http://images.ufutx.com/201908/13/9674e6b5f03efb2d121eebe768935b18.png" class="image" mode="widthFix"></image>
           <view class="font_28">发布供应</view>
         </view>
         <view class="wrapper-item text-center inline-block" @tap="selectType('demand')">
-          <image src="http://images.ufutx.com/201906/20/4c7c2bb0631b007ec86c437397f9db1d.png" class="image" mode="widthFix"></image>
+          <image src="http://images.ufutx.com/201908/13/5b0334dace582a4f78a7c9bfbfe93cc6.png" class="image" mode="widthFix"></image>
           <view class="font_28">发布需求</view>
         </view>
       </view>
@@ -107,13 +111,16 @@
   import base from '../../mixins/base'
   import user from '../../mixins/user'
   import modal from '../../components/modal'
+  import uploadImage from '../../components/uploadImage'
+
   export default class issue extends wepy.page {
     mixins = [base, http, user]
     config = {
       navigationBarTitleText: '发布'
     }
     components = {
-      modal
+      modal,
+      uploadImage
     }
     data = {
       loading: false,
@@ -126,19 +133,45 @@
       page: 1,
       list: [],
       region: [],
-      array: ['美国', '中国', '巴西', '日本'],
+      industries: [],
+      industrieId: '',
+      title: '',
+      startTime: '',
+      endTime: '',
+      link_mobile: '',
+      content: '',
+      linkman: '',
+      pics: [],
       index: 0,
       date: '',
       showIndustry: false,
       activeIndex: 1
     }
-    onShow() {
-      // this.getData()
-      // this.$invoke('modal', 'showModal')
-      this.type = ''
+
+    onLoad() {
+      this.$invoke('modal', 'showModal')
+      this.getIndustries()
       this.$apply()
       wx.setNavigationBarTitle({
         title: '发布'
+      })
+    }
+
+    onShow() {
+    }
+    getIndustries() {
+      let that = this
+      this.$get({url: `${service.host}/industries`}, {
+        success: ({code, data}) => {
+          for (let item of data) {
+            that.industries.push(item)
+          }
+          that.$apply()
+        },
+        fail: ({code, data}) => {
+        },
+        complete: () => {
+        }
       })
     }
     onPullDownRefresh() {
@@ -149,75 +182,65 @@
     onReachBottom() {
       // this.getData()
     }
-    getData() {
+    establish(data) {
       let _this = this
-      _this.loading = true
-      _this.noMore = true
-      let url = `${service.host}/jobs?type=${_this.type}`,
-        data = {
-          page: _this.page,
-          keyword: _this.searchObj.inputVal ? _this.searchObj.inputVal : '',
-          category_id: _this.searchObj.category_id ? _this.searchObj.category_id : '',
-          dist: _this.searchObj.dist ? _this.searchObj.dist : '',
-          order: _this.searchObj.order ? _this.searchObj.order : ''
-        }
-      _this.$get({
+      let url = `${service.host}/supply/and/demands?type=${_this.type}`
+      _this.$post({
         url: url, data
       }, {
         success: ({code, data}) => {
-          if (data == null) {
-            return
-          }
-          if (data.data.length == 0 && data.last_page == 1) {
-            _this.noMore = true
-            _this.loading = false
-            return
-          }
-          if (data.current_page > data.last_page) {
-            _this.noMore = true
-            _this.loading = false
-            return
-          }
-          data = data.data
-          if (this.isArray(data) && data.length === 0) {
-            _this.noMore = true
-            _this.loading = false
-            _this.list = []
-            return
-          }
-          if (_this.list.length === 0 || _this.page === 1) {
-            _this.list = data
-            _this.loading = false
-          } else {
-            data.map(function (item, index) {
-              _this.list.push(item)
-              setTimeout(() => {
-                _this.loading = false
-              }, 500)
-            })
-          }
-          console.log(_this.list)
-          _this.noMore = true
-          _this.page += 1
+          this.activeIndex++
+          this.$apply()
+          this.$showToast('等待管理员审核！')
         },
         fail: ({code, data}) => {
         },
         complete: () => {
-          _this.loading = false
-          _this.init = true
           wx.hideLoading()
         }
       })
     }
 
+    delData() {
+      this.title = ''
+      this.industrieId = ''
+      this.region = []
+      this.startTime = ''
+      this.endTime = ''
+      this.content = ''
+      this.pics = []
+      this.linkman = ''
+      this.link_mobile = ''
+      this.type = ''
+      this.activeIndex = 1
+      this.$invoke('modal', 'showModal')
+      this.showIndustry = false
+      wx.setNavigationBarTitle({
+        title: '发布'
+      })
+      this.$apply()
+    }
     methods = {
-      bindDateChange(e) {
-        this.date = e.detail.value
+      detection() {
+        this.$invoke('uploadImage', 'chooseimage')
+      },
+      editInput(val, e) {
+        this[val] = e.detail.value
+        this.$apply()
+        console.log(this[val])
+      },
+      bindDateChangeStart(e) {
+        this.startTime = e.detail.value
+        this.$apply()
+      },
+      bindDateChangeEnd(e) {
+        this.endTime = e.detail.value
         this.$apply()
       },
       bindPickerChange(e) {
         this.showIndustry = true
         this.index = e.detail.value
+        this.industrieId = this.industries[e.detail.value].id
         this.$apply()
       },
       bindRegionChange(e) {
@@ -227,14 +250,61 @@
       selectType(type) {
         this.type = type
         this.$apply()
+        console.log(this.type,';;;')
         this.$invoke('modal', 'hideModal')
         let title = type == 'supply' ? '发布供应' : '发布需求'
         wx.setNavigationBarTitle({
           title: title
         })
       },
+      reset() {
+        this.delData()
+      },
       next() {
-        if(this.activeIndex == 3) return
+        let data = {
+          title: this.title,
+          industry_id: this.industrieId,
+          city: this.region[1],
+          start_time: this.startTime,
+          end_time: this.endTime,
+          content: this.content,
+          pics: this.pics,
+          linkman: this.linkman,
+          link_mobile: this.link_mobile,
+          type: this.type
+        }
+        console.log(this.type)
+        let dataV = {
+          title: this.title,
+          industry_id: this.industrieId,
+          city: this.region[2],
+          start_time: this.startTime,
+          end_time: this.endTime
+        }
+        if (this.activeIndex == 1) {
+          for (var key in dataV) {
+            if (data[key] === '') {
+              this.$showToast('请填写带*的信息')
+              return
+            }
+          }
+        } else {
+          for (var key in data) {
+            if (data[key] === '') {
+              this.$showToast('请填写带*的信息')
+              return
+            }
+          }
+        }
+        console.log(data)
+        if (this.activeIndex == 2) {
+          this.establish(data)
+          return
+        }
+        if (this.activeIndex == 3) {
+          this.delData()
+          return
+        }
         this.activeIndex++
         this.$apply()
         console.log(this.activeIndex)
@@ -248,6 +318,14 @@
         this.$apply()
         console.log(this.searchObj)
         this.getData()
+      },
+      'UpLoadImage': (value) => {
+        let vm = this
+        if (vm.pics.length < 10) {
+          vm.pics.push(value)
+        }
+        vm.$apply()
+        console.log(vm.pics)
       }
     }
   }
@@ -345,6 +423,8 @@
           image{
             width: 120rpx;
             height: 120rpx;
+            margin-right: 22rpx;
+            margin-top: 12rpx;
           }
         }
         .editContent-linkman{

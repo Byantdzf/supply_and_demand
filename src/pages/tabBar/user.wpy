@@ -11,12 +11,21 @@
           <open-data type="userAvatarUrl"></open-data>
         </block>
       </view>
-      <block wx:if="{{user.name}}">
-        <view class="user_name noBorder bold font_30 color-666">{{user.name}}</view>
+      <block wx:if="{{showName}}">
+        <view class="inline-block main-input">
+          <input type="text" class="bold font_30 color-666" value="{{user.name}}" @change="saveName"/>
+        </view>
       </block>
       <block wx:else>
-        <button class="btn user_name font_30 color-666" open-type="getUserInfo" @getuserinfo="getUserInfo">微信信息授权
-        </button>
+        <block wx:if="{{user.name}}">
+          <view class="user_name noBorder bold font_30 color-666">{{user.name}}</view>
+          <image src="https://images.ufutx.com/201908/13/d13547f19a8d9fd174454065f96c8696.png" mode="aspectFit"  class="editName" @tap="editName"></image>
+        </block>
+        <block wx:else>
+          <open-data type="userNickName"></open-data>
+          <!--<button class="btn user_name font_30 color-666" open-type="getUserInfo" @getuserinfo="getUserInfo">微信信息授权-->
+          <!--</button>-->
+        </block>
       </block>
       <view class="clearfloat"></view>
     </view>
@@ -64,7 +73,6 @@
       is_vip: false,
       init: false,
       nickName: '加载中...',
-      showName: false,
       photo: 'http://images.ufutx.com/201908/12/e94d1cbfb48e22962c4550ef9d974df9.jpeg',
       extraData: {},
       filePath: '',
@@ -94,6 +102,7 @@
           path: '/pages/users/collect'
         }
       ],
+      showName: false,
       listV2: [
         {
           icon: 'http://images.ufutx.com/201906/20/624fe30cc3c0634f7b2fccf045ee69db.png',
@@ -153,6 +162,27 @@
     }
 
     methods = {
+      editName() {
+        this.showName = true
+        this.$apply()
+      },
+      saveName(e) {
+        let vm = this
+        vm.$put({
+          url: `${service.host}/user`,
+          data: {
+            name: e.detail.value
+          }
+        }, {
+          success: ({code, data}) => {
+            console.log(e.detail.value)
+            vm.$showToast('修改成功！')
+            vm.user.name = e.detail.value
+            vm.showName = false
+            vm.$apply()
+          }
+        })
+      },
       detection() {
         this.$invoke('uploadImage', 'chooseimage')
       },
@@ -273,6 +303,21 @@
           top: 0;
           z-index: 1;
         }
+      }
+      .main-input{
+        border-bottom: 2rpx solid #8f8f8f;
+        width: 200rpx;
+        padding: 6rpx;
+        input{
+          width: 100%;
+          height: 100%;
+        }
+      }
+      .editName{
+        width: 42rpx;
+        height: 42rpx;
+        vertical-align: middle;
+        margin-bottom: 12rpx;
       }
       .user_name{
         background: #F8F8F8;

@@ -3,7 +3,7 @@
     <view class="card_box">
       <view class="bc_top"></view>
       <view class="font_32 bc_title bold">//////////   合作方式   //////////</view>
-      <image src="{{linkInfo.qrcode}}" mode="widthFix" class="qr" @tap="previewImage"></image>
+      <image src="{{linkInfo.qrcode}}" mode="widthFix" class="qr" @tap="previewImage({{linkInfo.qrcode}})"></image>
       <view style="height: 100rpx;"></view>
       <view class="text-center white font_30 main-box">
         <view @tap="PhoneCall({{linkInfo.mobile}})" class="main-item">
@@ -72,7 +72,7 @@
         this.$makePhoneCall(text)
       },
       previewImage(url) {
-        this.$previewImage('http://images.ufutx.com/201906/25/cfbebe80d83faca341bcad7a2267d983.jpeg')
+        this.$previewImage(url)
       }
     }
   }

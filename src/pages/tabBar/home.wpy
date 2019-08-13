@@ -12,7 +12,7 @@
         <!--<notification></notification>-->
         <view class="bc_swiper_box">
           <view class="bc_title">
-            <span class="font_30 bold color-666">推荐文章</span>
+            <span class="font_30 bold color-666">推荐</span>
             <span class="font_22 colorb0 flo_r" style="margin-top: 12rpx;" @tap="goto('/pages/article/list')">更多
             <image src="http://images.ufutx.com/201906/20/02b0c5873eb2f556ab43d655965644ed.png" mode="widthFix" class="right_icon"></image>
             </span>
@@ -41,7 +41,7 @@
           </view>
           <view class="clearfloat"></view>
           <view class=" _bc_title ">
-            <span class="font_30 bold color-666">为你精选</span>
+            <span class="font_30 bold color-666">精选</span>
           </view>
         </view>
         <navBarTop :tabs.sync="tabs" @tabClick="tabClick"></navBarTop>

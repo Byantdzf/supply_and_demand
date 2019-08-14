@@ -1,6 +1,7 @@
 <template>
   <view class="about text-center">
-    <view class="title font_32">//////     关于我们     //////</view>
+    <view class="title font_32 bold color-666">//////     关于我们     //////</view>
+    <view class="main-infor colorb0">猴资源平台通过汇集海量合作需求，聚合各企业人脉、资源力量以及各界人才，对信息进行智能分析、匹配、商机挖掘，从而促进同行上下产业链对接、跨界合作、异业合作、跨境合作等各类合作的精准、极速的达成，有效的帮企业或者个人提高市场拓展效率并降低成本。</view>
   </view>
 </template>
 <script>
@@ -28,6 +29,11 @@
       .title{
         margin-top: 32rpx;
       }
+    }
+    .main-infor{
+      padding: 32rpx;
+      text-align: left;
+      text-indent:2em;
     }
   }
 </style>

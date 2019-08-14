@@ -29,7 +29,7 @@
         <view class="bc_edit font_26">
           <view class="editTitle bold color-666">合作地区 <span class="red">*</span></view>
           <view class="editContent">
-            <picker mode="region" bindchange="bindRegionChange" value="{{region}}" >
+            <picker mode='region' bindchange="bindRegionChange" value="{{region}}" >
               <input type="text" placeholder="请选择合作地区" disabled value="{{region.length > 1 ?region[1]+' - '+region[2]: ''}}"/>
             </picker>
           </view>
@@ -37,10 +37,10 @@
         <view class="bc_edit font_26">
           <view class="editTitle bold color-666">有效时间 <span class="red">*</span></view>
           <view class="editContent">
-            <picker mode="date"value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChangeStart" >
+            <picker mode='date' value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChangeStart" >
               <input type="text" placeholder="请选择开始时间" disabled value="{{startTime !== '' ?'开始时间：'+startTime: ''}}" class="inline-block"/>
             </picker>
-            <picker mode="date"value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChangeEnd" >
+            <picker mode="date" value="{{date}}" start="2015-09-01" end="2100-01-01" bindchange="bindDateChangeEnd" >
               <input type="text" placeholder="请选择开始时间" disabled value="{{endTime !== '' ?'结束时间：'+endTime: ''}}" class="inline-block"/>
             </picker>
           </view>
@@ -92,11 +92,11 @@
     <modal>
       <view slot="wrapper" class="wrapper-up text-center">
         <view class="wrapper-item text-center inline-block" @tap="selectType('supply')">
-          <image src="http://images.ufutx.com/201908/13/9674e6b5f03efb2d121eebe768935b18.png" class="image" mode="widthFix"></image>
+          <image src="https://images.ufutx.com/201908/14/717b2be70c89b08375b7a8c85a365634.png" class="image" mode="widthFix"></image>
           <view class="font_28">发布供应</view>
         </view>
         <view class="wrapper-item text-center inline-block" @tap="selectType('demand')">
-          <image src="http://images.ufutx.com/201908/13/5b0334dace582a4f78a7c9bfbfe93cc6.png" class="image" mode="widthFix"></image>
+          <image src="https://images.ufutx.com/201908/14/48187f8ce952cb8715fdd120cd60a463.png" class="image" mode="widthFix"></image>
           <view class="font_28">发布需求</view>
         </view>
       </view>
@@ -250,7 +250,6 @@
       selectType(type) {
         this.type = type
         this.$apply()
-        console.log(this.type,';;;')
         this.$invoke('modal', 'hideModal')
         let title = type == 'supply' ? '发布供应' : '发布需求'
         wx.setNavigationBarTitle({
@@ -289,7 +288,7 @@
             }
           }
         } else {
-          for (var key in data) {
+          for (let key in data) {
             if (data[key] === '') {
               this.$showToast('请填写带*的信息')
               return

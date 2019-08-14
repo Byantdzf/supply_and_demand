@@ -188,7 +188,6 @@
       let that = this
       this.$get({url: `${service.host}/industries`}, {
         success: ({code, data}) => {
-          let result = data
           for (let item of data) {
             that.industries.push(item)
           }

@@ -2,13 +2,13 @@
   <view class="text-center">
     <view class="card_box">
       <view class="bc_top"></view>
-      <view class="font_32 bc_title bold">//////////   合作方式   //////////</view>
-      <image src="http://images.ufutx.com/201906/25/cfbebe80d83faca341bcad7a2267d983.jpeg" mode="widthFix" class="qr" @tap="previewImage"></image>
-      <view class="font_28 bc_info color-666">每月活动、每日活动发布</view>
-      <view class="font_28 bc_info color-666">广告发布</view>
+      <view class="font_32 bc_title bold">//////////   商务合作   //////////</view>
+      <image src="{{qrCode}}" mode="widthFix" class="qr" @tap="previewImage({{qrCode}})"></image>
+      <!--<view class="font_28 bc_info color-666">每月活动、每日活动发布</view>-->
+      <!--<view class="font_28 bc_info color-666">广告发布</view>-->
       <view style="height: 100rpx;"></view>
-      <view class="bc_bottom text-center white font_30" @tap="copyText('XXXXXXX12345')">
-        业务微信： XXXXXXX12345
+      <view class="bc_bottom text-center white font_30" @tap="copyText('navypower')">
+        业务微信： navypower
         <image src="http://images.ufutx.com/201906/20/7b09aae087268629cf0605fe38ab84e8.png" mode="widthFix" class="copy_icon"></image>
       </view>
     </view>
@@ -26,13 +26,15 @@
     }
     components = {
     }
-    data = {}
+    data = {
+      qrCode: 'https://images.ufutx.com/201908/14/b6c31d01d41c9e1714958f9c56d01d8f.png'
+    }
     methods = {
       copyText(text) {
         this.$copyText(text)
       },
       previewImage(url) {
-        this.$previewImage('http://images.ufutx.com/201906/25/cfbebe80d83faca341bcad7a2267d983.jpeg')
+        this.$previewImage(url)
       }
     }
 

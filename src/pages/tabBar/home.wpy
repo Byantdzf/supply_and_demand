@@ -32,11 +32,11 @@
         </view>
         <view class="bc_center">
           <view class="mon flo_l font_30 text-center" @tap="goto('/pages/tabBar/supply')">
-            <image src="http://images.ufutx.com/201908/13/9674e6b5f03efb2d121eebe768935b18.png" class="image" mode="widthFix"></image>
+            <image src="https://images.ufutx.com/201908/14/717b2be70c89b08375b7a8c85a365634.png" class="image" mode="widthFix"></image>
             供应
           </view>
           <view class="day flo_r font_30 text-center" @tap="goto('/pages/tabBar/demand')">
-            <image src="http://images.ufutx.com/201908/13/5b0334dace582a4f78a7c9bfbfe93cc6.png" class="image" mode="widthFix"></image>
+            <image src="https://images.ufutx.com/201908/14/48187f8ce952cb8715fdd120cd60a463.png" class="image" mode="widthFix"></image>
             需求
           </view>
           <view class="clearfloat"></view>
@@ -309,7 +309,6 @@
           this.$apply()
           this.getData()
         }
-
       }
     }
   }

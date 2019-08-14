@@ -82,7 +82,7 @@
         //     this.$goto(item.path)
         //   }
         // } else {
-          this.gotoApp(item.path)
+        this.gotoApp(item.path)
         // }
       },
       gotofriends (item) {

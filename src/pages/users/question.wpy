@@ -1,7 +1,7 @@
 <template>
       <view class="question" wx:for="{{list}}" wx:key="index">
         <view class="bc_title font_32">{{item.title}}</view>
-        <view class="bc_info font_28">{{item.info}}</view>
+        <view class="bc_info font_28" wx:for="{{item.info}}" wx:for-index="idx" wx:for-item="itemName">{{itemName}}</view>
       </view>
       <button class="btn text-center contact" open-type="contact">
         <view class="font_32 white">意见反馈</view>
@@ -18,8 +18,11 @@
     components = {}
     data = {
       list: [
-        {title: '关于每月活动', info: '短期活动，一般当月或者次每月算，派单，充场，拉访，补课教师等'},
-        {title: '关于每日活动', info: '短期活动，一般当天或者次天结算，派单，充场，拉访，补课教师等'}
+        {title: '信息发布规范：', info: ['1、禁止在内容详情中留公众号、二维码等。', '2、严禁低俗、色情、敏感、虚假、负面内容；']},
+        {title: '如何发布信息？', info: ['点击发布按钮，根据提示完善信息，最后点击确认发布。']},
+        {title: '为什么我发布的信息没有显示？', info: ['为了确定信息的合法性，您发布的信息需要经过后台的工作人员审核。']},
+        {title: '工作人员审核信息需要多久？', info: ['24小时内。']},
+        {title: '在平台发布信息是否需要缴纳费用？', info: ['不需要缴纳费用。']}
       ]
     }
     methods = {}

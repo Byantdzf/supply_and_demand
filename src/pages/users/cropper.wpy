@@ -75,7 +75,7 @@
           this.src = JSON.parse(res.data).data
           this.$apply()
           console.log(this.src)
-          debugger
+          // debugger
         },
         fail: (res) => {
         },

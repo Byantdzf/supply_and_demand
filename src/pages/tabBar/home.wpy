@@ -293,6 +293,7 @@
       'search': (value) => { // 搜索返回值
         this.page = 1
         this.inputVal = value.inputVal
+        this.list = []
         this.$apply()
         this.getData()
       },
